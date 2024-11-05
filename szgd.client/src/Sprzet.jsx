@@ -107,7 +107,7 @@ const Sprzet = () => {
             onClick: (row) => handleEditOpen(row),
         },
         {
-            title: 'Usuñ',
+            title: 'Usuï¿½',
             icon: <DeleteIcon />,
             onClick: (row) => handleDelete(row.id),
         },
@@ -148,7 +148,7 @@ const Sprzet = () => {
         setCurrentResource(null); // Reset current resource
     };
 
-    const description = "Zarzqdzanie sprzetem";
+    const description = "ZarzÄ…dzanie sprzetem";
 
     return (
         <Box sx={{ width: '1000px' }}>
@@ -160,7 +160,7 @@ const Sprzet = () => {
             />
             {/* Edit Resource Modal */}
             <Dialog open={editOpen} onClose={() => setEditOpen(false)}>
-                <DialogTitle>Edytuj Zasób</DialogTitle>
+                <DialogTitle>Edytuj Zasï¿½b</DialogTitle>
                 <DialogContent>
                     {dialogData.map((data, index) => {
                         if (data.name === 'status') {

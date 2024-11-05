@@ -1,44 +1,61 @@
 import React, { useState } from 'react';
-import { Button, Stack, List, ListItem, Typography, IconButton } from '@mui/material';
+import { Button, Stack, List, ListItem, Typography, IconButton, TextField, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setGospodarstwo } from './features/resourceSlice.jsx';
-import axios from 'axios';
+
+// Lista użytkowników na sztywno
+const users = [
+    {
+        id: "61d0c250-5678-456f-91f1-d0a0f2f4f4ca",
+        userName: "Dsahu2.mak@gmail.com",
+    },
+    {
+        id: "c0a39e3a-be76-49b4-a047-1c96e34b18b2",
+        userName: "Dsahu3.mak@gmail.com",
+    },
+    {
+        id: "3180b27d-defa-4f12-992f-a1e987fac9e0",
+        userName: "Dsahu5.mak@gmail.com",
+    }
+];
 
 function MyButtons() {
     const [gospodarstwa, setGospodarstwa] = useState([]);
+    const [openModal, setOpenModal] = useState(false); // Kontroluje otwarcie modalnego okna
+    const [newGospodarstwo, setNewGospodarstwo] = useState(''); // Nazwa gospodarstwa
+    const [selectedUsers, setSelectedUsers] = useState([]); // Wybrani członkowie (wielokrotny wybór)
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     // Pobierz wybrane gospodarstwo z reduxowego stanu
     const selectedGospodarstwo = useSelector((state) => state.resource.gospodarstwo);
 
-    const handleCreateClick = async () => {
-        const newGospodarstwo = `Gospodarstwo ${gospodarstwa.length + 1}`;
-
-        try {
-            // Wysłanie żądania POST na serwer z nowym gospodarstwem
-            const response = await axios.post('https://localhost:44311/gospodarstwo', {
-                name: newGospodarstwo,
-            });
-
-            if (response.status === 201) {
-                // Dodaj gospodarstwo do lokalnego stanu, jeśli odpowiedź jest pozytywna
-                setGospodarstwa((prevGospodarstwa) => [
-                    ...prevGospodarstwa,
-                    response.data.name, // Zakładamy, że serwer zwraca nazwę w response.data.name
-                ]);
-                console.log('Gospodarstwo utworzone:', response.data);
-            }
-        } catch (error) {
-            console.error('Błąd podczas tworzenia gospodarstwa:', error);
-            // Obsługa błędu – np. wyświetlenie użytkownikowi komunikatu o błędzie
-        }
+    const handleOpenModal = () => setOpenModal(true); // Otwiera modalne okno
+    const handleCloseModal = () => {
+        setOpenModal(false); // Zamyka modalne okno
+        setNewGospodarstwo(''); // Resetuje nazwę gospodarstwa
+        setSelectedUsers([]); // Resetuje listę wybranych użytkowników
     };
 
-    const handleJoinClick = () => {
-        console.log("Dołącz clicked");
+    const handleCreateGospodarstwo = () => {
+        // Sprawdź, czy nazwa gospodarstwa i członkowie zostali wybrani
+        if (newGospodarstwo && selectedUsers.length > 0) {
+            // Dodaj gospodarstwo do lokalnego stanu
+            setGospodarstwa((prevGospodarstwa) => [
+                ...prevGospodarstwa,
+                { name: newGospodarstwo, members: selectedUsers }
+            ]);
+
+            console.log('Gospodarstwo utworzone:', newGospodarstwo, 'z członkami:', selectedUsers);
+
+            // Zamyka modalne okno po utworzeniu gospodarstwa
+            handleCloseModal();
+        } else {
+            console.log('Proszę podać nazwę gospodarstwa i wybrać członków.');
+        }
     };
 
     const handleDeleteClick = (indexToDelete) => {
@@ -48,16 +65,16 @@ function MyButtons() {
     };
 
     const handleGospodarstwoClick = (gospodarstwo) => {
-        dispatch(setGospodarstwo(gospodarstwo)); // Zapisz gospodarstwo do slice
+        dispatch(setGospodarstwo(gospodarstwo.name)); // Zapisz gospodarstwo do slice
     };
 
     return (
         <div>
             <Stack direction="row" spacing={2}>
-                <Button variant="contained" color="primary" onClick={handleCreateClick}>
-                    Utwórz
+                <Button variant="contained" color="primary" onClick={handleOpenModal}>
+                    Utwórz Gospodarstwo
                 </Button>
-                <Button variant="outlined" color="secondary" onClick={handleJoinClick}>
+                <Button variant="outlined" color="secondary">
                     Dołącz
                 </Button>
             </Stack>
@@ -80,7 +97,7 @@ function MyButtons() {
                             onClick={() => handleGospodarstwoClick(gospodarstwo)}
                             style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}
                         >
-                            {gospodarstwo}
+                            {gospodarstwo.name} - {gospodarstwo.members.join(', ')}
                         </Typography>
                     </ListItem>
                 ))}
@@ -92,6 +109,47 @@ function MyButtons() {
                     Wybrane gospodarstwo: {selectedGospodarstwo}
                 </Typography>
             )}
+
+            {/* Modalne okno do tworzenia gospodarstwa */}
+            <Dialog open={openModal} onClose={handleCloseModal}>
+                <DialogTitle>Utwórz Gospodarstwo</DialogTitle>
+                <DialogContent>
+                    {/* Pole tekstowe dla nazwy gospodarstwa */}
+                    <TextField
+                        label="Nazwa Gospodarstwa"
+                        value={newGospodarstwo}
+                        onChange={(e) => setNewGospodarstwo(e.target.value)}
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                    />
+
+                    {/* Lista rozwijana z wielokrotnym wyborem do wyboru członków */}
+                    <Select
+                        label="Wybierz członków"
+                        multiple
+                        value={selectedUsers}
+                        onChange={(e) => setSelectedUsers(e.target.value)}
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                    >
+                        {users.map((user) => (
+                            <MenuItem key={user.id} value={user.userName}>
+                                {user.userName}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseModal} color="secondary">
+                        Anuluj
+                    </Button>
+                    <Button onClick={handleCreateGospodarstwo} color="primary">
+                        Utwórz
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 }
