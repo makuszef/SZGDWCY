@@ -71,7 +71,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, Box, Typography, Snackbar, Alert } from '@mui/material';
 import axios from "axios";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate for redirect
 
 const RegisterPage = () => {
     const [email, setEmail] = useState('');
@@ -79,6 +79,7 @@ const RegisterPage = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState(false);
+    const navigate = useNavigate(); // Initialize useNavigate
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -99,9 +100,15 @@ const RegisterPage = () => {
             setPassword('');
             setConfirmPassword('');
 
+            // Automatically redirect to login page after successful registration
+            setTimeout(() => {
+                navigate('/login'); // Redirect to the login page
+            }, 2000); // Redirect after 2 seconds
+
         } catch (error) {
             console.error('Registration error:', error.response ? error.response.data : error.message);
             setSuccessMessage('Registration failed. Please try again.'); // Set error message
+            setOpenSnackbar(true); // Open Snackbar on error
         }
     };
 
@@ -142,7 +149,7 @@ const RegisterPage = () => {
                 </Button>
             </form>
 
-            {/* Snackbar for success message with link to login page */}
+            {/* Snackbar for success message */}
             <Snackbar
                 open={openSnackbar}
                 autoHideDuration={6000}
@@ -150,14 +157,11 @@ const RegisterPage = () => {
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }} // This moves the Snackbar to the top
             >
                 <Alert
-                    severity="success"
+                    severity={successMessage.includes('failed') ? "error" : "success"} // Set severity based on message
                     onClose={handleSnackbarClose}
                     sx={{ width: '100%' }}
                 >
                     {successMessage}
-                    <Link to="/login" style={{ color: 'black', textDecoration: 'underline', marginLeft: '10px' }}>
-                        Go to Login
-                    </Link>
                 </Alert>
             </Snackbar>
         </Box>
