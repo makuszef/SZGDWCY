@@ -20,4 +20,8 @@
         <Using Include="Xunit"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\SZGD.Server\SZGD.Server.csproj" />
+    </ItemGroup>
+
 </Project>
