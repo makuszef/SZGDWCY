@@ -6,5 +6,5 @@ public class Gospodarstwo
     public int Id { get; set; }
     public string nazwa { get; set; }
     public List<Domownik> Czlonkowie { get; set; }
-    public int KodDostepu { get; set; }
+    public string KodDostepu { get; set; }
 }
