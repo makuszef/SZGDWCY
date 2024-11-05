@@ -1,0 +1,36 @@
+{
+  "welcome": "Witamy w mojej aplikacji!",
+  "instructions": "Proszę używać poprawnych liter.",
+  "login": {
+    "title": "Zaloguj się",
+    "username": "Nazwa użytkownika",
+    "password": "Hasło",
+    "submit": "Zaloguj się",
+    "forgot_password": "Zapomniałeś hasła?"
+  },
+  "register": {
+    "title": "Zarejestruj się",
+    "username": "Nazwa użytkownika",
+    "email": "Email",
+    "password": "Hasło",
+    "submit": "Zarejestruj się"
+  },
+  "profile": {
+    "title": "Profil",
+    "edit": "Edytuj profil",
+    "logout": "Wyloguj się"
+  },
+  "dashboard": {
+    "title": "Panel",
+    "welcome_message": "Witaj, {{name}}! Jak mogę ci dzisiaj pomóc?"
+  },
+  "errors": {
+    "not_found": "Strona nie została znaleziona.",
+    "server_error": "Wystąpił błąd serwera. Spróbuj ponownie później."
+  },
+  "footer": {
+    "contact": "Kontakt",
+    "privacy_policy": "Polityka prywatności",
+    "terms_of_service": "Warunki korzystania z usługi"
+  }
+}
