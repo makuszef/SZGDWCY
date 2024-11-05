@@ -37,14 +37,14 @@ const Domownicy = () => {
         {
             id: 3,
             imie: 'Tomasz',
-            nazwisko: 'Wiœniewski',
+            nazwisko: 'Wisniewski',
             email: 'tomasz.w@example.com',
             telefon: '666777888',
         },
         {
             id: 4,
             imie: 'Kasia',
-            nazwisko: 'Wójcik',
+            nazwisko: 'Wï¿½jcik',
             email: 'kasia.w@example.com',
             telefon: '777888999',
         },
@@ -55,7 +55,7 @@ const Domownicy = () => {
 
     const columns = [
         { field: 'id', headerName: 'ID', width: 70 },
-        { field: 'imie', headerName: 'Imiê', width: 130 },
+        { field: 'imie', headerName: 'Imiï¿½', width: 130 },
         { field: 'nazwisko', headerName: 'Nazwisko', width: 130 },
         { field: 'email', headerName: 'Email', width: 200 },
         { field: 'telefon', headerName: 'Telefon', width: 150 },
@@ -95,7 +95,7 @@ const Domownicy = () => {
             onClick: (row) => handleEditOpen(row),
         },
         {
-            title: 'Usuñ',
+            title: 'Usuï¿½',
             icon: <DeleteIcon />,
             onClick: (row) => handleDelete(row.id),
         },
@@ -107,7 +107,7 @@ const Domownicy = () => {
     useEffect(() => {
         if (currentDomownik) {
             setDialogData([
-                { label: 'Imiê', value: currentDomownik.imie, name: 'imie' },
+                { label: 'Imiï¿½', value: currentDomownik.imie, name: 'imie' },
                 { label: 'Nazwisko', value: currentDomownik.nazwisko, name: 'nazwisko' },
                 { label: 'Email', value: currentDomownik.email, name: 'email' },
                 { label: 'Telefon', value: currentDomownik.telefon, name: 'telefon' },
@@ -136,7 +136,7 @@ const Domownicy = () => {
         setCurrentDomownik(null); // Reset current domownik
     };
 
-    const description = "Zarz¹dzanie domownikami";
+    const description = "Zarzï¿½dzanie domownikami";
 
     return (
         <Box sx={{ width: '1000px' }}>
