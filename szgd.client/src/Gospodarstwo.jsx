@@ -1,155 +1,145 @@
-import React, { useState } from 'react';
-import { Button, Stack, List, ListItem, Typography, IconButton, TextField, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Button, Stack, List, ListItem, Typography, IconButton, Modal, TextField, MenuItem, Select, Checkbox, ListItemText } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setGospodarstwo } from './features/resourceSlice.jsx';
-
-// Lista użytkowników na sztywno
-const users = [
-    {
-        id: "61d0c250-5678-456f-91f1-d0a0f2f4f4ca",
-        userName: "Dsahu2.mak@gmail.com",
-    },
-    {
-        id: "c0a39e3a-be76-49b4-a047-1c96e34b18b2",
-        userName: "Dsahu3.mak@gmail.com",
-    },
-    {
-        id: "3180b27d-defa-4f12-992f-a1e987fac9e0",
-        userName: "Dsahu5.mak@gmail.com",
-    }
-];
+import axios from 'axios';
 
 function MyButtons() {
     const [gospodarstwa, setGospodarstwa] = useState([]);
-    const [openModal, setOpenModal] = useState(false); // Kontroluje otwarcie modalnego okna
-    const [newGospodarstwo, setNewGospodarstwo] = useState(''); // Nazwa gospodarstwa
-    const [selectedUsers, setSelectedUsers] = useState([]); // Wybrani członkowie (wielokrotny wybór)
-
+    const [users, setUsers] = useState([]);
+    const [isModalOpen, setModalOpen] = useState(false);
+    const [newGospodarstwoName, setNewGospodarstwoName] = useState('');
+    const [selectedUsers, setSelectedUsers] = useState([]);
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
-    // Pobierz wybrane gospodarstwo z reduxowego stanu
     const selectedGospodarstwo = useSelector((state) => state.resource.gospodarstwo);
 
-    const handleOpenModal = () => setOpenModal(true); // Otwiera modalne okno
-    const handleCloseModal = () => {
-        setOpenModal(false); // Zamyka modalne okno
-        setNewGospodarstwo(''); // Resetuje nazwę gospodarstwa
-        setSelectedUsers([]); // Resetuje listę wybranych użytkowników
+    // Pobranie listy użytkowników z API przy montowaniu komponentu
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const response = await axios.get('https://localhost:7191/api/Users/All');
+                console.log("Odpowiedź z API /Users/All:", response.data); // Logujemy odpowiedź dla debugowania
+                setUsers(response.data);
+            } catch (error) {
+                console.error("Błąd podczas pobierania użytkowników:", error);
+            }
+        };
+        fetchUsers();
+    }, []);
+
+    // Obsługa otwarcia modala
+    const handleOpenModal = () => {
+        setModalOpen(true);
     };
 
-    const handleCreateGospodarstwo = () => {
-        // Sprawdź, czy nazwa gospodarstwa i członkowie zostali wybrani
-        if (newGospodarstwo && selectedUsers.length > 0) {
-            // Dodaj gospodarstwo do lokalnego stanu
-            setGospodarstwa((prevGospodarstwa) => [
-                ...prevGospodarstwa,
-                { name: newGospodarstwo, members: selectedUsers }
-            ]);
+    // Obsługa zamknięcia modala
+    const handleCloseModal = () => {
+        setModalOpen(false);
+        setNewGospodarstwoName('');
+        setSelectedUsers([]);
+    };
 
-            console.log('Gospodarstwo utworzone:', newGospodarstwo, 'z członkami:', selectedUsers);
+    // Obsługa utworzenia gospodarstwa
+    const handleCreateGospodarstwo = async () => {
+        const newGospodarstwo = {
+            idGospodarstwa: 0,
+            nazwa: newGospodarstwoName,
+            czlonkowie: selectedUsers.map((userId) => {
+                const user = users.find((u) => u.id === userId);
+                return {
+                    id_domownika: user.id,
+                    imie: user.userName.split('@')[0], // Placeholder imienia
+                    nazwisko: "Test", // Placeholder nazwiska
+                    email: user.email,
+                    telefon: "000-000-000", // Placeholder telefonu
+                    nazwa_uzytkownika: user.userName,
+                };
+            }),
+        };
 
-            // Zamyka modalne okno po utworzeniu gospodarstwa
-            handleCloseModal();
-        } else {
-            console.log('Proszę podać nazwę gospodarstwa i wybrać członków.');
+        try {
+            const response = await axios.post('https://localhost:7191/api/Gospodarstwo', newGospodarstwo);
+            if (response.status === 201) {
+                setGospodarstwa((prevGospodarstwa) => [...prevGospodarstwa, response.data]);
+                console.log('Gospodarstwo utworzone:', response.data);
+                handleCloseModal();
+            }
+        } catch (error) {
+            console.error('Błąd podczas tworzenia gospodarstwa:', error);
         }
     };
 
-    const handleDeleteClick = (indexToDelete) => {
-        setGospodarstwa((prevGospodarstwa) =>
-            prevGospodarstwa.filter((_, index) => index !== indexToDelete)
-        );
-    };
-
-    const handleGospodarstwoClick = (gospodarstwo) => {
-        dispatch(setGospodarstwo(gospodarstwo.name)); // Zapisz gospodarstwo do slice
+    // Obsługa wyboru członków z dropdown
+    const handleUserSelection = (event) => {
+        setSelectedUsers(event.target.value);
     };
 
     return (
         <div>
             <Stack direction="row" spacing={2}>
                 <Button variant="contained" color="primary" onClick={handleOpenModal}>
-                    Utwórz Gospodarstwo
-                </Button>
-                <Button variant="outlined" color="secondary">
-                    Dołącz
+                    Utwórz gospodarstwo
                 </Button>
             </Stack>
+
+            <Modal open={isModalOpen} onClose={handleCloseModal}>
+                <div style={{ backgroundColor: 'white', padding: 20, margin: '100px auto', width: 400, outline: 'none' }}>
+                    <Typography variant="h6">Utwórz nowe gospodarstwo</Typography>
+                    <TextField
+                        label="Nazwa gospodarstwa"
+                        value={newGospodarstwoName}
+                        onChange={(e) => setNewGospodarstwoName(e.target.value)}
+                        fullWidth
+                        margin="normal"
+                    />
+                    <Typography variant="body1">Wybierz członków:</Typography>
+                    <Select
+                        multiple
+                        value={selectedUsers}
+                        onChange={handleUserSelection}
+                        renderValue={(selected) => selected.map((id) => users.find((u) => u.id === id)?.userName).join(', ')}
+                        fullWidth
+                    >
+                        {users.length > 0 ? (
+                            users.map((user) => (
+                                <MenuItem key={user.id} value={user.id}>
+                                    <Checkbox checked={selectedUsers.indexOf(user.id) > -1} />
+                                    <ListItemText primary={user.userName} />
+                                </MenuItem>
+                            ))
+                        ) : (
+                            <MenuItem disabled>Brak dostępnych użytkowników</MenuItem>
+                        )}
+                    </Select>
+                    <Button variant="contained" color="primary" onClick={handleCreateGospodarstwo} style={{ marginTop: 20 }}>
+                        Dodaj
+                    </Button>
+                </div>
+            </Modal>
 
             <Typography variant="h6" style={{ marginTop: 20 }}>
                 Lista Gospodarstw:
             </Typography>
-
             <List>
                 {gospodarstwa.map((gospodarstwo, index) => (
-                    <ListItem
-                        key={index}
-                        secondaryAction={
-                            <IconButton edge="end" onClick={() => handleDeleteClick(index)}>
-                                <DeleteIcon />
-                            </IconButton>
-                        }
-                    >
+                    <ListItem key={index}>
                         <Typography
-                            onClick={() => handleGospodarstwoClick(gospodarstwo)}
+                            onClick={() => dispatch(setGospodarstwo(gospodarstwo.nazwa))}
                             style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}
                         >
-                            {gospodarstwo.name} - {gospodarstwo.members.join(', ')}
+                            {gospodarstwo.nazwa}
                         </Typography>
                     </ListItem>
                 ))}
             </List>
 
-            {/* Wyświetl wybrane gospodarstwo, jeśli istnieje */}
             {selectedGospodarstwo && (
                 <Typography variant="h2" style={{ marginTop: 20 }}>
                     Wybrane gospodarstwo: {selectedGospodarstwo}
                 </Typography>
             )}
-
-            {/* Modalne okno do tworzenia gospodarstwa */}
-            <Dialog open={openModal} onClose={handleCloseModal}>
-                <DialogTitle>Utwórz Gospodarstwo</DialogTitle>
-                <DialogContent>
-                    {/* Pole tekstowe dla nazwy gospodarstwa */}
-                    <TextField
-                        label="Nazwa Gospodarstwa"
-                        value={newGospodarstwo}
-                        onChange={(e) => setNewGospodarstwo(e.target.value)}
-                        variant="outlined"
-                        fullWidth
-                        margin="normal"
-                    />
-
-                    {/* Lista rozwijana z wielokrotnym wyborem do wyboru członków */}
-                    <Select
-                        label="Wybierz członków"
-                        multiple
-                        value={selectedUsers}
-                        onChange={(e) => setSelectedUsers(e.target.value)}
-                        variant="outlined"
-                        fullWidth
-                        margin="normal"
-                    >
-                        {users.map((user) => (
-                            <MenuItem key={user.id} value={user.userName}>
-                                {user.userName}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseModal} color="secondary">
-                        Anuluj
-                    </Button>
-                    <Button onClick={handleCreateGospodarstwo} color="primary">
-                        Utwórz
-                    </Button>
-                </DialogActions>
-            </Dialog>
         </div>
     );
 }
