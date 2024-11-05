@@ -44,7 +44,7 @@ const Domownicy = () => {
         {
             id: 4,
             imie: 'Kasia',
-            nazwisko: 'W�jcik',
+            nazwisko: 'Wojcik',
             email: 'kasia.w@example.com',
             telefon: '777888999',
         },
@@ -55,7 +55,7 @@ const Domownicy = () => {
 
     const columns = [
         { field: 'id', headerName: 'ID', width: 70 },
-        { field: 'imie', headerName: 'Imi�', width: 130 },
+        { field: 'imie', headerName: 'Imie', width: 130 },
         { field: 'nazwisko', headerName: 'Nazwisko', width: 130 },
         { field: 'email', headerName: 'Email', width: 200 },
         { field: 'telefon', headerName: 'Telefon', width: 150 },
@@ -95,7 +95,7 @@ const Domownicy = () => {
             onClick: (row) => handleEditOpen(row),
         },
         {
-            title: 'Usu�',
+            title: 'Usuń',
             icon: <DeleteIcon />,
             onClick: (row) => handleDelete(row.id),
         },
@@ -107,7 +107,7 @@ const Domownicy = () => {
     useEffect(() => {
         if (currentDomownik) {
             setDialogData([
-                { label: 'Imi�', value: currentDomownik.imie, name: 'imie' },
+                { label: 'Imie', value: currentDomownik.imie, name: 'imie' },
                 { label: 'Nazwisko', value: currentDomownik.nazwisko, name: 'nazwisko' },
                 { label: 'Email', value: currentDomownik.email, name: 'email' },
                 { label: 'Telefon', value: currentDomownik.telefon, name: 'telefon' },
@@ -136,7 +136,7 @@ const Domownicy = () => {
         setCurrentDomownik(null); // Reset current domownik
     };
 
-    const description = "Zarz�dzanie domownikami";
+    const description = "Zarzadzanie domownikami";
 
     return (
         <Box sx={{ width: '1000px' }}>

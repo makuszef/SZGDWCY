@@ -33,7 +33,7 @@ function TableTemplate({ passedResources, description, columns, rowActions }) {
                 onClick={() => navigate('/create-resource')}
                 style={{ marginBottom: 16 }}
             >
-                Dodaj sprzet
+                Dodaj
             </Button>
             <Button
                 variant="contained"
