@@ -26,7 +26,7 @@ namespace SZGD.Server.Controllers
             var domownik = _domownicy.FirstOrDefault(d => d.id_domownika == id);
             if (domownik == null)
             {
-                return NotFound(new { message = "Domownik not found" });
+                return NotFound(new ErrorResponse { Message = "Domownik not found" });
             }
             return Ok(domownik);
         }
@@ -48,7 +48,7 @@ namespace SZGD.Server.Controllers
             var domownik = _domownicy.FirstOrDefault(d => d.id_domownika == id);
             if (domownik == null)
             {
-                return NotFound(new { message = "Domownik not found" });
+                return NotFound(new ErrorResponse { Message = "Domownik not found" });
             }
 
             // Aktualizacja właściwości domownika
@@ -58,7 +58,7 @@ namespace SZGD.Server.Controllers
             domownik.Telefon = updateDomownik.Telefon;
             domownik.Nazwa_uzytkownika = updateDomownik.Nazwa_uzytkownika;
 
-            return Ok(new { message = "Domownik updated successfully" });
+            return Ok(new SuccessResponse { Message = "Domownik updated successfully" });
         }
 
         // DELETE: api/Domownik/{id}
