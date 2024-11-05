@@ -3,8 +3,7 @@ namespace SZGD.Server.Models;
 public class Gospodarstwo
 {
     // Właściwości klasy Domownik
-    public int Id { get; set; }
+    public int idGospodarstwa { get; set; }
     public string nazwa { get; set; }
-    public List<Domownik> Czlonkowie { get; set; }
-    public string KodDostepu { get; set; }
+    public List<Domownik> czlonkowie { get; set; }
 }
