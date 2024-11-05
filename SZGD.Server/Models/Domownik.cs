@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace SZGD.Server.Models
 {
-    public class Domownik : IdentityUser
+    public class Domownik
     {
         // Właściwości klasy Domownik
         [Key]

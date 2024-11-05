@@ -1,129 +1,77 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SZGD.Server.Data;
 using SZGD.Server.Models;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace SZGD.Server.Controllers;
-
-[Route("api/[controller]")]
-public class DomownikController : ControllerBase
+namespace SZGD.Server.Controllers
 {
-    private readonly ApplicationDbContext _context;
-
-    public DomownikController(ApplicationDbContext context)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class DomownikController : ControllerBase
     {
-        _context = context;
-    }
+        // Lista przechowująca domowników w pamięci
+        private static List<Domownik> _domownicy = new List<Domownik>();
 
-    // GET: api/Domownicy
-    [HttpGet]
-    public ActionResult<IEnumerable<Domownik>> GetDomownicy()
-    {
-        try
+        // GET: api/Domownik
+        [HttpGet]
+        public ActionResult<IEnumerable<Domownik>> GetDomownicy()
         {
-            var domownicy = _context.Domownicy.ToList();
-            return Ok(domownicy); // Return 200 OK with the list of Domownicy
+            return Ok(_domownicy);
         }
-        catch (DbUpdateException dbEx)
-        {
-            // Log the error details (dbEx) here if necessary
-            return StatusCode(500, "Database operation failed. Please try again later.");
-        }
-        catch (Exception ex)
-        {
-            // Log the error details (ex) here if necessary
-            return StatusCode(500, "An unexpected error occurred. Please try again later.");
-        }
-    }
 
-    // GET: api/Domownicy/5
-    [HttpGet("{id}")]
-    public ActionResult<Domownik> GetDomownik(int id)
-    {
-        try
+        // GET: api/Domownik/{id}
+        [HttpGet("{id}")]
+        public ActionResult<Domownik> GetDomownik(int id)
         {
-            var domownik = _context.Domownicy.Find(id);
-
+            var domownik = _domownicy.FirstOrDefault(d => d.id_domownika == id);
             if (domownik == null)
             {
-                return NotFound(); // Return 404 Not Found if not found
+                return NotFound(new { message = "Domownik not found" });
             }
+            return Ok(domownik);
+        }
 
-            return Ok(domownik); // Return 200 OK with the found Domownik
-        }
-        catch (DbUpdateException dbEx)
+        // POST: api/Domownik
+        [HttpPost]
+        public ActionResult<Domownik> CreateDomownik([FromBody] Domownik newDomownik)
         {
-            // Log the error details (dbEx) here if necessary
-            return StatusCode(500, "Database operation failed. Please try again later.");
+            // Ustawienie unikalnego ID dla nowego domownika
+            newDomownik.id_domownika = _domownicy.Any() ? _domownicy.Max(d => d.id_domownika) + 1 : 1;
+            _domownicy.Add(newDomownik);
+            return CreatedAtAction(nameof(GetDomownik), new { id = newDomownik.id_domownika }, newDomownik);
         }
-        catch (Exception ex)
-        {
-            // Log the error details (ex) here if necessary
-            Console.WriteLine(ex.Message);
-            return StatusCode(500, "An unexpected error occurred. Please try again later." + ex.Message);
-        }
-    }
-    [HttpGet("top5")]
-    public async Task<ActionResult<IEnumerable<Domownik>>> GetTop5Domownicy()
-    {
-        try
-        {
-            var query = "SELECT TOP 5 Id, Imie FROM Domownicy ORDER BY Id";
-            var top5Domownicy = await _context.Domownicy
-                .FromSqlRaw(query)
-                .Select(d => new DomownikDto
-                {
-                    Id = d.id_domownika,
-                    Imie = d.Imie
-                })
-                .ToListAsync();
 
-            return Ok(top5Domownicy);
-        }
-        catch (Exception ex)
+        // PUT: api/Domownik/{id}
+        [HttpPut("{id}")]
+        public ActionResult UpdateDomownik(int id, [FromBody] Domownik updateDomownik)
         {
-            // Log the exception (you can use a logging framework)
-            // For now, just returning a bad request
-            return BadRequest(new { message = ex.Message });
-        }
-    }
-    // PUT: api/Domownik/5
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateDomownik(int id, [FromBody] Domownik updateDto)
-    {
-        try
-        {
-            // Znajdź domownika po Id
-            var domownik = await _context.Domownicy.FindAsync(id);
-        
+            var domownik = _domownicy.FirstOrDefault(d => d.id_domownika == id);
             if (domownik == null)
             {
-                return NotFound(new { message = "Domownik not found" }); // Zwróć 404 jeśli nie znaleziono
+                return NotFound(new { message = "Domownik not found" });
             }
 
-            // Zaktualizuj pola nazwy i e-maila
-            domownik.Imie = updateDto.Imie;
-            domownik.Email = updateDto.Email;
-            // Zapisz zmiany w bazie danych
-            await _context.SaveChangesAsync();
+            // Aktualizacja właściwości domownika
+            domownik.Imie = updateDomownik.Imie;
+            domownik.Nazwisko = updateDomownik.Nazwisko;
+            domownik.Email = updateDomownik.Email;
+            domownik.Telefon = updateDomownik.Telefon;
+            domownik.Nazwa_uzytkownika = updateDomownik.Nazwa_uzytkownika;
 
-            return Ok(new { message = "Domownik updated successfully" }); // Zwróć 200 OK z potwierdzeniem
+            return Ok(new { message = "Domownik updated successfully" });
         }
-        catch (DbUpdateException dbEx)
+
+        // DELETE: api/Domownik/{id}
+        [HttpDelete("{id}")]
+        public ActionResult DeleteDomownik(int id)
         {
-            // Obsłuż błąd aktualizacji w bazie danych
-            return StatusCode(500, "Database operation failed. Please try again later.");
+            var domownik = _domownicy.FirstOrDefault(d => d.id_domownika == id);
+            if (domownik == null)
+            {
+                return NotFound(new { message = "Domownik not found" });
+            }
+            _domownicy.Remove(domownik);
+            return NoContent();
         }
-        catch (Exception ex)
-        {
-            // Obsłuż inne błędy
-            Console.WriteLine(ex.Message);
-            return StatusCode(500, "An unexpected error occurred. Please try again later." + ex.Message);
-        }
-    }
-    public class DomownikDto
-    {
-        public int Id { get; set; }
-        public string Imie { get; set; }
     }
 }
