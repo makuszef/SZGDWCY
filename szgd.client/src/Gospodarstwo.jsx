@@ -19,6 +19,8 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { setGospodarstwo } from './features/resourceSlice.jsx';
 import axios from 'axios';
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import PhoneIcon from '@mui/icons-material/Phone';
 
 function MyButtons() {
     const [gospodarstwa, setGospodarstwa] = useState([]);
@@ -186,11 +188,13 @@ function MyButtons() {
                                                         <Typography
                                                             component="span"
                                                             variant="body2"
-                                                            sx={{ color: 'text.primary', display: 'inline' }}
+                                                            sx={{ color: 'white', display: 'inline' }}
                                                         >
                                                             Email: {member.email}
                                                         </Typography>
-                                                        {" — Telefon: " + member.telefon}
+                                                    <Typography sx={{ color: 'white'}}>
+                                                        {"Telefon: " + member.telefon}
+                                                    </Typography>
                                                     </React.Fragment>
                                                 }
                                             />

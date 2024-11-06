@@ -12,7 +12,7 @@ export default function Sidebar({ ListItems }) {
 
     useEffect(() => {
         setButtonItems(ListItems);
-    }, [ListItems]); // Tablica zale¿noœci
+    }, [ListItems]); // Tablica zaleï¿½noï¿½ci
 
     const handleToggle = () => {
         setOpen(!open);

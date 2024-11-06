@@ -3,12 +3,12 @@ import Navbar from './Navbar'; // Assuming you have Navbar component
 import Sidebar from './Sidebar'; 
 import Footer from './Footer'; // Assuming you have Footer component
 import { Box } from '@mui/material'; // Use Box and useTheme for accessing theme
-import SprzatanieIcon from '@mui/icons-material/CleaningServices';  // Ikona sprz¹tania
-import ReceiptIcon from '@mui/icons-material/Receipt';               // Ikona paragonów
-import BuildIcon from '@mui/icons-material/Build';                   // Ikona sprzêtu
+import SprzatanieIcon from '@mui/icons-material/CleaningServices';  // Ikona sprzï¿½tania
+import ReceiptIcon from '@mui/icons-material/Receipt';               // Ikona paragonï¿½w
+import BuildIcon from '@mui/icons-material/Build';                   // Ikona sprzï¿½tu
 import PollIcon from '@mui/icons-material/Poll';                     // Ikona ankiet
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices'; // Ikona zdrowia
-import InventoryIcon from '@mui/icons-material/Inventory';            // Ikona zapasów
+import InventoryIcon from '@mui/icons-material/Inventory';            // Ikona zapasï¿½w
 import WindowIcon from '@mui/icons-material/Window';                 // Ikona kontroli okien
 import HomeIcon from '@mui/icons-material/Home';
 const MainCards = [
