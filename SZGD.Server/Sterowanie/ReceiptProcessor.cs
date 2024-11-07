@@ -49,14 +49,13 @@ public class ReceiptProcessor
         return stream;
     }
     
-    public async Task<ReceiptData> ProcessAI(string text)
+    public async Task<ReceiptData> ProcessAI(Stream fileStream)
     { 
         var client = new DocumentAnalysisClient(new Uri("https://szgd.cognitiveservices.azure.com"), new AzureKeyCredential("2iBemidnYyqJ6GDRmNhzL4OIn7vKGPDa3gJZDNFzYmRHjgIJ7u3lJQQJ99AKACYeBjFXJ3w3AAALACOGzA1o"));
 
         // Wczytaj obraz paragonu
-        Stream stream = ConvertStringToStream(text);
         // Rozpocznij analizę dokumentu - używamy 'prebuilt-receipt' (przygotowanego modelu do paragonów)
-        var operation = await client.AnalyzeDocumentAsync(WaitUntil.Completed, "prebuilt-layout", stream);
+        var operation = await client.AnalyzeDocumentAsync(WaitUntil.Completed, "prebuilt-receipt", fileStream);
         var result = await operation.WaitForCompletionAsync();
 
         // Zainicjalizuj obiekt ReceiptData
@@ -79,6 +78,22 @@ public class ReceiptProcessor
             {
                 receiptData.TotalAmount = document.Fields["Total"].Value.AsDouble();
             }
+            if (document.Fields.ContainsKey("Items"))
+            {
+                var items = document.Fields["Items"].Value.AsList();
+                foreach (var item in items)
+                {
+                    var itemFields = item.Value.AsDictionary();
+                    var itemName = itemFields.ContainsKey("Description") ? itemFields["Description"].Value.AsString() : string.Empty;
+                    var itemPrice = itemFields.ContainsKey("TotalPrice") ? itemFields["TotalPrice"].Value.AsDouble() : 0;
+
+                    receiptData.Items.Add(new ReceiptItem
+                    {
+                        Name = itemName,
+                        Price = itemPrice
+                    });
+                }
+            }
         }
 
         return receiptData;
@@ -97,5 +112,5 @@ public class ReceiptData
 public class ReceiptItem
 {
     public string Name { get; set; }
-    public decimal Price { get; set; }
+    public double Price { get; set; }
 }

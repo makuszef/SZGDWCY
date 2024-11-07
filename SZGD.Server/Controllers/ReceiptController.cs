@@ -40,8 +40,9 @@ public class ReceiptController : ControllerBase
                 }
 
                 // Przetwarzaj plik i dodaj dane do listy wyników
-                var fileContent = _receiptProcessor.ProcessReceiptImage(filePath);
-                var receiptData = await _receiptProcessor.ProcessAI(fileContent);
+                Stream fileStream = files.First().OpenReadStream();
+                //var fileContent = _receiptProcessor.ProcessReceiptImage(filePath);
+                var receiptData = await _receiptProcessor.ProcessAI(fileStream);
                 receiptDataList.Add(receiptData);
 
                 // Usuń tymczasowy plik po przetworzeniu
