@@ -1,100 +1,79 @@
-namespace SZGD.Server.Controllers;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SZGD.Server.Data;
-using SZGD.Server.Models;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Linq;
+using SZGD.Server.Models;
+
+namespace SZGD.Server.Controllers
+{
     [Route("api/[controller]")]
     [ApiController]
     public class UprawnieniaController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-
-        public UprawnieniaController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private static List<Uprawnienia> _uprawnienia = new List<Uprawnienia>();
 
         // GET: api/Uprawnienia
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Uprawnienia>>> GetUprawnienia()
+        public ActionResult<IEnumerable<Uprawnienia>> GetUprawnienia()
         {
-            return await _context.Uprawnienia.ToListAsync();
+            return Ok(_uprawnienia);
         }
 
-        // GET: api/Uprawnienia/5
+        // GET: api/Uprawnienia/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<Uprawnienia>> GetUprawnienie(int id)
+        public ActionResult<Uprawnienia> GetUprawnienia(int id)
         {
-            var uprawnienie = await _context.Uprawnienia.FindAsync(id);
-
+            var uprawnienie = _uprawnienia.FirstOrDefault(u => u.Id == id);
             if (uprawnienie == null)
             {
-                return NotFound();
+                return NotFound("Uprawnienia nie zostały znalezione.");
             }
-
-            return uprawnienie;
+            return Ok(uprawnienie);
         }
 
         // POST: api/Uprawnienia
         [HttpPost]
-        public async Task<ActionResult<Uprawnienia>> PostUprawnienie(Uprawnienia uprawnienie)
+        public ActionResult<Uprawnienia> CreateUprawnienia([FromBody] Uprawnienia newUprawnienia)
         {
-            _context.Uprawnienia.Add(uprawnienie);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetUprawnienie), new { id = uprawnienie.Id }, uprawnienie);
+            // Ustawienie unikalnego ID dla nowych uprawnień
+            newUprawnienia.Id = _uprawnienia.Any() ? _uprawnienia.Max(u => u.Id) + 1 : 1;
+            _uprawnienia.Add(newUprawnienia);
+            return CreatedAtAction(nameof(GetUprawnienia), new { id = newUprawnienia.Id }, newUprawnienia);
         }
 
-        // PUT: api/Uprawnienia/5
+        // PUT: api/Uprawnienia/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUprawnienie(int id, Uprawnienia uprawnienie)
+        public ActionResult UpdateUprawnienia(int id, [FromBody] Uprawnienia updatedUprawnienia)
         {
-            if (id != uprawnienie.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(uprawnienie).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UprawnienieExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // DELETE: api/Uprawnienia/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUprawnienie(int id)
-        {
-            var uprawnienie = await _context.Uprawnienia.FindAsync(id);
+            var uprawnienie = _uprawnienia.FirstOrDefault(u => u.Id == id);
             if (uprawnienie == null)
             {
-                return NotFound();
+                return NotFound("Uprawnienia nie zostały znalezione.");
             }
 
-            _context.Uprawnienia.Remove(uprawnienie);
-            await _context.SaveChangesAsync();
+            // Aktualizacja właściwości uprawnień
+            uprawnienie.CzyWidziInformacjeMedyczneDomownikow = updatedUprawnienia.CzyWidziInformacjeMedyczneDomownikow;
+            uprawnienie.CzyWidziSprzet = updatedUprawnienia.CzyWidziSprzet;
+            uprawnienie.CzyWidziDomownikow = updatedUprawnienia.CzyWidziDomownikow;
+            uprawnienie.CzyMozeModyfikowacDomownikow = updatedUprawnienia.CzyMozeModyfikowacDomownikow;
+            uprawnienie.CzyMozeModyfikowacGospodarstwo = updatedUprawnienia.CzyMozeModyfikowacGospodarstwo;
+            uprawnienie.CzyMozePrzesylacPliki = updatedUprawnienia.CzyMozePrzesylacPliki;
+            uprawnienie.Domownik = updatedUprawnienia.Domownik;
 
             return NoContent();
         }
 
-        private bool UprawnienieExists(int id)
+        // DELETE: api/Uprawnienia/{id}
+        [HttpDelete("{id}")]
+        public ActionResult DeleteUprawnienia(int id)
         {
-            return _context.Uprawnienia.Any(e => e.Id == id);
+            var uprawnienie = _uprawnienia.FirstOrDefault(u => u.Id == id);
+            if (uprawnienie == null)
+            {
+                return NotFound("Uprawnienia nie zostały znalezione.");
+            }
+
+            _uprawnienia.Remove(uprawnienie);
+            return NoContent();
         }
     }
+}
