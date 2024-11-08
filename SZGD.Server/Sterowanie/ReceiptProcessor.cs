@@ -16,40 +16,14 @@ using System;
 using System.IO;
 using System.Text;
 using IronOcr;
+using SZGD.Server.Models;
+
 namespace Azure;
 public class ReceiptProcessor
 {
     private static string endpoint = "https://szgd.cognitiveservices.azure.com";
     private static string apiKey = "2iBemidnYyqJ6GDRmNhzL4OIn7vKGPDa3gJZDNFzYmRHjgIJ7u3lJQQJ99AKACYeBjFXJ3w3AAALACOGzA1o";
-    public string ProcessReceiptImage(string filePath)
-    {
-        var receiptData = new ReceiptData();
-
-        var ocr = new IronTesseract { Language = OcrLanguage.Polish };
-
-        using (var input = new OcrInput(filePath))
-        {
-            var result = ocr.Read(input);
-            var text = result.Text;
-            Console.WriteLine(text);
-            return text;
-        }
-    }
-    public static Stream ConvertStringToStream(string inputString)
-    {
-        // Convert the string to a byte array using UTF-8 encoding (default)
-        byte[] byteArray = Encoding.UTF8.GetBytes(inputString);
-
-        // Create a MemoryStream from the byte array
-        MemoryStream stream = new MemoryStream(byteArray);
-
-        // Optionally, reset the position to the beginning of the stream if needed
-        stream.Position = 0;
-
-        return stream;
-    }
-    
-    public async Task<ReceiptData> ProcessAI(Stream fileStream)
+    public async Task<Paragon> ProcessAI(Stream fileStream)
     { 
         var client = new DocumentAnalysisClient(new Uri("https://szgd.cognitiveservices.azure.com"), new AzureKeyCredential("2iBemidnYyqJ6GDRmNhzL4OIn7vKGPDa3gJZDNFzYmRHjgIJ7u3lJQQJ99AKACYeBjFXJ3w3AAALACOGzA1o"));
 
@@ -59,7 +33,7 @@ public class ReceiptProcessor
         var result = await operation.WaitForCompletionAsync();
 
         // Zainicjalizuj obiekt ReceiptData
-        var receiptData = new ReceiptData();
+        var receiptData = new Paragon();
 
         // Przetwarzaj wyniki analizy
         foreach (var document in result.Value.Documents)
@@ -87,7 +61,7 @@ public class ReceiptProcessor
                     var itemName = itemFields.ContainsKey("Description") ? itemFields["Description"].Value.AsString() : string.Empty;
                     var itemPrice = itemFields.ContainsKey("TotalPrice") ? itemFields["TotalPrice"].Value.AsDouble() : 0;
 
-                    receiptData.Items.Add(new ReceiptItem
+                    receiptData.Items.Add(new PozycjaParagonu()
                     {
                         Name = itemName,
                         Price = itemPrice
@@ -98,19 +72,4 @@ public class ReceiptProcessor
 
         return receiptData;
     }
-}
-
-// Klasy pomocnicze
-public class ReceiptData
-{
-    public string Date { get; set; }
-    public string StoreName { get; set; }
-    public List<ReceiptItem> Items { get; set; } = new List<ReceiptItem>();
-    public double TotalAmount { get; set; }
-}
-
-public class ReceiptItem
-{
-    public string Name { get; set; }
-    public double Price { get; set; }
 }
