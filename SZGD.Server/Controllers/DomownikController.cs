@@ -21,12 +21,12 @@ namespace SZGD.Server.Controllers
 
         // GET: api/Domownik/{id}
         [HttpGet("{id}")]
-        public ActionResult<Domownik> GetDomownik(int id)
+        public ActionResult<Domownik> GetDomownik(string id)
         {
-            var domownik = _domownicy.FirstOrDefault(d => d.id_domownika == id);
+            var domownik = _domownicy.FirstOrDefault(d => d.Id == id);
             if (domownik == null)
             {
-                return NotFound(new ErrorResponse { Message = "Domownik not found" });
+                return NotFound(new { message = "Domownik not found" });
             }
             return Ok(domownik);
         }
@@ -36,36 +36,36 @@ namespace SZGD.Server.Controllers
         public ActionResult<Domownik> CreateDomownik([FromBody] Domownik newDomownik)
         {
             // Ustawienie unikalnego ID dla nowego domownika
-            newDomownik.id_domownika = _domownicy.Any() ? _domownicy.Max(d => d.id_domownika) + 1 : 1;
+            newDomownik.Id = (_domownicy.Count + 1).ToString();
             _domownicy.Add(newDomownik);
-            return CreatedAtAction(nameof(GetDomownik), new { id = newDomownik.id_domownika }, newDomownik);
+            return CreatedAtAction(nameof(GetDomownik), new { id = newDomownik.Id }, newDomownik);
         }
 
         // PUT: api/Domownik/{id}
         [HttpPut("{id}")]
-        public ActionResult UpdateDomownik(int id, [FromBody] Domownik updateDomownik)
+        public ActionResult UpdateDomownik(string id, [FromBody] Domownik updateDomownik)
         {
-            var domownik = _domownicy.FirstOrDefault(d => d.id_domownika == id);
+            var domownik = _domownicy.FirstOrDefault(d => d.Id == id);
             if (domownik == null)
             {
-                return NotFound(new ErrorResponse { Message = "Domownik not found" });
+                return NotFound(new { message = "Domownik not found" });
             }
 
             // Aktualizacja właściwości domownika
             domownik.Imie = updateDomownik.Imie;
             domownik.Nazwisko = updateDomownik.Nazwisko;
             domownik.Email = updateDomownik.Email;
-            domownik.Telefon = updateDomownik.Telefon;
-            domownik.Nazwa_uzytkownika = updateDomownik.Nazwa_uzytkownika;
+            domownik.PhoneNumber = updateDomownik.PhoneNumber;
+            domownik.UserName = updateDomownik.UserName;
 
-            return Ok(new SuccessResponse { Message = "Domownik updated successfully" });
+            return Ok(new { message = "Domownik updated successfully" });
         }
 
         // DELETE: api/Domownik/{id}
         [HttpDelete("{id}")]
-        public ActionResult DeleteDomownik(int id)
+        public ActionResult DeleteDomownik(string id)
         {
-            var domownik = _domownicy.FirstOrDefault(d => d.id_domownika == id);
+            var domownik = _domownicy.FirstOrDefault(d => d.Id == id);
             if (domownik == null)
             {
                 return NotFound(new { message = "Domownik not found" });

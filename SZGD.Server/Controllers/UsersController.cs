@@ -1,3 +1,5 @@
+using SZGD.Server.Models;
+
 namespace SZGD.Server.Controllers;
 
 using System.Collections.Generic;
@@ -9,15 +11,15 @@ using Microsoft.AspNetCore.Mvc;
 [Route("[controller]")]
 public class UsersController : ControllerBase
 {
-    private readonly UserManager<IdentityUser> _userManager;
+    private readonly UserManager<Domownik> _userManager;
 
-    public UsersController(UserManager<IdentityUser> userManager)
+    public UsersController(UserManager<Domownik> userManager)
     {
         _userManager = userManager;
     }
 
     [HttpGet("all")]
-    public ActionResult<IEnumerable<IdentityUser>> GetAllUsers()
+    public ActionResult<IEnumerable<Domownik>> GetAllUsers()
     {
         var users = _userManager.Users.ToList();
         return Ok(users);

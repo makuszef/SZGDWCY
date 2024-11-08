@@ -2,6 +2,7 @@ using SZGD.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
+
 namespace SZGD.Server.Controllers
 {
     [ApiController]
@@ -70,6 +71,7 @@ namespace SZGD.Server.Controllers
             _gospodarstwa.Remove(gospodarstwo);
             return NoContent();
         }
+
         // POST: api/Gospodarstwo/{id}/Domownik
         [HttpPost("{id}/Domownik")]
         public ActionResult AddDomownik(int id, Domownik newDomownik)
@@ -80,10 +82,8 @@ namespace SZGD.Server.Controllers
             {
                 return NotFound("Gospodarstwo o podanym ID nie istnieje.");
             }
-
-            // Ustawienie unikalnego ID dla domownika w obrębie aplikacji in-memory
-            newDomownik.id_domownika = gospodarstwo.czlonkowie.Any() ? gospodarstwo.czlonkowie.Max(d => d.id_domownika) + 1 : 1;
-
+            // Ustawiamy unikalne ID dla nowego domownika w ramach gospodarstwa
+            newDomownik.Id = (gospodarstwo.czlonkowie.Count + 1).ToString();
             // Dodajemy domownika do listy członków gospodarstwa
             gospodarstwo.czlonkowie.Add(newDomownik);
 
