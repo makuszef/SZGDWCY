@@ -1,7 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
 using SZGD.Server.Models;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
 
 namespace SZGD.Server.Controllers
 {
@@ -9,21 +11,26 @@ namespace SZGD.Server.Controllers
     [ApiController]
     public class DomownikController : ControllerBase
     {
-        // Lista przechowująca domowników w pamięci
-        private static List<Domownik> _domownicy = new List<Domownik>();
+        private readonly UserManager<Domownik> _userManager;
+
+        public DomownikController(UserManager<Domownik> userManager)
+        {
+            _userManager = userManager;
+        }
 
         // GET: api/Domownik
         [HttpGet]
-        public ActionResult<IEnumerable<Domownik>> GetDomownicy()
+        public async Task<ActionResult<IEnumerable<Domownik>>> GetDomownicy()
         {
-            return Ok(_domownicy);
+            var domownicy = _userManager.Users.ToList();
+            return Ok(domownicy);
         }
 
         // GET: api/Domownik/{id}
         [HttpGet("{id}")]
-        public ActionResult<Domownik> GetDomownik(string id)
+        public async Task<ActionResult<Domownik>> GetDomownik(string id)
         {
-            var domownik = _domownicy.FirstOrDefault(d => d.Id == id);
+            var domownik = await _userManager.FindByIdAsync(id);
             if (domownik == null)
             {
                 return NotFound(new { message = "Domownik not found" });
@@ -33,45 +40,56 @@ namespace SZGD.Server.Controllers
 
         // POST: api/Domownik
         [HttpPost]
-        public ActionResult<Domownik> CreateDomownik([FromBody] Domownik newDomownik)
+        public async Task<ActionResult<Domownik>> CreateDomownik([FromBody] Domownik newDomownik, string password)
         {
-            // Ustawienie unikalnego ID dla nowego domownika
-            newDomownik.Id = (_domownicy.Count + 1).ToString();
-            _domownicy.Add(newDomownik);
-            return CreatedAtAction(nameof(GetDomownik), new { id = newDomownik.Id }, newDomownik);
+            var result = await _userManager.CreateAsync(newDomownik, password);
+            if (result.Succeeded)
+            {
+                return CreatedAtAction(nameof(GetDomownik), new { id = newDomownik.Id }, newDomownik);
+            }
+            return BadRequest(result.Errors);
         }
 
         // PUT: api/Domownik/{id}
         [HttpPut("{id}")]
-        public ActionResult UpdateDomownik(string id, [FromBody] Domownik updateDomownik)
+        public async Task<ActionResult> UpdateDomownik(string id, [FromBody] Domownik updateDomownik)
         {
-            var domownik = _domownicy.FirstOrDefault(d => d.Id == id);
+            var domownik = await _userManager.FindByIdAsync(id);
             if (domownik == null)
             {
                 return NotFound(new { message = "Domownik not found" });
             }
 
-            // Aktualizacja właściwości domownika
             domownik.Imie = updateDomownik.Imie;
             domownik.Nazwisko = updateDomownik.Nazwisko;
             domownik.Email = updateDomownik.Email;
             domownik.PhoneNumber = updateDomownik.PhoneNumber;
             domownik.UserName = updateDomownik.UserName;
 
-            return Ok(new { message = "Domownik updated successfully" });
+            var result = await _userManager.UpdateAsync(domownik);
+            if (result.Succeeded)
+            {
+                return Ok(new { message = "Domownik updated successfully" });
+            }
+            return BadRequest(result.Errors);
         }
 
         // DELETE: api/Domownik/{id}
         [HttpDelete("{id}")]
-        public ActionResult DeleteDomownik(string id)
+        public async Task<ActionResult> DeleteDomownik(string id)
         {
-            var domownik = _domownicy.FirstOrDefault(d => d.Id == id);
+            var domownik = await _userManager.FindByIdAsync(id);
             if (domownik == null)
             {
                 return NotFound(new { message = "Domownik not found" });
             }
-            _domownicy.Remove(domownik);
-            return NoContent();
+
+            var result = await _userManager.DeleteAsync(domownik);
+            if (result.Succeeded)
+            {
+                return NoContent();
+            }
+            return BadRequest(result.Errors);
         }
     }
 }
