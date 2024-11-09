@@ -1,9 +1,7 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 using SZGD.Server.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SZGD.Server.Controllers
 {
@@ -11,51 +9,67 @@ namespace SZGD.Server.Controllers
     [ApiController]
     public class ParagonController : ControllerBase
     {
-        private static List<PrzeslanyPlik> _przeslanePliki = new List<PrzeslanyPlik>();
+        private static List<Paragon> _paragonList = new List<Paragon>();
 
-        // POST: api/File
         [HttpPost]
-        public async Task<ActionResult> UploadFile(IFormFile file)
+        public ActionResult<Paragon> CreateParagon([FromBody] Paragon paragon)
         {
-            if (file == null || file.Length == 0)
+            if (string.IsNullOrEmpty(paragon.Date) || string.IsNullOrEmpty(paragon.StoreName) || paragon.Items == null || paragon.Items.Count == 0 || paragon.TotalAmount <= 0)
             {
-                return BadRequest("No file uploaded.");
+                return BadRequest("Wszystkie pola muszą być wypełnione i poprawne.");
             }
 
-            using (var memoryStream = new MemoryStream())
-            {
-                await file.CopyToAsync(memoryStream);
-                var fileContent = memoryStream.ToArray();
-
-                var uploadedFile = new PrzeslanyPlik(file.FileName, fileContent);
-                _przeslanePliki.Add(uploadedFile);
-            }
-
-            return Ok("File uploaded successfully.");
+            _paragonList.Add(paragon);
+            return CreatedAtAction(nameof(GetParagonById), new { id = _paragonList.Count - 1 }, paragon);
         }
 
-        // GET: api/File
         [HttpGet]
-        public ActionResult<List<PrzeslanyPlik>> GetUploadedFiles()
+        public ActionResult<IEnumerable<Paragon>> GetAllParagon()
         {
-            return Ok(_przeslanePliki);
+            return Ok(_paragonList);
         }
-        [HttpDelete("deleteReceipt")]
-        public IActionResult UsunParagon(string nazwapliku)
+
+        [HttpGet("{id}")]
+        public ActionResult<Paragon> GetParagonById(int id)
         {
-            if (string.IsNullOrEmpty(nazwapliku))
+            var paragon = _paragonList.ElementAtOrDefault(id);
+            if (paragon == null)
             {
-                return BadRequest("Brak nazwy pliku.");
+                return NotFound();
+            }
+            return Ok(paragon);
+        }
+
+        [HttpPut("{id}")]
+        public ActionResult UpdateParagon(int id, [FromBody] Paragon updatedParagon)
+        {
+            var paragon = _paragonList.ElementAtOrDefault(id);
+            if (paragon == null)
+            {
+                return NotFound();
             }
 
-            var przeslanyPlik = _przeslanePliki.FirstOrDefault(p => p.NazwaPliku == nazwapliku);
-            if (przeslanyPlik == null)
+            if (string.IsNullOrEmpty(updatedParagon.Date) || string.IsNullOrEmpty(updatedParagon.StoreName) || updatedParagon.Items == null || updatedParagon.Items.Count == 0 || updatedParagon.TotalAmount <= 0)
             {
-                return NotFound("Plik nie został znaleziony.");
+                return BadRequest("Wszystkie pola muszą być wypełnione i poprawne.");
             }
 
-            _przeslanePliki.Remove(przeslanyPlik);
+            paragon.Date = updatedParagon.Date;
+            paragon.StoreName = updatedParagon.StoreName;
+            paragon.Items = updatedParagon.Items;
+            paragon.TotalAmount = updatedParagon.TotalAmount;
+            return NoContent();
+        }
 
+        [HttpDelete("{id}")]
+        public ActionResult DeleteParagon(int id)
+        {
+            var paragon = _paragonList.ElementAtOrDefault(id);
+            if (paragon == null)
+            {
+                return NotFound();
+            }
+            _paragonList.RemoveAt(id);
             return NoContent();
         }
     }
