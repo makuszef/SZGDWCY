@@ -13,7 +13,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllersWithViews();
@@ -21,8 +20,7 @@ builder.Services.AddControllersWithViews();
 // Register ApplicationDbContext with the connection string
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-//login
-builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("AppDb"));
+
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<Domownik>(opt =>
 {
@@ -31,32 +29,32 @@ builder.Services.AddIdentityApiEndpoints<Domownik>(opt =>
     opt.Password.RequireNonAlphanumeric = false;
     opt.SignIn.RequireConfirmedEmail = false;
 })
-        .AddEntityFrameworkStores<AppDbContext>();
+.AddEntityFrameworkStores<ApplicationDbContext>();
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/login";
     options.AccessDeniedPath = "/access-denied";
 });
 
-//koniec login
-
-//CORS
+// CORS
 string FRONTEND_URL = "https://localhost:5137";
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins", policy =>
     {
         policy.AllowAnyOrigin()
-            .AllowAnyMethod()    // Pozwól na wszystkie metody (GET, POST, itd.)
-            .AllowAnyHeader();   // Pozwól na wszystkie nagłówki
+            .AllowAnyMethod()
+            .AllowAnyHeader();
     });
 });
+
 var app = builder.Build();
 app.UseCors("AllowSpecificOrigins");
 app.UseDefaultFiles();
 app.UseStaticFiles();
 app.MapIdentityApi<Domownik>();
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -68,16 +66,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.MapFallbackToFile("/index.html");
-
 app.MapGet("/testLogin", (ClaimsPrincipal user) => $"Hello user {user.Identity!.Name}").RequireAuthorization();
 
 app.Run();
-
-public class AppDbContext : IdentityDbContext<Domownik>
-{
-    public AppDbContext(DbContextOptions<AppDbContext> options) :
-        base(options)
-    { }
-}

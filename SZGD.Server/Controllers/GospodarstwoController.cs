@@ -23,7 +23,7 @@ namespace SZGD.Server.Controllers
         [HttpGet("{id}")]
         public ActionResult<Gospodarstwo> GetById(int id)
         {
-            var gospodarstwo = _gospodarstwa.FirstOrDefault(g => g.idGospodarstwa == id);
+            var gospodarstwo = _gospodarstwa.FirstOrDefault(g => g.Id == id);
             if (gospodarstwo == null)
             {
                 return NotFound();
@@ -36,16 +36,16 @@ namespace SZGD.Server.Controllers
         public ActionResult<Gospodarstwo> Create(Gospodarstwo gospodarstwo)
         {
             // Ustawiamy unikalne ID dla nowego gospodarstwa
-            gospodarstwo.idGospodarstwa = _gospodarstwa.Any() ? _gospodarstwa.Max(g => g.idGospodarstwa) + 1 : 1;
+            gospodarstwo.Id = _gospodarstwa.Any() ? _gospodarstwa.Max(g => g.Id) + 1 : 1;
             _gospodarstwa.Add(gospodarstwo);
-            return CreatedAtAction(nameof(GetById), new { id = gospodarstwo.idGospodarstwa }, gospodarstwo);
+            return CreatedAtAction(nameof(GetById), new { id = gospodarstwo.Id }, gospodarstwo);
         }
 
         // PUT: api/Gospodarstwo/{id}
         [HttpPut("{id}")]
         public ActionResult Update(int id, Gospodarstwo updatedGospodarstwo)
         {
-            var gospodarstwo = _gospodarstwa.FirstOrDefault(g => g.idGospodarstwa == id);
+            var gospodarstwo = _gospodarstwa.FirstOrDefault(g => g.Id == id);
             if (gospodarstwo == null)
             {
                 return NotFound();
@@ -62,7 +62,7 @@ namespace SZGD.Server.Controllers
         [HttpDelete("{id}")]
         public ActionResult Delete(int id)
         {
-            var gospodarstwo = _gospodarstwa.FirstOrDefault(g => g.idGospodarstwa == id);
+            var gospodarstwo = _gospodarstwa.FirstOrDefault(g => g.Id == id);
             if (gospodarstwo == null)
             {
                 return NotFound();
@@ -77,7 +77,7 @@ namespace SZGD.Server.Controllers
         public ActionResult AddDomownik(int id, Domownik newDomownik)
         {
             // Znajdujemy gospodarstwo na podstawie id
-            var gospodarstwo = _gospodarstwa.FirstOrDefault(g => g.idGospodarstwa == id);
+            var gospodarstwo = _gospodarstwa.FirstOrDefault(g => g.Id == id);
             if (gospodarstwo == null)
             {
                 return NotFound("Gospodarstwo o podanym ID nie istnieje.");
@@ -87,7 +87,7 @@ namespace SZGD.Server.Controllers
             // Dodajemy domownika do listy członków gospodarstwa
             gospodarstwo.czlonkowie.Add(newDomownik);
 
-            return CreatedAtAction(nameof(GetById), new { id = gospodarstwo.idGospodarstwa }, newDomownik);
+            return CreatedAtAction(nameof(GetById), new { id = gospodarstwo.Id }, newDomownik);
         }
     }
 }

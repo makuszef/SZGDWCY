@@ -22,7 +22,7 @@ namespace SZGD.Server.Controllers
         [HttpGet("{id}")]
         public ActionResult<Sprzet> GetSprzet(int id)
         {
-            var sprzet = _sprzety.FirstOrDefault(s => s.ID == id);
+            var sprzet = _sprzety.FirstOrDefault(s => s.Id == id);
             if (sprzet == null)
             {
                 return NotFound("Sprzęt nie został znaleziony.");
@@ -35,16 +35,16 @@ namespace SZGD.Server.Controllers
         public ActionResult<Sprzet> CreateSprzet([FromBody] Sprzet newSprzet)
         {
             // Ustawienie unikalnego ID dla nowego sprzętu
-            newSprzet.ID = _sprzety.Any() ? _sprzety.Max(s => s.ID) + 1 : 1;
+            newSprzet.Id = _sprzety.Any() ? _sprzety.Max(s => s.Id) + 1 : 1;
             _sprzety.Add(newSprzet);
-            return CreatedAtAction(nameof(GetSprzet), new { id = newSprzet.ID }, newSprzet);
+            return CreatedAtAction(nameof(GetSprzet), new { id = newSprzet.Id }, newSprzet);
         }
 
         // PUT: api/Sprzet/{id}
         [HttpPut("{id}")]
         public ActionResult UpdateSprzet(int id, [FromBody] Sprzet updatedSprzet)
         {
-            var sprzet = _sprzety.FirstOrDefault(s => s.ID == id);
+            var sprzet = _sprzety.FirstOrDefault(s => s.Id == id);
             if (sprzet == null)
             {
                 return NotFound("Sprzęt nie został znaleziony.");
@@ -63,7 +63,7 @@ namespace SZGD.Server.Controllers
         [HttpDelete("{id}")]
         public ActionResult DeleteSprzet(int id)
         {
-            var sprzet = _sprzety.FirstOrDefault(s => s.ID == id);
+            var sprzet = _sprzety.FirstOrDefault(s => s.Id == id);
             if (sprzet == null)
             {
                 return NotFound("Sprzęt nie został znaleziony.");
