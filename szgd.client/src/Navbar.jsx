@@ -17,6 +17,8 @@ import HomeIcon from '@mui/icons-material/Home';
 import LoginIcon from '@mui/icons-material/Login';
 import { useDispatch, useSelector } from 'react-redux';
 import { setDomownik, clearDomownik, selectDomownik } from './features/resourceSlice.jsx'; // Zmień ścieżkę na właściwą
+import { useContext } from 'react';
+import { useAuth } from './AuthContext';
 
 const pages = [];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
@@ -25,6 +27,8 @@ function Navbar() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
     const [domownik, setDomownik] = React.useState(useSelector(selectDomownik));
+    const { user, logout } = useAuth(); // Pobierz user z kontekstu
+    
     console.log(domownik)
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -75,9 +79,10 @@ function Navbar() {
                         }}
                     >
                         <Typography variant="h6">Home</Typography>
-                        {domownik ? <Typography sx={{margin: right}} variant="h6">Witaj {domownik}</Typography> : <p></p>}
+                        {user ? <Typography sx={{marginRight: '10px'}} variant="h6">Witaj {user.email}</Typography> : <p></p>}
                     </Button>
-
+                 
+                  
                     {/* Responsive Menu and Other Components */}
                     <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
                         <IconButton
@@ -106,8 +111,8 @@ function Navbar() {
                             onClose={handleCloseNavMenu}
                             sx={{ display: { xs: 'block', md: 'none' } }}
                         >
-                            {pages.map((page) => (
-                                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                            {pages.map((page, index) => (
+                                <MenuItem key={`page-${page}-${index}`} onClick={handleCloseNavMenu}>
                                     <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
                                 </MenuItem>
                             ))}
@@ -148,6 +153,7 @@ function Navbar() {
                     </Box>
 
                     <Box sx={{ flexGrow: 0 }}>
+                                                
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                                 <Avatar alt="User Avatar" src="/static/images/avatar/2.jpg" />
@@ -169,8 +175,8 @@ function Navbar() {
                             open={Boolean(anchorElUser)}
                             onClose={handleCloseUserMenu}
                         >
-                            {settings.map((setting) => (
-                                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                            {settings.map((setting, index) => (
+                                <MenuItem key={`setting-${setting}-${index}`} onClick={handleCloseUserMenu}>
                                     <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
                                 </MenuItem>
                             ))}
@@ -183,5 +189,7 @@ function Navbar() {
 }
 
 export default Navbar;
+
+
 
 
