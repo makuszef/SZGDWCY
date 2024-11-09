@@ -1,11 +1,172 @@
-﻿#root {
+﻿/* Resetowanie marginesów i paddingów */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Centrowanie i maksymalna szerokość dla głównego kontenera */
+#root {
     max-width: 1280px;
     margin: 0 auto;
     padding: 2rem;
     text-align: center;
 }
 
+/* Styl tabeli */
 th, td {
     padding-left: 1rem;
     padding-right: 1rem;
+}
+
+/* Styl głównych kontenerów (mobilna wersja) */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Responsywność dla małych ekranów (Mobile-first) */
+@media (max-width: 768px) {
+    /* Ustawienia navbaru na telefonach */
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem;
+        flex-wrap: wrap; /* Pozwoli na elastyczne rozmieszczenie */
+    }
+
+    /* Ukrycie sidebaru na telefonach */
+    .sidebar {
+        display: none;
+    }
+
+    /* Przekształcenie sidebaru w rozwijane menu */
+    .drawer-sidebar {
+        display: block; /* Włącza rozwijane Sidebar w wersji mobilnej */
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+    }
+
+    /* Styl dla elementów w sidebarze w wersji mobilnej */
+    .sidebar-item {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 1rem;
+        border-bottom: 1px solid #ddd;
+    }
+
+    /* Zwiększenie rozmiaru tekstu na urządzeniach mobilnych */
+    h1, h2, h3, h4, h5, h6 {
+        font-size: 1.2rem;
+    }
+
+    /* Dopasowanie kart na telefonach */
+    .card {
+        padding: 1rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+
+    .main-content {
+        padding: 1rem;
+        margin-top: 2rem;
+    }
+}
+
+/* Responsywność dla tabletów i większych ekranów */
+@media (min-width: 768px) {
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .sidebar {
+        width: 250px; /* Stała szerokość Sidebaru */
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background-color: #f4f4f4;
+    }
+
+    .main-content {
+        margin-left: 250px; /* Ustawienie marginesu na szerokość Sidebaru */
+        padding: 2rem;
+        transition: margin-left 0.3s ease;
+    }
+
+    /* Poprawienie wyglądu kart na tabletach */
+    .card {
+        padding: 1.5rem;
+        margin: 1rem 0;
+    }
+}
+
+/* Układ dla dużych ekranów */
+@media (min-width: 1024px) {
+    .container {
+        display: flex;
+        justify-content: space-between;
+        gap: 2rem;
+    }
+
+    .sidebar {
+        width: 250px;
+    }
+
+    .main-content {
+        margin-left: 250px;
+    }
+
+    /* Dodatkowe style dla większych ekranów */
+    .main-container {
+        flex-direction: row;
+    }
+
+    .card {
+        padding: 2rem;
+    }
+}
+
+/* Przyciski i inne elementy */
+button {
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Inne style */
+input, textarea {
+    font-size: 1rem;
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    margin: 0.5rem 0;
+}
+
+input:focus, textarea:focus {
+    outline: none;
+    border-color: #007bff;
 }

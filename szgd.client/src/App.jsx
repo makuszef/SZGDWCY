@@ -15,6 +15,7 @@ import WindowIcon from '@mui/icons-material/Window';                 // Ikona ko
 import HomeIcon from '@mui/icons-material/Home';                     // Ikona domownik�w
 import Sprzet from './Sprzet'
 import Domownicy from './Domownicy';
+import Paragony from './Paragony.jsx';
 import LoginPage from './LoginPage';
 import Gospodarstwo from "@/Gospodarstwo.jsx";
 import RegisterPage from './RegisterPage';
@@ -23,16 +24,13 @@ import About from "@/About.jsx";
 // Karty g��wne z przypisanymi ikonami i trasami
 const MainCards = [
     { title: 'Harmonogram sprzatania', icon: <SprzatanieIcon />, route: "/sprzatanie", component: <div>Harmonogram sprzatania</div> },
-    { title: 'Paragony i gwarancje', icon: <ReceiptIcon />, route: "/paragony", component: <div>Paragony i gwarancje</div> },
-    {
-        title: 'Sprzet', icon: <BuildIcon />, route: "/sprzet", component: <Sprzet/> },
+    { title: 'Paragony i gwarancje', icon: <ReceiptIcon />, route: "/paragony", component: <Paragony /> },
+    { title: 'Sprzet', icon: <BuildIcon />, route: "/sprzet", component: <Sprzet/> },
     { title: 'Ankiety', icon: <PollIcon />, route: "/ankiety", component: <div>Ankiety</div> },
     { title: 'Informacje zdrowotne', icon: <MedicalServicesIcon />, route: "/zdrowie", component: <div>Informacje zdrowotne</div> },
     { title: 'Zapasy', icon: <InventoryIcon />, route: "/zapasy", component: <div>Zapasy</div> },
     { title: 'Kontrola okien', icon: <WindowIcon />, route: "/kontrola-okien", component: <div>Kontrola okien</div> },
-    {
-        title: 'Domownicy', icon: <HomeIcon />, route: "/domownicy", component: <Domownicy />
-    },
+    { title: 'Domownicy', icon: <HomeIcon />, route: "/domownicy", component: <Domownicy />},
 ];
 
 function App() {
@@ -58,3 +56,5 @@ function App() {
 }
 
 export default App;
+
+
