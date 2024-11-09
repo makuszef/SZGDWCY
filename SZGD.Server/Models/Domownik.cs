@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
 
 namespace SZGD.Server.Models
 {
@@ -7,10 +8,12 @@ namespace SZGD.Server.Models
     {
         public string? Imie { get; set; } 
         public string? Nazwisko { get; set; } 
-
+        [JsonIgnore]
+        public List<Gospodarstwo>? Gospodarstwa { get; set; }
+        public List<HistoriaUzyciaSprzetu>? HistoriaUzyciaSprzetu { get; set; }
         // Konstruktor domyślny
         public Domownik() { }
-
+        
         // Konstruktor z parametrami
         public Domownik(string imie, string nazwisko)
         {

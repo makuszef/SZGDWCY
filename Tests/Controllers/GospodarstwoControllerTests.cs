@@ -48,13 +48,13 @@ public class GospodarstwoControllerTests
         controller.Create(gospodarstwo);
 
         // Act
-        var result = controller.GetById(gospodarstwo.idGospodarstwa);
+        var result = controller.GetById(gospodarstwo.Id);
 
         // Assert
         var actionResult = Assert.IsType<ActionResult<Gospodarstwo>>(result);
         var okResult = Assert.IsType<OkObjectResult>(actionResult.Result);
         var returnedGospodarstwo = Assert.IsType<Gospodarstwo>(okResult.Value);
-        Assert.Equal(gospodarstwo.idGospodarstwa, returnedGospodarstwo.idGospodarstwa);
+        Assert.Equal(gospodarstwo.Id, returnedGospodarstwo.Id);
         Assert.Equal(gospodarstwo.nazwa, returnedGospodarstwo.nazwa);
     }
 
@@ -87,7 +87,7 @@ public class GospodarstwoControllerTests
         var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
         var returnedGospodarstwo = Assert.IsType<Gospodarstwo>(createdAtActionResult.Value);
         Assert.Equal(gospodarstwo.nazwa, returnedGospodarstwo.nazwa);
-        Assert.NotEqual(0, returnedGospodarstwo.idGospodarstwa);
+        Assert.NotEqual(0, returnedGospodarstwo.Id);
     }
 
     [Fact]
@@ -101,11 +101,11 @@ public class GospodarstwoControllerTests
         var updatedGospodarstwo = new Gospodarstwo { nazwa = "Zaktualizowane Gospodarstwo", czlonkowie = new List<Domownik>() };
 
         // Act
-        var result = controller.Update(gospodarstwo.idGospodarstwa, updatedGospodarstwo);
+        var result = controller.Update(gospodarstwo.Id, updatedGospodarstwo);
 
         // Assert
         Assert.IsType<NoContentResult>(result);
-        var fetchedGospodarstwo = controller.GetById(gospodarstwo.idGospodarstwa);
+        var fetchedGospodarstwo = controller.GetById(gospodarstwo.Id);
         var actionResult = Assert.IsType<ActionResult<Gospodarstwo>>(fetchedGospodarstwo);
         var okResult = Assert.IsType<OkObjectResult>(actionResult.Result);
         var returnedGospodarstwo = Assert.IsType<Gospodarstwo>(okResult.Value);
@@ -135,11 +135,11 @@ public class GospodarstwoControllerTests
         controller.Create(gospodarstwo);
 
         // Act
-        var result = controller.Delete(gospodarstwo.idGospodarstwa);
+        var result = controller.Delete(gospodarstwo.Id);
 
         // Assert
         Assert.IsType<NoContentResult>(result);
-        var fetchResult = controller.GetById(gospodarstwo.idGospodarstwa);
+        var fetchResult = controller.GetById(gospodarstwo.Id);
         var actionResult = Assert.IsType<ActionResult<Gospodarstwo>>(fetchResult);
         Assert.IsType<NotFoundResult>(actionResult.Result);
     }
@@ -175,7 +175,7 @@ public class GospodarstwoControllerTests
         };
 
         // Act
-        var result = controller.AddDomownik(gospodarstwo.idGospodarstwa, newDomownik);
+        var result = controller.AddDomownik(gospodarstwo.Id, newDomownik);
 
         // Assert
         var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result);
@@ -184,7 +184,7 @@ public class GospodarstwoControllerTests
         Assert.Equal(1, returnedDomownik.id_domownika);
 
         // Sprawdzenie, czy domownik został dodany do gospodarstwa
-        var fetchResult = controller.GetById(gospodarstwo.idGospodarstwa);
+        var fetchResult = controller.GetById(gospodarstwo.Id);
         var actionResult = Assert.IsType<ActionResult<Gospodarstwo>>(fetchResult);
         var okResult = Assert.IsType<OkObjectResult>(actionResult.Result);
         var updatedGospodarstwo = Assert.IsType<Gospodarstwo>(okResult.Value);

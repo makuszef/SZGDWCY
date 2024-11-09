@@ -4,7 +4,11 @@ namespace SZGD.Server.Models
 {
     public class Sprzet
     {
-        public int ID { get; set; }
+        public int Id { get; set; }
+        public int GospodarstwoId { get; set; }
+        [JsonIgnore]
+        public Gospodarstwo? Gospodarstwo { get; set; }
+        public List<HistoriaUzyciaSprzetu>? HistoriaUzyciaSprzetu { get; set; }
         public string Nazwa { get; set; }
         public string Typ { get; set; }
         public StatusSprzetu Status { get; set; }
