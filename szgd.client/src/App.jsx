@@ -20,6 +20,7 @@ import LoginPage from './LoginPage';
 import Gospodarstwo from "@/Gospodarstwo.jsx";
 import RegisterPage from './RegisterPage';
 import About from "@/About.jsx";
+import {AuthProvider} from "@/AuthContext.jsx";
 
 // Karty g��wne z przypisanymi ikonami i trasami
 const MainCards = [
@@ -35,23 +36,25 @@ const MainCards = [
 
 function App() {
     return (
-        <Routes>
-            {/* Trasa g��wna - renderowanie menu z kartami */}
-            <Route path="/" element={<AppLayout Content={<MainMenu cards={MainCards} />} Cards={MainCards} />} />
-            <Route path="/gospodarstwa" element={<AppLayout Content={<Gospodarstwo/>}/>} />
-            <Route path="/login" element={<AppLayout Content={<LoginPage/>}/>} />
-            <Route path="/about" element={<AppLayout Content={<About/>}/>} />
-            <Route path="/register" element={<AppLayout Content={<RegisterPage />} />} />
-
-            {/* Dynamiczne mapowanie tras */}
-            {MainCards.map(card => (
-                <Route
-                    key={card.route}
-                    path={card.route}
-                    element={<AppLayout Content={card.component} Cards={MainCards} />}
-                />
-            ))}
-        </Routes>
+        <AuthProvider>
+            <Routes>
+                {/* Trasa g��wna - renderowanie menu z kartami */}
+                <Route path="/" element={<AppLayout Content={<MainMenu cards={MainCards} />} Cards={MainCards} />} />
+                <Route path="/gospodarstwa" element={<AppLayout Content={<Gospodarstwo/>}/>} />
+                <Route path="/login" element={<AppLayout Content={<LoginPage/>}/>} />
+                <Route path="/about" element={<AppLayout Content={<About/>}/>} />
+                <Route path="/register" element={<AppLayout Content={<RegisterPage />} />} />
+    
+                {/* Dynamiczne mapowanie tras */}
+                {MainCards.map(card => (
+                    <Route
+                        key={card.route}
+                        path={card.route}
+                        element={<AppLayout Content={card.component} Cards={MainCards} />}
+                    />
+                ))}
+            </Routes>
+        </AuthProvider>
     );
 }
 
