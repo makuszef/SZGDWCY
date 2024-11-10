@@ -7,7 +7,7 @@ namespace SZGD.Server.Models
         public int Id { get; set; }
         public int SprzetId { get; set; }
         [ForeignKey(nameof(Domownik))]
-        public int DomownikId { get; set; }
+        public string DomownikId { get; set; }
         [ForeignKey(nameof(Gospodarstwo))]
         public int GospodarstwoId { get; set; }
         [JsonIgnore]
