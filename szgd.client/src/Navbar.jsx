@@ -12,11 +12,10 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
-import { useNavigate } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
 import LoginIcon from '@mui/icons-material/Login';
-import { useDispatch, useSelector } from 'react-redux';
-import { setDomownik, clearDomownik, selectDomownik } from './features/resourceSlice.jsx'; // Zmień ścieżkę na właściwą
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
 const pages = [];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
@@ -24,11 +23,13 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 function Navbar() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
-    const [domownik, setDomownik] = React.useState(useSelector(selectDomownik));
-    console.log(domownik)
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
+
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
     };
+
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);
     };
@@ -40,8 +41,6 @@ function Navbar() {
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
-
-    const navigate = useNavigate();
 
     return (
         <AppBar>
@@ -75,7 +74,7 @@ function Navbar() {
                         }}
                     >
                         <Typography variant="h6">Home</Typography>
-                        {domownik ? <Typography sx={{margin: right}} variant="h6">Witaj {domownik}</Typography> : <p></p>}
+                        {user ? <Typography variant="h6" sx={{ marginLeft: '1rem' }}>Witaj {user.email}</Typography> : null}
                     </Button>
 
                     {/* Responsive Menu and Other Components */}
