@@ -27,7 +27,9 @@ namespace SZGD.Server.Data
             modelBuilder.Entity<Paragon>()
                 .HasMany(p => p.Items);
             modelBuilder.Entity<Domownik>()
-                .HasMany(d => d.DomownikWGospodarstwie);
+                .HasMany(d => d.DomownikWGospodarstwie)
+                .WithOne()
+                .HasForeignKey(e => e.DomownikId);
             modelBuilder.Entity<Gospodarstwo>()
                 .HasMany(e => e.Sprzet);
             modelBuilder.Entity<Gospodarstwo>()
@@ -41,7 +43,7 @@ namespace SZGD.Server.Data
             modelBuilder.Entity<HistoriaUzyciaSprzetu>()
                 .HasOne(h => h.DomownikWGospodarstwie)
                 .WithMany(dw => dw.HistoriaUzyciaSprzetu)
-                .HasForeignKey(h => new { h.DomownikId, h.GospodarstwoId })
+                .HasForeignKey(h => new { h.GospodarstwoId, h.DomownikId})
                 .OnDelete(DeleteBehavior.Cascade);
             Seed(modelBuilder);
         }
