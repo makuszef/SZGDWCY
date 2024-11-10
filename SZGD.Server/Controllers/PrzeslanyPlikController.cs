@@ -2,12 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using SZGD.Server.Models;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
 using SZGD.Server.Sterowanie;
 using SZGD.Server.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+
 namespace SZGD.Server.Controllers
 {
     [Route("api/[controller]")]
@@ -19,10 +20,11 @@ namespace SZGD.Server.Controllers
         private static readonly List<string> AllowedImageTypes = new List<string> { "image/jpeg", "image/png", "image/gif" };
         private readonly VirusTotalScanner _virusTotalScanner;
 
-        public PrzeslanyPlikController(ApplicationDbContext context)
+        public PrzeslanyPlikController(ApplicationDbContext context, IConfiguration configuration)
         {
             _context = context;
-            _virusTotalScanner = new VirusTotalScanner("d3d6ce1a3ae4b80c146739d5747d831031733f75caa9dc6bcd73d7fdcc9cf887");
+            var apiKey = configuration["VirusTotal:ApiKey"];
+            _virusTotalScanner = new VirusTotalScanner(apiKey);
         }
 
         // POST: api/PrzeslanyPlik
@@ -32,19 +34,19 @@ namespace SZGD.Server.Controllers
             // Walidacja obecności pliku
             if (file == null || file.Length == 0)
             {
-                return BadRequest("No file uploaded.");
+                return BadRequest("Nie przesłano pliku.");
             }
 
             // Walidacja rozmiaru pliku
             if (file.Length > MaxFileSize)
             {
-                return BadRequest("File size exceeds the 5 MB limit.");
+                return BadRequest("Rozmiar pliku przekracza limit 5 MB.");
             }
 
             // Walidacja typu MIME pliku
             if (!AllowedImageTypes.Contains(file.ContentType))
             {
-                return BadRequest("Only image files are allowed (JPEG, PNG, GIF).");
+                return BadRequest("Dozwolone są tylko pliki graficzne (JPEG, PNG, GIF).");
             }
 
             // Przekonwertuj plik do tablicy bajtów
@@ -57,7 +59,7 @@ namespace SZGD.Server.Controllers
                 var isMalicious = await _virusTotalScanner.ScanFileForMalware(fileContent);
                 if (isMalicious)
                 {
-                    return BadRequest("File is identified as malicious.");
+                    return BadRequest("Plik został zidentyfikowany jako złośliwy.");
                 }
 
                 // Tworzenie nowego obiektu pliku i dodawanie go do bazy danych
@@ -66,9 +68,10 @@ namespace SZGD.Server.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return Ok("File uploaded successfully.");
+            return Ok("Plik został pomyślnie przesłany.");
         }
 
+        // GET: api/PrzeslanyPlik
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PrzeslanyPlik>>> GetAllPrzeslanyPlik()
         {
@@ -76,24 +79,26 @@ namespace SZGD.Server.Controllers
             return Ok(pliki);
         }
 
+        // GET: api/PrzeslanyPlik/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<PrzeslanyPlik>> GetPrzeslanyPlikById(int id)
         {
             var plik = await _context.Pliki.FindAsync(id);
             if (plik == null)
             {
-                return NotFound();
+                return NotFound("Plik nie został znaleziony.");
             }
             return Ok(plik);
         }
 
+        // DELETE: api/PrzeslanyPlik/{id}
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeletePrzeslanyPlik(int id)
         {
             var plik = await _context.Pliki.FindAsync(id);
             if (plik == null)
             {
-                return NotFound();
+                return NotFound("Plik nie został znaleziony.");
             }
 
             _context.Pliki.Remove(plik);

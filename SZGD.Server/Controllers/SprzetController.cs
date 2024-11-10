@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using SZGD.Server.Data;
 using SZGD.Server.Models;
 
 namespace SZGD.Server.Controllers
@@ -9,68 +12,91 @@ namespace SZGD.Server.Controllers
     [ApiController]
     public class SprzetController : ControllerBase
     {
-        private static List<Sprzet> _sprzety = new List<Sprzet>();
+        private readonly ApplicationDbContext _context;
+
+        public SprzetController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
         // GET: api/Sprzet
         [HttpGet]
-        public ActionResult<IEnumerable<Sprzet>> GetSprzety()
+        public async Task<ActionResult<IEnumerable<Sprzet>>> GetSprzety()
         {
-            return Ok(_sprzety);
+            return await _context.Sprzet.ToListAsync();
         }
 
         // GET: api/Sprzet/{id}
         [HttpGet("{id}")]
-        public ActionResult<Sprzet> GetSprzet(int id)
+        public async Task<ActionResult<Sprzet>> GetSprzet(int id)
         {
-            var sprzet = _sprzety.FirstOrDefault(s => s.Id == id);
+            var sprzet = await _context.Sprzet.FindAsync(id);
             if (sprzet == null)
             {
                 return NotFound("Sprzęt nie został znaleziony.");
             }
-            return Ok(sprzet);
+            return sprzet;
         }
 
         // POST: api/Sprzet
         [HttpPost]
-        public ActionResult<Sprzet> CreateSprzet([FromBody] Sprzet newSprzet)
+        public async Task<ActionResult<Sprzet>> CreateSprzet([FromBody] Sprzet newSprzet)
         {
-            // Ustawienie unikalnego ID dla nowego sprzętu
-            newSprzet.Id = _sprzety.Any() ? _sprzety.Max(s => s.Id) + 1 : 1;
-            _sprzety.Add(newSprzet);
+            _context.Sprzet.Add(newSprzet);
+            await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetSprzet), new { id = newSprzet.Id }, newSprzet);
         }
 
+
         // PUT: api/Sprzet/{id}
         [HttpPut("{id}")]
-        public ActionResult UpdateSprzet(int id, [FromBody] Sprzet updatedSprzet)
+        public async Task<IActionResult> UpdateSprzet(int id, [FromBody] Sprzet updatedSprzet)
         {
-            var sprzet = _sprzety.FirstOrDefault(s => s.Id == id);
-            if (sprzet == null)
+            if (id != updatedSprzet.Id)
             {
-                return NotFound("Sprzęt nie został znaleziony.");
+                return BadRequest();
             }
 
-            // Aktualizacja właściwości sprzętu
-            sprzet.Nazwa = updatedSprzet.Nazwa;
-            sprzet.Typ = updatedSprzet.Typ;
-            sprzet.Status = updatedSprzet.Status;
-            sprzet.Opis = updatedSprzet.Opis;
+            _context.Entry(updatedSprzet).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!SprzetExists(id))
+                {
+                    return NotFound("Sprzęt nie został znaleziony.");
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
             return NoContent();
         }
 
         // DELETE: api/Sprzet/{id}
         [HttpDelete("{id}")]
-        public ActionResult DeleteSprzet(int id)
+        public async Task<IActionResult> DeleteSprzet(int id)
         {
-            var sprzet = _sprzety.FirstOrDefault(s => s.Id == id);
+            var sprzet = await _context.Sprzet.FindAsync(id);
             if (sprzet == null)
             {
                 return NotFound("Sprzęt nie został znaleziony.");
             }
 
-            _sprzety.Remove(sprzet);
+            _context.Sprzet.Remove(sprzet);
+            await _context.SaveChangesAsync();
+
             return NoContent();
+        }
+
+        private bool SprzetExists(int id)
+        {
+            return _context.Sprzet.Any(e => e.Id == id);
         }
     }
 }

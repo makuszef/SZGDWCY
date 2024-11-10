@@ -18,6 +18,7 @@ namespace SZGD.Server.Data
         public DbSet<PozycjaParagonu> PozycjeParagonu { get; set; }
         public DbSet<PrzeslanyPlik> Pliki { get; set; }
         public DbSet<Sprzet> Sprzet { get; set; }
+        public DbSet<HistoriaUzyciaSprzetu> HistoriaUzyciaSprzetu { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
