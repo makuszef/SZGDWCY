@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace SZGD.Server.Models
 {
@@ -17,6 +18,7 @@ namespace SZGD.Server.Models
         public bool CzyMozeModyfikowacDomownikow { get; set; } = false;
         public bool CzyMozeModyfikowacGospodarstwo { get; set; } = false;
         public bool CzyMozePrzesylacPliki { get; set; } = false;
+        [JsonIgnore]
         public List<HistoriaUzyciaSprzetu>? HistoriaUzyciaSprzetu { get; set; }
 
         [ForeignKey(nameof(Domownik))]
@@ -24,7 +26,10 @@ namespace SZGD.Server.Models
 
         [ForeignKey(nameof(Gospodarstwo))]
         public int GospodarstwoId { get; set; }
-
+        [JsonIgnore]
+        public Domownik? Domownik { get; set; }
+        [JsonIgnore]
+        public Gospodarstwo? Gospodarstwo { get; set; }
         public DomownikRole Rola { get; set; }  // New enum property
     }
 }
