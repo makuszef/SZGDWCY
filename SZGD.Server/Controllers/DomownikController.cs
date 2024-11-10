@@ -1,10 +1,10 @@
 using SZGD.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using SZGD.Server.Data;
 using Microsoft.EntityFrameworkCore;
+
 namespace SZGD.Server.Controllers
 {
     [Route("api/[controller]")]
@@ -22,7 +22,8 @@ namespace SZGD.Server.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Domownik>>> GetDomownicy()
         {
-            var domownicy = await _context.Domownicy.ToListAsync();
+            var domownicy = await _context.Domownicy
+                .ToListAsync();
             return Ok(domownicy);
         }
 
@@ -30,11 +31,14 @@ namespace SZGD.Server.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Domownik>> GetDomownik(string id)
         {
-            var domownik = await _context.Domownicy.FindAsync(id);
+            var domownik = await _context.Domownicy
+                .FirstOrDefaultAsync(d => d.Id == id);
+
             if (domownik == null)
             {
                 return NotFound(new { message = "Domownik not found" });
             }
+
             return Ok(domownik);
         }
 
@@ -42,8 +46,15 @@ namespace SZGD.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<Domownik>> CreateDomownik([FromBody] Domownik newDomownik)
         {
+            // Check if email or username already exists
+            if (await _context.Domownicy.AnyAsync(d => d.Email == newDomownik.Email || d.UserName == newDomownik.UserName))
+            {
+                return BadRequest(new { message = "Email or username already in use" });
+            }
+
             _context.Domownicy.Add(newDomownik);
             await _context.SaveChangesAsync();
+
             return CreatedAtAction(nameof(GetDomownik), new { id = newDomownik.Id }, newDomownik);
         }
 
@@ -57,6 +68,7 @@ namespace SZGD.Server.Controllers
                 return NotFound(new { message = "Domownik not found" });
             }
 
+            // Update properties
             domownik.Imie = updateDomownik.Imie;
             domownik.Nazwisko = updateDomownik.Nazwisko;
             domownik.Email = updateDomownik.Email;
@@ -73,12 +85,16 @@ namespace SZGD.Server.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteDomownik(string id)
         {
-            var domownik = await _context.Domownicy.FindAsync(id);
+            var domownik = await _context.Domownicy
+                .Include(d => d.DomownikWGospodarstwie) // Include related entities
+                .FirstOrDefaultAsync(d => d.Id == id);
+
             if (domownik == null)
             {
                 return NotFound(new { message = "Domownik not found" });
             }
 
+            // Remove related DomownikWGospodarstwie entries if necessary
             _context.Domownicy.Remove(domownik);
             await _context.SaveChangesAsync();
 
