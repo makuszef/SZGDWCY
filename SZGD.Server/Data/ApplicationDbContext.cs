@@ -5,14 +5,14 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace SZGD.Server.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<Domownik>
+    public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
 
         public DbSet<Domownik> Domownicy { get; set; }
-        public DbSet<Uprawnienia> Uprawnienia { get; set; }
+        public DbSet<DomownikWGospodarstwie> DomownikWGospodarstwie { get; set; }
         public DbSet<Gospodarstwo> Gospodarstwa { get; set; }
         public DbSet<Paragon> Paragony { get; set; }
         public DbSet<PozycjaParagonu> PozycjeParagonu { get; set; }
@@ -22,26 +22,27 @@ namespace SZGD.Server.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
+            modelBuilder.Entity<DomownikWGospodarstwie>()
+                .HasKey(e => new { e.GospodarstwoId, e.DomownikId });
             modelBuilder.Entity<Paragon>()
-                .HasMany(p => p.Items)
-                .WithOne(p => p.Paragon);
+                .HasMany(p => p.Items);
             modelBuilder.Entity<Domownik>()
-                .HasMany(d => d.Gospodarstwa)
-                .WithMany(e => e.czlonkowie);
+                .HasMany(d => d.DomownikWGospodarstwie);
             modelBuilder.Entity<Gospodarstwo>()
-                .HasMany(e => e.Sprzet)
-                .WithOne(e => e.Gospodarstwo);
+                .HasMany(e => e.Sprzet);
             modelBuilder.Entity<Gospodarstwo>()
-                .HasMany(e => e.czlonkowie)
-                .WithMany(e => e.Gospodarstwa)
-                .UsingEntity("DomownikWGospodarstwie");
+                .HasMany(e => e.DomownikWGospodarstwie);
             modelBuilder.Entity<Gospodarstwo>()
-                .HasMany(e => e.Paragony)
-                .WithOne(e => e.Gospodarstwo);
+                .HasMany(e => e.Paragony);
             modelBuilder.Entity<Sprzet>()
                 .HasMany(e => e.HistoriaUzyciaSprzetu)
-                .WithOne(e => e.Sprzet);
+                .WithOne(e => e.Sprzet)
+                .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<HistoriaUzyciaSprzetu>()
+                .HasOne(h => h.DomownikWGospodarstwie)
+                .WithMany(dw => dw.HistoriaUzyciaSprzetu)
+                .HasForeignKey(h => new { h.DomownikId, h.GospodarstwoId })
+                .OnDelete(DeleteBehavior.Cascade);
             Seed(modelBuilder);
         }
 

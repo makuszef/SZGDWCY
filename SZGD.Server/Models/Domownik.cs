@@ -8,9 +8,8 @@ namespace SZGD.Server.Models
     {
         public string? Imie { get; set; } 
         public string? Nazwisko { get; set; } 
-        [JsonIgnore]
-        public List<Gospodarstwo>? Gospodarstwa { get; set; }
-        public List<HistoriaUzyciaSprzetu>? HistoriaUzyciaSprzetu { get; set; }
+        
+        public List<DomownikWGospodarstwie>? DomownikWGospodarstwie { get; set; }
         // Konstruktor domyślny
         public Domownik() { }
         

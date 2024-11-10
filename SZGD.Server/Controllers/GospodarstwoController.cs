@@ -53,7 +53,6 @@ namespace SZGD.Server.Controllers
 
             // Aktualizujemy właściwości gospodarstwa
             gospodarstwo.nazwa = updatedGospodarstwo.nazwa;
-            gospodarstwo.czlonkowie = updatedGospodarstwo.czlonkowie;
 
             return NoContent();
         }
@@ -82,10 +81,7 @@ namespace SZGD.Server.Controllers
             {
                 return NotFound("Gospodarstwo o podanym ID nie istnieje.");
             }
-            // Ustawiamy unikalne ID dla nowego domownika w ramach gospodarstwa
-            newDomownik.Id = (gospodarstwo.czlonkowie.Count + 1).ToString();
-            // Dodajemy domownika do listy członków gospodarstwa
-            gospodarstwo.czlonkowie.Add(newDomownik);
+            
 
             return CreatedAtAction(nameof(GetById), new { id = gospodarstwo.Id }, newDomownik);
         }

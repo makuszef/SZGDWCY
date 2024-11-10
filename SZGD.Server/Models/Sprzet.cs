@@ -1,13 +1,13 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace SZGD.Server.Models
 {
     public class Sprzet
     {
         public int Id { get; set; }
+        [ForeignKey(nameof(Domownik))]
         public int GospodarstwoId { get; set; }
-        [JsonIgnore]
-        public Gospodarstwo? Gospodarstwo { get; set; }
         public List<HistoriaUzyciaSprzetu>? HistoriaUzyciaSprzetu { get; set; }
         public string Nazwa { get; set; }
         public string Typ { get; set; }
