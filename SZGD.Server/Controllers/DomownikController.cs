@@ -73,22 +73,18 @@ namespace SZGD.Server.Controllers
         }
 
         // PUT: api/Domownik/{id}
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateDomownik(string id, [FromBody] Domownik updateDomownik)
+        [HttpPut("{email}")]
+        public async Task<ActionResult> UpdateDomownik(string email, [FromBody] DomownikDTO DomownikDTO)
         {
-            var domownik = await _context.Domownicy.FindAsync(id);
+            var domownik = await _context.Domownicy
+                .FirstOrDefaultAsync(d => d.Email == email);
             if (domownik == null)
             {
                 return NotFound(new { message = "Domownik not found" });
             }
-
-            // Update properties
-            domownik.Imie = updateDomownik.Imie;
-            domownik.Nazwisko = updateDomownik.Nazwisko;
-            domownik.Email = updateDomownik.Email;
-            domownik.PhoneNumber = updateDomownik.PhoneNumber;
-            domownik.UserName = updateDomownik.UserName;
-
+            domownik.Imie = DomownikDTO.Imie;
+            domownik.Nazwisko = DomownikDTO.Nazwisko;
+            domownik.PhoneNumber = DomownikDTO.PhoneNumber;
             _context.Domownicy.Update(domownik);
             await _context.SaveChangesAsync();
 
@@ -133,4 +129,11 @@ namespace SZGD.Server.Controllers
         }
 
     }
+}
+
+public class DomownikDTO
+{
+    public string Imie { get; set; }
+    public string Nazwisko { get; set; }
+    public string PhoneNumber { get; set; }
 }
