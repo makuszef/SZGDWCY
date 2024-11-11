@@ -74,7 +74,7 @@ function Navbar() {
                         }}
                     >
                         <Typography variant="h6">Home</Typography>
-                        {user ? <Typography variant="h6" sx={{ marginLeft: '1rem' }}>Witaj {user.email}</Typography> : null}
+                        {user ? <Typography variant="h6" sx={{ marginLeft: '1rem' }}>Witaj {user.userdata.email}</Typography> : null}
                     </Button>
 
                     {/* Responsive Menu and Other Components */}

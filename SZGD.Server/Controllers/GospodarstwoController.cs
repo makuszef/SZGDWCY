@@ -54,11 +54,16 @@ namespace SZGD.Server.Controllers
 
         // POST: api/Gospodarstwo
         [HttpPost]
-        public async Task<ActionResult<Gospodarstwo>> Create(Gospodarstwo gospodarstwo)
+        public async Task<ActionResult<Gospodarstwo>> Create(DodajGospodarstwoRequest gospodarstwo)
         {
-            _context.Gospodarstwa.Add(gospodarstwo);
+            var noweGospodarstwo = new Gospodarstwo()
+            {
+                Id = gospodarstwo.id,
+                nazwa = gospodarstwo.nazwa
+            };
+            _context.Gospodarstwa.Add(noweGospodarstwo);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetById), new { id = gospodarstwo.Id }, gospodarstwo);
+            return CreatedAtAction(nameof(GetById), new { id = noweGospodarstwo.Id }, noweGospodarstwo);
         }
 
         // PUT: api/Gospodarstwo/{id}
@@ -122,4 +127,10 @@ namespace SZGD.Server.Controllers
             return CreatedAtAction(nameof(GetById), new { id = gospodarstwo.Id }, newDomownik);
         }
     }
+    
+}
+public class DodajGospodarstwoRequest
+{
+    public int id { get; set; }
+    public string nazwa { get; set; }
 }
