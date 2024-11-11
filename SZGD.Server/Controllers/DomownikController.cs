@@ -73,10 +73,11 @@ namespace SZGD.Server.Controllers
         }
 
         // PUT: api/Domownik/{id}
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateDomownik(string id, [FromBody] DomownikDTO DomownikDTO)
+        [HttpPut("{email}")]
+        public async Task<ActionResult> UpdateDomownik(string email, [FromBody] DomownikDTO DomownikDTO)
         {
-            var domownik = await _context.Domownicy.FindAsync(id);
+            var domownik = await _context.Domownicy
+                .FirstOrDefaultAsync(d => d.Email == email);
             if (domownik == null)
             {
                 return NotFound(new { message = "Domownik not found" });

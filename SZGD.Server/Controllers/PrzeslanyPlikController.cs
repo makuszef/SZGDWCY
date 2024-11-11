@@ -63,7 +63,9 @@ namespace SZGD.Server.Controllers
                 }
 
                 // Tworzenie nowego obiektu pliku i dodawanie go do bazy danych
-                var uploadedFile = new PrzeslanyPlik(file.FileName, fileContent);
+                var uploadedFile = new PrzeslanyPlik();
+                uploadedFile.NazwaPliku = file.FileName;
+                uploadedFile.ZawartoscPliku = fileContent;
                 _context.Pliki.Add(uploadedFile);
                 await _context.SaveChangesAsync();
             }

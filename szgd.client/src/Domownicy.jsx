@@ -7,51 +7,18 @@ import {
     DialogContent,
     DialogActions,
     TextField,
-    Typography,
-    Select,
-    MenuItem,
-    FormControl,
-    InputLabel,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import TableTemplate from './TableTemplate'; // Ensure this is your custom TableTemplate
-import RowActions from './RowActions'; // Ensure this is your custom row actions component
+import TableTemplate from './TableTemplate';
+import RowActions from './RowActions';
+import axios from 'axios';
 
-const Domownicy = () => {
-    const [domownicy, setDomownicy] = useState([
-        {
-            id: 1,
-            imie: 'Anna',
-            nazwisko: 'Kowalska',
-            email: 'anna.k@example.com',
-            telefon: '444555666',
-        },
-        {
-            id: 2,
-            imie: 'Marek',
-            nazwisko: 'Nowak',
-            email: 'marek.n@example.com',
-            telefon: '555666777',
-        },
-        {
-            id: 3,
-            imie: 'Tomasz',
-            nazwisko: 'Wisniewski',
-            email: 'tomasz.w@example.com',
-            telefon: '666777888',
-        },
-        {
-            id: 4,
-            imie: 'Kasia',
-            nazwisko: 'Wojcik',
-            email: 'kasia.w@example.com',
-            telefon: '777888999',
-        },
-    ]);
-
+const Domownicy = ({ gospodarstwoId }) => {
+    const [domownicy, setDomownicy] = useState([]);
     const [editOpen, setEditOpen] = useState(false);
     const [currentDomownik, setCurrentDomownik] = useState(null);
+    const [dialogData, setDialogData] = useState([]);
 
     const columns = [
         { field: 'id', headerName: 'ID', width: 70 },
@@ -69,8 +36,43 @@ const Domownicy = () => {
         },
     ];
 
+    // Fetch data from the API when the component mounts or gospodarstwoId changes
+    useEffect(() => {
+        const fetchDomownicy = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7191/api/Gospodarstwo/${gospodarstwoId}`);
+                const fetchedDomownicy = response.data.domownikWGospodarstwie.map(item => ({
+                    id: item.domownik.id,
+                    imie: item.domownik.imie,
+                    nazwisko: item.domownik.nazwisko,
+                    email: item.domownik.email,
+                    telefon: item.domownik.phoneNumber,
+                    czyWidziInformacjeMedyczneDomownikow: item.czyWidziInformacjeMedyczneDomownikow,
+                    czyWidziSprzet: item.czyWidziSprzet,
+                    czyWidziDomownikow: item.czyWidziDomownikow,
+                    czyMozeModyfikowacDomownikow: item.czyMozeModyfikowacDomownikow,
+                    czyMozeModyfikowacGospodarstwo: item.czyMozeModyfikowacGospodarstwo,
+                    czyMozePrzesylacPliki: item.czyMozePrzesylacPliki,
+                }));
+                setDomownicy(fetchedDomownicy);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        if (gospodarstwoId) {
+            fetchDomownicy();
+        }
+    }, [gospodarstwoId]);
+
     const handleEditOpen = (domownik) => {
         setCurrentDomownik(domownik);
+        setDialogData([
+            { label: 'Imie', value: domownik.imie, name: 'imie' },
+            { label: 'Nazwisko', value: domownik.nazwisko, name: 'nazwisko' },
+            { label: 'Email', value: domownik.email, name: 'email' },
+            { label: 'Telefon', value: domownik.telefon, name: 'telefon' },
+        ]);
         setEditOpen(true);
     };
 
@@ -101,45 +103,31 @@ const Domownicy = () => {
         },
     ];
 
-    // Handle dialog data
-    const [dialogData, setDialogData] = useState([]);
-
-    useEffect(() => {
-        if (currentDomownik) {
-            setDialogData([
-                { label: 'Imie', value: currentDomownik.imie, name: 'imie' },
-                { label: 'Nazwisko', value: currentDomownik.nazwisko, name: 'nazwisko' },
-                { label: 'Email', value: currentDomownik.email, name: 'email' },
-                { label: 'Telefon', value: currentDomownik.telefon, name: 'telefon' },
-            ]);
-        }
-    }, [currentDomownik]);
-
     const handleChange = (index, value) => {
         setDialogData((prevData) => {
             const updatedData = [...prevData];
-            updatedData[index].value = value; // Update the specific field's value
+            updatedData[index].value = value;
             return updatedData;
         });
     };
 
     const handleSubmit = () => {
         const updatedDomownik = {
-            id: currentDomownik.id, // Ensure to keep the same ID
+            id: currentDomownik.id,
             imie: dialogData[0].value,
             nazwisko: dialogData[1].value,
             email: dialogData[2].value,
             telefon: dialogData[3].value,
         };
-        handleUpdate(updatedDomownik); // Call the update function
-        setEditOpen(false); // Close the modal
-        setCurrentDomownik(null); // Reset current domownik
+        handleUpdate(updatedDomownik);
+        setEditOpen(false);
+        setCurrentDomownik(null);
     };
 
-    const description = "Zarzadzanie domownikami";
+    const description = "Zarządzanie domownikami";
 
     return (
-        <Box sx={{ width: '1000px' }}>
+        <Box sx={{ width: '100%' }}>
             <TableTemplate
                 passedResources={domownicy}
                 description={description}
@@ -172,6 +160,6 @@ const Domownicy = () => {
             </Dialog>
         </Box>
     );
-}
+};
 
 export default Domownicy;

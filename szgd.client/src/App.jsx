@@ -31,7 +31,7 @@ const MainCards = [
     { title: 'Informacje zdrowotne', icon: <MedicalServicesIcon />, route: "/zdrowie", component: <div>Informacje zdrowotne</div> },
     { title: 'Zapasy', icon: <InventoryIcon />, route: "/zapasy", component: <div>Zapasy</div> },
     { title: 'Kontrola okien', icon: <WindowIcon />, route: "/kontrola-okien", component: <div>Kontrola okien</div> },
-    { title: 'Domownicy', icon: <HomeIcon />, route: "/domownicy", component: <Domownicy />},
+    { title: 'Domownicy', icon: <HomeIcon />, route: "/domownicy", component: <Domownicy gospodarstwoId={1}/>},
 ];
 
 function App() {
