@@ -1,9 +1,9 @@
 using SZGD.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
+using SZGD.Server.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace SZGD.Server.Controllers
 {
@@ -11,18 +11,19 @@ namespace SZGD.Server.Controllers
     [ApiController]
     public class DomownikController : ControllerBase
     {
-        private readonly UserManager<Domownik> _userManager;
+        private readonly ApplicationDbContext _context;
 
-        public DomownikController(UserManager<Domownik> userManager)
+        public DomownikController(ApplicationDbContext context)
         {
-            _userManager = userManager;
+            _context = context;
         }
 
         // GET: api/Domownik
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Domownik>>> GetDomownicy()
         {
-            var domownicy = _userManager.Users.ToList();
+            var domownicy = await _context.Domownicy
+                .ToListAsync();
             return Ok(domownicy);
         }
 
@@ -30,66 +31,106 @@ namespace SZGD.Server.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Domownik>> GetDomownik(string id)
         {
-            var domownik = await _userManager.FindByIdAsync(id);
+            var domownik = await _context.Domownicy
+                .FirstOrDefaultAsync(d => d.Id == id);
+
             if (domownik == null)
             {
                 return NotFound(new { message = "Domownik not found" });
             }
+
+            return Ok(domownik);
+        }
+        // GET: api/Domownik/{id}
+        [HttpGet("GetDomownikByEmail/{email}")]
+        public async Task<ActionResult<Domownik>> GetDomownikByEmail(string email)
+        {
+            var domownik = await _context.Domownicy
+                .FirstOrDefaultAsync(d => d.Email == email);
+
+            if (domownik == null)
+            {
+                return NotFound(new { message = "Domownik not found" });
+            }
+
             return Ok(domownik);
         }
 
         // POST: api/Domownik
         [HttpPost]
-        public async Task<ActionResult<Domownik>> CreateDomownik([FromBody] Domownik newDomownik, string password)
+        public async Task<ActionResult<Domownik>> CreateDomownik([FromBody] Domownik newDomownik)
         {
-            var result = await _userManager.CreateAsync(newDomownik, password);
-            if (result.Succeeded)
+            // Check if email or username already exists
+            if (await _context.Domownicy.AnyAsync(d => d.Email == newDomownik.Email || d.UserName == newDomownik.UserName))
             {
-                return CreatedAtAction(nameof(GetDomownik), new { id = newDomownik.Id }, newDomownik);
+                return BadRequest(new { message = "Email or username already in use" });
             }
-            return BadRequest(result.Errors);
+
+            _context.Domownicy.Add(newDomownik);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetDomownik), new { id = newDomownik.Id }, newDomownik);
         }
 
         // PUT: api/Domownik/{id}
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateDomownik(string id, [FromBody] Domownik updateDomownik)
         {
-            var domownik = await _userManager.FindByIdAsync(id);
+            var domownik = await _context.Domownicy.FindAsync(id);
             if (domownik == null)
             {
                 return NotFound(new { message = "Domownik not found" });
             }
 
+            // Update properties
             domownik.Imie = updateDomownik.Imie;
             domownik.Nazwisko = updateDomownik.Nazwisko;
             domownik.Email = updateDomownik.Email;
             domownik.PhoneNumber = updateDomownik.PhoneNumber;
             domownik.UserName = updateDomownik.UserName;
 
-            var result = await _userManager.UpdateAsync(domownik);
-            if (result.Succeeded)
-            {
-                return Ok(new { message = "Domownik updated successfully" });
-            }
-            return BadRequest(result.Errors);
+            _context.Domownicy.Update(domownik);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Domownik updated successfully" });
         }
 
         // DELETE: api/Domownik/{id}
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteDomownik(string id)
         {
-            var domownik = await _userManager.FindByIdAsync(id);
+            var domownik = await _context.Domownicy
+                .Include(d => d.DomownikWGospodarstwie) // Include related entities
+                .FirstOrDefaultAsync(d => d.Id == id);
+
             if (domownik == null)
             {
                 return NotFound(new { message = "Domownik not found" });
             }
 
-            var result = await _userManager.DeleteAsync(domownik);
-            if (result.Succeeded)
-            {
-                return NoContent();
-            }
-            return BadRequest(result.Errors);
+            // Remove related DomownikWGospodarstwie entries if necessary
+            _context.Domownicy.Remove(domownik);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
+// GET: api/Domownik/GetAllGospodarstwa/{domownikId}
+        [HttpGet("GetAllGospodarstwa/{domownikId}")]
+        public async Task<ActionResult<IEnumerable<DomownikWGospodarstwie>>> GetAllGospodarstwaForDomownik(string domownikId)
+        {
+            // Find all DomownikWGospodarstwie records where the DomownikId matches the given ID
+            var gospodarstwa = await _context.Gospodarstwa
+                .Where(g => g.DomownikWGospodarstwie.Any(d => d.DomownikId == domownikId)) // Find Gospodarstwa related to the Domownik
+                .Include(g => g.DomownikWGospodarstwie) // Include DomownikWGospodarstwie for each Gospodarstwo
+                .ThenInclude(dwg => dwg.Domownik) // Include Domownik from DomownikWGospodarstwie
+                .ToListAsync();
+            if (gospodarstwa == null || gospodarstwa.Count == 0)
+            {
+                return NotFound(new { message = "No gospodarstwa found for this domownik" });
+            }
+
+            return Ok(gospodarstwa);
+        }
+
     }
 }

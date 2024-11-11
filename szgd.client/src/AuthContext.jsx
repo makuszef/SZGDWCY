@@ -1,37 +1,30 @@
-import { createContext, useContext, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { useLocalStorage } from "./useLocalStorage"; // Musisz mieć ten hook w swoim projekcie
+import React, { createContext, useState, useContext } from 'react';
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    // Stan użytkownika zapisany w localStorage
-    const [user, setUser] = useLocalStorage("user", null);
-    const navigate = useNavigate();
+    const [user, setUser] = useState(() => {
+        const savedUser = sessionStorage.getItem('user');
+        return savedUser ? JSON.parse(savedUser) : null;
+    });
 
-    // Funkcja logowania
-    const login = async (data) => {
-        setUser(data);  // Zapisz dane użytkownika w localStorage
-        navigate("/profile");  // Przekieruj użytkownika na stronę profilu
+    const login = (userData) => {
+        setUser(userData);
+        sessionStorage.setItem('user', JSON.stringify(userData));
     };
 
-    // Funkcja wylogowania
     const logout = () => {
-        setUser(null);  // Usuń dane użytkownika
-        navigate("/", { replace: true });  // Przekieruj na stronę główną
+        setUser(null);
+        sessionStorage.removeItem('user');
     };
 
-    // Udostępnienie funkcji i stanu użytkownika przez kontekst
-    const value = useMemo(() => ({
-        user,
-        login,
-        logout,
-    }), [user]);
-
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+    return (
+        <AuthContext.Provider value={{ user, login, logout }}>
+            {children}
+        </AuthContext.Provider>
+    );
 };
 
-// Hook do uzyskiwania dostępu do kontekstu
 export const useAuth = () => {
     return useContext(AuthContext);
 };
