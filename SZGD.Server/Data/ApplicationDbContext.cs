@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using SZGD.Server.Models;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace SZGD.Server.Data
 {
@@ -29,7 +27,7 @@ namespace SZGD.Server.Data
                 .HasMany(p => p.Items);
             modelBuilder.Entity<Domownik>()
                 .HasMany(d => d.DomownikWGospodarstwie)
-                .WithOne()
+                .WithOne(e => e.Domownik)
                 .HasForeignKey(e => e.DomownikId);
             modelBuilder.Entity<Gospodarstwo>()
                 .HasMany(e => e.Sprzet);
