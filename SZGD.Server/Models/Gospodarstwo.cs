@@ -12,7 +12,6 @@ public class Gospodarstwo
     public List<Sprzet>? Sprzet { get; set; }
     [JsonIgnore]
     public List<Paragon>? Paragony { get; set; }
-    [JsonIgnore]
     public List<DomownikWGospodarstwie>? DomownikWGospodarstwie { get; set; }
     [JsonIgnore]
     public List<PrzeslanyPlik>? PrzeslanyPlik { get; set; }

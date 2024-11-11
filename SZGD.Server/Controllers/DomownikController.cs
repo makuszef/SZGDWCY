@@ -41,6 +41,20 @@ namespace SZGD.Server.Controllers
 
             return Ok(domownik);
         }
+        // GET: api/Domownik/{id}
+        [HttpGet("GetDomownikByEmail/{email}")]
+        public async Task<ActionResult<Domownik>> GetDomownikByEmail(string email)
+        {
+            var domownik = await _context.Domownicy
+                .FirstOrDefaultAsync(d => d.Email == email);
+
+            if (domownik == null)
+            {
+                return NotFound(new { message = "Domownik not found" });
+            }
+
+            return Ok(domownik);
+        }
 
         // POST: api/Domownik
         [HttpPost]
@@ -100,5 +114,23 @@ namespace SZGD.Server.Controllers
 
             return NoContent();
         }
+// GET: api/Domownik/GetAllGospodarstwa/{domownikId}
+        [HttpGet("GetAllGospodarstwa/{domownikId}")]
+        public async Task<ActionResult<IEnumerable<DomownikWGospodarstwie>>> GetAllGospodarstwaForDomownik(string domownikId)
+        {
+            // Find all DomownikWGospodarstwie records where the DomownikId matches the given ID
+            var gospodarstwa = await _context.Gospodarstwa
+                .Where(g => g.DomownikWGospodarstwie.Any(d => d.DomownikId == domownikId)) // Find Gospodarstwa related to the Domownik
+                .Include(g => g.DomownikWGospodarstwie) // Include DomownikWGospodarstwie for each Gospodarstwo
+                .ThenInclude(dwg => dwg.Domownik) // Include Domownik from DomownikWGospodarstwie
+                .ToListAsync();
+            if (gospodarstwa == null || gospodarstwa.Count == 0)
+            {
+                return NotFound(new { message = "No gospodarstwa found for this domownik" });
+            }
+
+            return Ok(gospodarstwa);
+        }
+
     }
 }

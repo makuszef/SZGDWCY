@@ -26,7 +26,6 @@ namespace SZGD.Server.Models
 
         [ForeignKey(nameof(Gospodarstwo))]
         public int GospodarstwoId { get; set; }
-        [JsonIgnore]
         public Domownik? Domownik { get; set; }
         [JsonIgnore]
         public Gospodarstwo? Gospodarstwo { get; set; }

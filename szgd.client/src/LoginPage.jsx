@@ -25,8 +25,16 @@ const LoginPage = () => {
             console.log('Login successful:', response.status);
             console.log("tokens", response.data);
             setSuccessMessage('Login successl!');
-            const userData = { email, tokens: response.data };
-            login(userData);
+            // Teraz wyślij zapytanie GET do api/Domownik/{email}
+            try {
+                const userResponse = await axios.get(`https://localhost:7191/api/Domownik/GetDomownikByEmail/${email}`);
+                console.log('User data:', userResponse.data);
+                const userData = { userdata: userResponse.data, tokens: response.data };
+                login(userData);
+            } catch (error) {
+                console.error('Error fetching user data:', error.response ? error.response.data : error.message);
+            }
+            
 
             // Otwórz snackbar z komunikatem
             setOpenSnackbar(true);
