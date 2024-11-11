@@ -19,26 +19,50 @@ namespace SZGD.Server.Controllers
             _context = context;
         }
 
-        // POST: api/DomownikWGospodarstwie
-        [HttpPost]
-        public async Task<ActionResult<DomownikWGospodarstwie>> CreateDomownikWGospodarstwie([FromBody] DomownikWGospodarstwie domownikWGospodarstwie)
+        // POST: api/DomownikWGospodarstwie/DodajDomownikaDoGospodarstwa
+        [HttpPost("DodajDomownikaDoGospodarstwa")]
+        public async Task<ActionResult<DomownikWGospodarstwie>> DodajDomownikaDoGospodarstwa([FromBody] DodajDomownikaRequest request)
         {
-            if (domownikWGospodarstwie == null)
+            if (request == null)
             {
-                return BadRequest("DomownikWGospodarstwie cannot be null.");
+                return BadRequest("Request body cannot be null.");
             }
 
-            // Validate properties here if necessary
-            if (string.IsNullOrEmpty(domownikWGospodarstwie.DomownikId) || domownikWGospodarstwie.GospodarstwoId == 0)
+            // Ensure both IDs are provided
+            if (string.IsNullOrEmpty(request.DomownikId) || request.GospodarstwoId == 0)
             {
                 return BadRequest("DomownikId and GospodarstwoId are required.");
             }
 
+            // Check if Domownik exists
+            var domownikExists = await _context.Domownicy.AnyAsync(d => d.Id == request.DomownikId); // Replace 'Domownicy' with the actual DbSet name
+            if (!domownikExists)
+            {
+                return NotFound($"Domownik with ID {request.DomownikId} does not exist.");
+            }
+
+            // Check if Gospodarstwo exists
+            var gospodarstwoExists = await _context.Gospodarstwa.AnyAsync(g => g.Id == request.GospodarstwoId); // Replace 'Gospodarstwa' with the actual DbSet name
+            if (!gospodarstwoExists)
+            {
+                return NotFound($"Gospodarstwo with ID {request.GospodarstwoId} does not exist.");
+            }
+
+            // Create a new DomownikWGospodarstwie entity
+            var domownikWGospodarstwie = new DomownikWGospodarstwie
+            {
+                DomownikId = request.DomownikId,
+                GospodarstwoId = request.GospodarstwoId,
+                Rola = request.Rola // You can use the provided role or assign a default value
+            };
+
+            // Add the new entity to the context
             _context.DomownikWGospodarstwie.Add(domownikWGospodarstwie);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetDomownikWGospodarstwieById), new { id = domownikWGospodarstwie.GospodarstwoId }, domownikWGospodarstwie);
         }
+
 
         // GET: api/DomownikWGospodarstwie
         [HttpGet]
@@ -109,5 +133,13 @@ namespace SZGD.Server.Controllers
 
             return NoContent();
         }
+    }
+
+    // Request DTO for adding a Domownik to a Gospodarstwo
+    public class DodajDomownikaRequest
+    {
+        public string DomownikId { get; set; }
+        public int GospodarstwoId { get; set; }
+        public DomownikRole Rola { get; set; }  // Assign a default role or let the caller specify
     }
 }
