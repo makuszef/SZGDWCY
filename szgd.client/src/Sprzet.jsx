@@ -15,8 +15,9 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import TableTemplate from './TableTemplate'; // Ensure this is your custom TableTemplate
-import RowActions from './RowActions'; // Ensure this is your custom row actions component
+import TableTemplate from './TableTemplate'; // Custom TableTemplate component
+import RowActions from './RowActions'; // Custom RowActions component
+import axios from 'axios'; // Import axios for API requests
 
 // Define the enum for resource status
 const ResourceStatus = {
@@ -25,54 +26,17 @@ const ResourceStatus = {
     DAMAGED: 'Uszkodzone',
 };
 
-const Sprzet = () => {
-    const [resources, setResources] = useState([
-        {
-            id: 1,
-            name: 'Kuchenka',
-            type: 'AGD',
-            status: ResourceStatus.IN_REPAIR,
-            description: 'Uszkodzona plyta grzewcza, wymagana naprawa.',
-        },
-        {
-            id: 2,
-            name: 'Lodowka',
-            type: 'AGD',
-            status: ResourceStatus.OPERATIONAL,
-            description: 'Nowa lodowka, brak usterek.',
-        },
-        {
-            id: 3,
-            name: 'Odkurzacz',
-            type: 'AGD',
-            status: ResourceStatus.IN_REPAIR,
-            description: 'Nie dziala silnik, wymagana naprawa.',
-        },
-        {
-            id: 4,
-            name: 'Pralka',
-            type: 'AGD',
-            status: ResourceStatus.IN_REPAIR,
-            description: 'Nieprawidlowe dzialanie, wymaga przegladu.',
-        },
-        {
-            id: 5,
-            name: 'Mikrofalowka',
-            type: 'AGD',
-            status: ResourceStatus.OPERATIONAL,
-            description: 'Dziala bez zarzutu.',
-        },
-    ]);
-
+const Sprzet = () => { // Add gospodarstwoId prop
+    const [resources, setResources] = useState([]);
     const [editOpen, setEditOpen] = useState(false);
     const [currentResource, setCurrentResource] = useState(null);
-
+    const [gospodarstwoId, setGospodarstwoId] = useState(1);
     const columns = [
         { field: 'id', headerName: 'ID', width: 70 },
-        { field: 'name', headerName: 'Nazwa', width: 130 },
-        { field: 'type', headerName: 'Typ', width: 130 },
+        { field: 'nazwa', headerName: 'Nazwa', width: 130 },
+        { field: 'typ', headerName: 'Typ', width: 130 },
         { field: 'status', headerName: 'Status', width: 130 },
-        { field: 'description', headerName: 'Opis', width: 300 },
+        { field: 'opis', headerName: 'Opis', width: 300 },
         {
             field: 'actions',
             headerName: 'Akcje',
@@ -82,6 +46,23 @@ const Sprzet = () => {
             ),
         },
     ];
+
+    // Fetch resources data from API based on GospodarstwoId
+    useEffect(() => {
+        const fetchResources = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7191/api/sprzet/GetAllSprzet/${gospodarstwoId}`);
+                setResources(response.data);
+                console.log(response.data);
+            } catch (error) {
+                console.error("Error fetching equipment data:", error);
+            }
+        };
+
+        if (gospodarstwoId) {
+            fetchResources();
+        }
+    }, [gospodarstwoId]);
 
     const handleEditOpen = (resource) => {
         setCurrentResource(resource);
@@ -107,22 +88,21 @@ const Sprzet = () => {
             onClick: (row) => handleEditOpen(row),
         },
         {
-            title: 'Usu�',
+            title: 'Usuń',
             icon: <DeleteIcon />,
             onClick: (row) => handleDelete(row.id),
         },
     ];
 
-    // Handle dialog data
     const [dialogData, setDialogData] = useState([]);
 
     useEffect(() => {
         if (currentResource) {
             setDialogData([
-                { label: 'Nazwa', value: currentResource.name, name: 'name' },
-                { label: 'Typ', value: currentResource.type, name: 'type' },
+                { label: 'Nazwa', value: currentResource.nazwa, name: 'nazwa' },
+                { label: 'Typ', value: currentResource.typ, name: 'typ' },
                 { label: 'Status', value: currentResource.status, name: 'status' },
-                { label: 'Opis', value: currentResource.description, name: 'description' },
+                { label: 'Opis', value: currentResource.opis, name: 'opis' },
             ]);
         }
     }, [currentResource]);
@@ -130,25 +110,25 @@ const Sprzet = () => {
     const handleChange = (index, value) => {
         setDialogData((prevData) => {
             const updatedData = [...prevData];
-            updatedData[index].value = value; // Update the specific field's value
+            updatedData[index].value = value;
             return updatedData;
         });
     };
 
     const handleSubmit = () => {
         const updatedResource = {
-            id: currentResource.id, // Ensure to keep the same ID
-            name: dialogData[0].value,
-            type: dialogData[1].value,
+            id: currentResource.id,
+            nazwa: dialogData[0].value,
+            typ: dialogData[1].value,
             status: dialogData[2].value,
-            description: dialogData[3].value,
+            opis: dialogData[3].value,
         };
-        handleUpdate(updatedResource); // Call the update function
-        setEditOpen(false); // Close the modal
-        setCurrentResource(null); // Reset current resource
+        handleUpdate(updatedResource);
+        setEditOpen(false);
+        setCurrentResource(null);
     };
 
-    const description = "Zarządzanie sprzetem";
+    const description = "Zarządzanie sprzętem";
 
     return (
         <Box sx={{ width: '1000px' }}>
@@ -160,7 +140,7 @@ const Sprzet = () => {
             />
             {/* Edit Resource Modal */}
             <Dialog open={editOpen} onClose={() => setEditOpen(false)}>
-                <DialogTitle>Edytuj Zas�b</DialogTitle>
+                <DialogTitle>Edytuj Zasób</DialogTitle>
                 <DialogContent>
                     {dialogData.map((data, index) => {
                         if (data.name === 'status') {
