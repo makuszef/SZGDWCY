@@ -44,11 +44,13 @@ namespace SZGD.Server.Controllers
             {
                 return NotFound();
             }
+
             foreach (var dw in gospodarstwo.DomownikWGospodarstwie)
             {
                 dw.Domownik = await _context.Domownicy
                     .FirstOrDefaultAsync(d => d.Id == dw.DomownikId);
             }
+
             return Ok(gospodarstwo);
         }
 
@@ -121,5 +123,58 @@ namespace SZGD.Server.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = gospodarstwo.Id }, newDomownik);
         }
+
+        // GET: api/Gospodarstwo/{id}/Paragony
+        [HttpGet("{id}/Paragony")]
+        public async Task<ActionResult<IEnumerable<Paragon>>> GetParagonyByGospodarstwoId(int id)
+        {
+            // Pobierz paragony powiązane z gospodarstwem o określonym Id
+            var paragony = await _context.Paragony
+                .Include(p => p.Items) // Uwzględnij elementy paragonu
+                .Where(p => p.GospodarstwoId == id) // Filtruj po GospodarstwoId
+                .ToListAsync();
+
+            if (paragony == null || !paragony.Any())
+            {
+                return NotFound("Nie znaleziono paragonów dla podanego gospodarstwa.");
+            }
+
+            return Ok(paragony);
+        }
+        
+        // GET: api/Gospodarstwo/{id}/Sprzety
+        [HttpGet("{id}/Sprzety")]
+        public async Task<ActionResult<IEnumerable<Sprzet>>> GetSprzetyByGospodarstwoId(int id)
+        {
+            // Pobierz sprzęty powiązane z gospodarstwem o określonym Id
+            var sprzety = await _context.Sprzet
+                .Where(s => s.GospodarstwoId == id)  // Filtruj po GospodarstwoId
+                .ToListAsync();
+
+            if (sprzety == null || !sprzety.Any())
+            {
+                return NotFound("Nie znaleziono sprzętu dla podanego gospodarstwa.");
+            }
+
+            return Ok(sprzety);
+        }
+
+        // GET: api/Gospodarstwo/{id}/Pliki
+        [HttpGet("{id}/Pliki")]
+        public async Task<ActionResult<IEnumerable<PrzeslanyPlik>>> GetPlikiByGospodarstwoId(int id)
+        {
+            // Pobierz pliki powiązane z gospodarstwem o określonym Id
+            var pliki = await _context.Pliki
+                .Where(p => p.GospodarstwoId == id)  // Filtruj po GospodarstwoId
+                .ToListAsync();
+
+            if (pliki == null || !pliki.Any())
+            {
+                return NotFound("Nie znaleziono plików dla podanego gospodarstwa.");
+            }
+
+            return Ok(pliki);
+        }
+
     }
 }
