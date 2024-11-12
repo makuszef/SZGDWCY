@@ -193,16 +193,13 @@ const ReceiptManager = () => {
 
             const formData = new FormData();
             formData.append('file', file);
-
-            const fileUploadResponse = await axios.post('https://localhost:7191/api/PrzeslanyPlik', formData, {
+            const gospodarstwoId = 1;
+            // Change the URL to the correct endpoint
+            const fileUploadResponse = await axios.post(`https://localhost:7191/api/AnalizeFile/upload/${gospodarstwoId}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-
-            const receiptId = fileUploadResponse.data.receiptId;
-            const receiptResponse = await axios.get(`https://localhost:7191/api/paragon/${receiptId}`);
-            setReceipts([...receipts, receiptResponse.data]); // Dodajemy nowy paragon do listy
         } catch (error) {
             console.error('Błąd podczas wysyłania pliku lub pobierania paragonu:', error);
             setError('Wystąpił błąd podczas przetwarzania pliku.');
@@ -210,6 +207,7 @@ const ReceiptManager = () => {
             setIsLoading(false);
         }
     };
+
 
     const handleSelectReceipt = async (receiptId) => {
         try {

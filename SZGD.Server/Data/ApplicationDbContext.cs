@@ -29,7 +29,7 @@ namespace SZGD.Server.Data
 
             modelBuilder.Entity<Paragon>()
                 .HasMany(p => p.Items)
-                .WithOne()
+                .WithOne(p => p.Paragon)
                 .HasForeignKey(i => i.ParagonId);
 
             // Relacja jeden-do-jeden Paragon -> PrzeslanyPlik

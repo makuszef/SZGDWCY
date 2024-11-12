@@ -28,83 +28,80 @@ namespace SZGD.Server.Controllers
         }
 
         // POST: api/AnalizeFile/upload
-        [HttpPost("upload")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> PrzeslijPlik(IFormFile file, int idParagonu)
+        [HttpPost("upload/{gospodarstwoId}")]
+[Consumes("multipart/form-data")]
+public async Task<IActionResult> PrzeslijPlik(IFormFile file, int gospodarstwoId)
+{
+    if (file == null || file.Length == 0)
+        return BadRequest("Nie przesłano pliku.");
+
+    if (file.Length > MaxFileSize)
+        return BadRequest("Rozmiar pliku przekracza limit 5 MB.");
+
+    if (!AllowedImageTypes.Contains(file.ContentType))
+        return BadRequest("Dozwolone są tylko pliki graficzne (JPEG, PNG, GIF).");
+    var uploadedFile = new PrzeslanyPlik();
+    using (var memoryStream = new MemoryStream())
+    {
+        await file.CopyToAsync(memoryStream);
+        var fileContent = memoryStream.ToArray();
+
+        var isMalicious = await _virusTotalScanner.ScanFileForMalware(fileContent);
+        if (isMalicious)
+            return BadRequest("Plik został zidentyfikowany jako złośliwy.");
+
+        // Save the file to database
+        uploadedFile.NazwaPliku = file.FileName;
+        uploadedFile.ZawartoscPliku = fileContent;
+        
+    }
+
+    var filePath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+    await using (var stream = System.IO.File.Create(filePath))
+    {
+        await file.CopyToAsync(stream);
+    }
+
+    Paragon receiptData;
+    await using (var fileStream = new FileStream(filePath, FileMode.Open))
+    {
+        receiptData = await _receiptProcessor.ProcessAI(fileStream);
+    }
+
+    System.IO.File.Delete(filePath);
+
+    // Add the parsed receipt data to Paragony and PozycjeParagonu tables
+    var paragon = new Paragon
+    {
+        Date = receiptData.Date,
+        StoreName = receiptData.StoreName,
+        TotalAmount = receiptData.TotalAmount,
+        GospodarstwoId = gospodarstwoId,
+    };
+    uploadedFile.Paragon = paragon;
+    _context.Pliki.Add(uploadedFile);
+    _context.Paragony.Add(paragon);
+    await _context.SaveChangesAsync();
+
+    // Add items to PozycjeParagonu associated with the paragon
+    foreach (var item in receiptData.Items)
+    {
+        var pozycjaParagonu = new PozycjaParagonu
         {
-            if (file == null || file.Length == 0)
-                return BadRequest("Nie przesłano pliku.");
+            Paragon = paragon, // Associate the item directly with the Paragon object
+            Name = item.Name,
+            Price = item.Price,
+            Quantity = item.Quantity
+        };
 
-            if (file.Length > MaxFileSize)
-                return BadRequest("Rozmiar pliku przekracza limit 5 MB.");
+        _context.PozycjeParagonu.Add(pozycjaParagonu);
+    }
 
-            if (!AllowedImageTypes.Contains(file.ContentType))
-                return BadRequest("Dozwolone są tylko pliki graficzne (JPEG, PNG, GIF).");
+    await _context.SaveChangesAsync();
 
-            using (var memoryStream = new MemoryStream())
-            {
-                await file.CopyToAsync(memoryStream);
-                var fileContent = memoryStream.ToArray();
+    return Ok(new { receipt = receiptData });
+}
 
-                var isMalicious = await _virusTotalScanner.ScanFileForMalware(fileContent);
-                if (isMalicious)
-                    return BadRequest("Plik został zidentyfikowany jako złośliwy.");
-
-                var uploadedFile = new PrzeslanyPlik();
-                uploadedFile.NazwaPliku = file.FileName;
-                uploadedFile.ZawartoscPliku = fileContent;
-                uploadedFile.ParagonId = idParagonu; // Powiąż plik bezpośrednio z Paragonem
-                _context.Pliki.Add(uploadedFile);
-                await _context.SaveChangesAsync();
-            }
-
-            var filePath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            using (var stream = System.IO.File.Create(filePath))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            var receiptDataList = new List<Paragon>();
-
-            using (var fileStream = new FileStream(filePath, FileMode.Open))
-            {
-                var receiptData = await _receiptProcessor.ProcessAI(fileStream);
-                receiptDataList.Add(receiptData);
-            }
-
-            System.IO.File.Delete(filePath);
-
-            foreach (var receiptData in receiptDataList)
-            {
-                var paragon = new Paragon
-                {
-                    Id = idParagonu,
-                    Date = receiptData.Date,
-                    StoreName = receiptData.StoreName,
-                    TotalAmount = receiptData.TotalAmount
-                };
-
-                _context.Paragony.Add(paragon);
-                await _context.SaveChangesAsync();
-
-                foreach (var item in receiptData.Items)
-                {
-                    var pozycjaParagonu = new PozycjaParagonu
-                    {
-                        ParagonId = paragon.Id,
-                        Name = item.Name,
-                        Price = item.Price,
-                        Quantity = item.Quantity
-                    };
-
-                    _context.PozycjeParagonu.Add(pozycjaParagonu);
-                }
-
-                await _context.SaveChangesAsync();
-            }
-
-            return Ok(new { receipt = receiptDataList.FirstOrDefault() });
-        }
 
         // GET: api/AnalizeFile/AnalizujParagon
         [HttpGet("AnalizujParagon")]
