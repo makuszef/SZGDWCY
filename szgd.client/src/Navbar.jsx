@@ -19,6 +19,7 @@ import Person from '@mui/icons-material/Person';
 import { Select, MenuItem as MuiMenuItem, InputLabel, FormControl } from '@mui/material';
 import { Typography } from '@mui/material';
 import GroupIcon from '@mui/icons-material/Group';
+import axios from 'axios'; // Upewnij się, że masz zainstalowany axios
 
 const pages = [];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
@@ -31,6 +32,7 @@ function Navbar() {
     const [avatar, setAvatar] = React.useState(null); // State to handle avatar change
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const [refresh, setRefresh] = React.useState(false); // To trigger refetching
 
     React.useEffect(() => {
         if (user && user.id) {
@@ -59,6 +61,21 @@ function Navbar() {
             console.log('User or user.id is not available');
         }
     }, [user]);
+
+    React.useEffect(() => {
+        if (user && user.userdata.id) {
+            const fetchGospodarstwa = async () => {
+                try {
+                    const response = await axios.get(`https://localhost:7191/api/Domownik/GetAllGospodarstwa/${user.userdata.id}`);
+                    console.log("Response from API /Domownik/GetAllGospodarstwa:", response.data);
+                    setGospodarstwa(response.data); // Set fetched gospodarstwa data
+                } catch (error) {
+                    console.error("Error fetching gospodarstwa:", error);
+                }
+            };
+            fetchGospodarstwa();
+        }
+    }, [user, refresh]); // Fetch when the user changes or component mounts
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -98,9 +115,9 @@ function Navbar() {
     };
 
     const handleProfileClick = () => {
-        // Handle the logic for profile settings if needed
-        console.log('Profile clicked');
-    };
+        // Redirect to profile page
+        navigate('/profile');
+    }
 
     return (
         <AppBar>
@@ -178,6 +195,8 @@ function Navbar() {
                         </FormControl>
                     </Box>
 
+                    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}></Box>
+
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                         {pages.map((page) => (
                             <Button
@@ -228,11 +247,11 @@ function Navbar() {
                                         onClick={() => {
                                             handleCloseUserMenu();
                                             if (setting === 'Logout') {
-                                                handleLogout(); // Wylogowanie
+                                                handleLogout(); // Log out
                                             } else if (setting === 'Profile') {
-                                                handleProfileClick(); // Obsługuje kliknięcie profilu
+                                                handleProfileClick(); // Profile click
                                             } else {
-                                                navigate(`/${setting.toLowerCase()}`);
+                                                navigate('/profile');
                                             }
                                         }}
                                     >
@@ -246,6 +265,7 @@ function Navbar() {
                             </Menu>
                         </Box>
                     </Box>
+
                     {/* Hidden file input for avatar upload */}
                     <input
                         type="file"

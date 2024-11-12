@@ -7,6 +7,7 @@ import {
     DialogContent,
     DialogActions,
     TextField,
+    Typography,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -19,6 +20,7 @@ const Domownicy = ({ gospodarstwoId }) => {
     const [editOpen, setEditOpen] = useState(false);
     const [currentDomownik, setCurrentDomownik] = useState(null);
     const [dialogData, setDialogData] = useState([]);
+    const [gospodarstwoName, setGospodarstwoName] = useState('');
 
     const columns = [
         { field: 'id', headerName: 'ID', width: 70 },
@@ -36,7 +38,15 @@ const Domownicy = ({ gospodarstwoId }) => {
         },
     ];
 
-    // Fetch data from the API when the component mounts or gospodarstwoId changes
+    // Aktualizacja nazwy gospodarstwa przy każdym załadowaniu komponentu
+    useEffect(() => {
+        const savedGospodarstwoName = sessionStorage.getItem('gospodarstwoName');
+        if (savedGospodarstwoName) {
+            setGospodarstwoName(savedGospodarstwoName);
+        }
+    }, []); // Pusty array dependency oznacza, że ten efekt wykonuje się tylko raz przy montowaniu
+
+    // Pobieranie danych domowników z API
     useEffect(() => {
         const fetchDomownicy = async () => {
             try {
@@ -56,7 +66,7 @@ const Domownicy = ({ gospodarstwoId }) => {
                 }));
                 setDomownicy(fetchedDomownicy);
             } catch (error) {
-                console.error("Error fetching data:", error);
+                console.error("Błąd podczas pobierania danych:", error);
             }
         };
 
@@ -128,13 +138,20 @@ const Domownicy = ({ gospodarstwoId }) => {
 
     return (
         <Box sx={{ width: '100%' }}>
+            {/* Wyświetlanie nazwy gospodarstwa */}
+            <Typography variant="h5" sx={{ mb: 2 }}>
+                Gospodarstwo: {gospodarstwoName || "Nie wybrano gospodarstwa"}
+            </Typography>
+
+            {/* Tabela domowników */}
             <TableTemplate
                 passedResources={domownicy}
                 description={description}
                 columns={columns}
                 rowActions={rowActions}
             />
-            {/* Edit Domownik Modal */}
+
+            {/* Modal edycji domownika */}
             <Dialog open={editOpen} onClose={() => setEditOpen(false)}>
                 <DialogTitle>Edytuj Domownika</DialogTitle>
                 <DialogContent>
