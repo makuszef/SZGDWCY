@@ -112,5 +112,24 @@ namespace SZGD.Server.Controllers
 
             return NoContent();
         }
+        
+        // GET: api/Paragon/ByGospodarstwo/{gospodarstwoId}
+        [HttpGet("ByGospodarstwo/{gospodarstwoId}")]
+        public async Task<ActionResult<IEnumerable<Paragon>>> GetParagonyByGospodarstwoId(int gospodarstwoId)
+        {
+            var paragony = await _context.Paragony
+                .Include(p => p.Items) // Uwzględnij elementy paragonu
+                .Where(p => p.GospodarstwoId == gospodarstwoId) // Filtruj po GospodarstwoId
+                .ToListAsync();
+
+            if (paragony == null || !paragony.Any())
+            {
+                return NotFound("Nie znaleziono paragonów dla podanego gospodarstwa.");
+            }
+
+            return Ok(paragony);
+        }
+
+        
     }
 }

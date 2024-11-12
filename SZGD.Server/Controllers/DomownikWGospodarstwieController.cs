@@ -53,7 +53,6 @@ namespace SZGD.Server.Controllers
             {
                 DomownikId = request.DomownikId,
                 GospodarstwoId = request.GospodarstwoId,
-                Rola = request.Rola // You can use the provided role or assign a default value
             };
 
             // Add the new entity to the context
@@ -110,7 +109,6 @@ namespace SZGD.Server.Controllers
             domownikWGospodarstwie.CzyMozeModyfikowacDomownikow = updatedDomownikWGospodarstwie.CzyMozeModyfikowacDomownikow;
             domownikWGospodarstwie.CzyMozeModyfikowacGospodarstwo = updatedDomownikWGospodarstwie.CzyMozeModyfikowacGospodarstwo;
             domownikWGospodarstwie.CzyMozePrzesylacPliki = updatedDomownikWGospodarstwie.CzyMozePrzesylacPliki;
-            domownikWGospodarstwie.Rola = updatedDomownikWGospodarstwie.Rola;
 
             _context.DomownikWGospodarstwie.Update(domownikWGospodarstwie);
             await _context.SaveChangesAsync();
@@ -140,6 +138,5 @@ namespace SZGD.Server.Controllers
     {
         public string DomownikId { get; set; }
         public int GospodarstwoId { get; set; }
-        public DomownikRole Rola { get; set; }  // Assign a default role or let the caller specify
     }
 }

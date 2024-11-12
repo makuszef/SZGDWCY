@@ -3,15 +3,10 @@ using System.Text.Json.Serialization;
 
 namespace SZGD.Server.Models
 {
-    public enum DomownikRole
-    {
-        Starzec,
-        Rodzic,
-        Dziecko
-    }
 
     public class DomownikWGospodarstwie
     {
+        public bool czyWlasciciel { get; set; } = true;
         public bool CzyWidziInformacjeMedyczneDomownikow { get; set; } = false;
         public bool CzyWidziSprzet { get; set; } = false;
         public bool CzyWidziDomownikow { get; set; } = false;
@@ -29,6 +24,6 @@ namespace SZGD.Server.Models
         public Domownik? Domownik { get; set; }
         [JsonIgnore]
         public Gospodarstwo? Gospodarstwo { get; set; }
-        public DomownikRole Rola { get; set; }  // New enum property
+        
     }
 }

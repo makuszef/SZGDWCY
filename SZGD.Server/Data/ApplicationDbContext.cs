@@ -99,11 +99,11 @@ namespace SZGD.Server.Data
                 new Domownik { Id = "3", UserName = "maria", Imie = "Maria", Nazwisko = "Zalewska", Email = "maria.zalewska@example.com" }
             );
 
-            // Seed data for DomownikWGospodarstwie (Associating Household Members with Households)
+            // Seed data for DomownikWGospodarstwie 
             modelBuilder.Entity<DomownikWGospodarstwie>().HasData(
-                new DomownikWGospodarstwie { DomownikId = "1", GospodarstwoId = 1, Rola = DomownikRole.Rodzic },  // Parent
-                new DomownikWGospodarstwie { DomownikId = "2", GospodarstwoId = 1, Rola = DomownikRole.Rodzic },  // Parent
-                new DomownikWGospodarstwie { DomownikId = "3", GospodarstwoId = 2, Rola = DomownikRole.Dziecko } // Child
+                new DomownikWGospodarstwie { DomownikId = "1", GospodarstwoId = 1, czyWlasciciel = true}, 
+                new DomownikWGospodarstwie { DomownikId = "2", GospodarstwoId = 1, czyWlasciciel = true }, 
+                new DomownikWGospodarstwie { DomownikId = "3", GospodarstwoId = 2, czyWlasciciel = false } 
             );
 
             // Seed data for Sprzet (Household Equipment)
@@ -131,6 +131,7 @@ namespace SZGD.Server.Data
                 new HistoriaUzyciaSprzetu { Id = 1, SprzetId = 1, DomownikId = "1", GospodarstwoId = 1, DataUzycia = new DateTime(2023, 02, 10), CzyWystapilaAwaria = false, KomentarzDoAwarii = "" },
                 new HistoriaUzyciaSprzetu { Id = 2, SprzetId = 2, DomownikId = "2", GospodarstwoId = 1, DataUzycia = new DateTime(2023, 03, 12), CzyWystapilaAwaria = true, KomentarzDoAwarii = "Pęknięta uszczelka" }
             );
+
         }
     }
 }

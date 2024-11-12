@@ -106,6 +106,12 @@ namespace SZGD.Server.Controllers
 
             return Ok(sprzet);
         }
+        
+        private bool SprzetExists(int id)
+        {
+            return _context.Sprzet.Any(e => e.Id == id);
+        }
+        
         // GET: api/Sprzet/{id}/Historia
         [HttpGet("{id}/Historia")]
         public async Task<ActionResult<IEnumerable<object>>> GetHistoriaBySprzetId(int id)
@@ -131,9 +137,8 @@ namespace SZGD.Server.Controllers
 
             return Ok(historia);
         }
-        private bool SprzetExists(int id)
-        {
-            return _context.Sprzet.Any(e => e.Id == id);
-        }
+
+
+        
     }
 }
