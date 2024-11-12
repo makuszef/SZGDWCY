@@ -7,6 +7,13 @@ const FileUpload = ({ onFileUpload }) => {
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
+        const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+
+        if (file && !allowedTypes.includes(file.type)) {
+            alert('Proszę wybrać plik o odpowiednim formacie (JPEG, PNG, PDF)');
+            return;
+        }
+
         setSelectedFile(file);
     };
 
@@ -61,9 +68,9 @@ const ReceiptManager = () => {
             const formData = new FormData();
             formData.append('file', file);
 
-            const fileUploadResponse = await axios.post('https://your-api-endpoint.com/api/przeslanyplik', formData, {
+            const fileUploadResponse = await axios.post('https://localhost:7191/api/Paragon', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
+                    //'Content-Type': 'multipart/form-data',
                 },
             });
 
@@ -73,7 +80,7 @@ const ReceiptManager = () => {
             const receiptId = fileUploadResponse.data.receiptId;  // Zależy od struktury odpowiedzi API
 
             // Pobieranie danych paragonu z ParagonController
-            const receiptResponse = await axios.get(`https://your-api-endpoint.com/api/paragon/${receiptId}`);
+            const receiptResponse = await axios.get(`https://localhost:7191/api/Paragon/${receiptId}`);
             setParagonData(receiptResponse.data);
         } catch (error) {
             console.error('Błąd podczas wysyłania pliku lub pobierania paragonu:', error);
@@ -85,7 +92,7 @@ const ReceiptManager = () => {
 
     return (
         <div>
-            <h1>System zarządzania gospodarstwem domowym</h1>
+            <h1>Paragony i gwarancje</h1>
 
             {/* Formularz do uploadu pliku */}
             <FileUpload onFileUpload={handleFileUpload} />

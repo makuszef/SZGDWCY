@@ -3,7 +3,6 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
@@ -16,6 +15,10 @@ import HomeIcon from '@mui/icons-material/Home';
 import LoginIcon from '@mui/icons-material/Login';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import Person from '@mui/icons-material/Person';
+import { Select, MenuItem as MuiMenuItem, InputLabel, FormControl } from '@mui/material';
+import { Typography } from '@mui/material';
+import GroupIcon from '@mui/icons-material/Group';
 
 const pages = [];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
@@ -23,8 +26,39 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 function Navbar() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
+    const [gospodarstwa, setGospodarstwa] = React.useState([]);
+    const [selectedGospodarstwo, setSelectedGospodarstwo] = React.useState("");
+    const [avatar, setAvatar] = React.useState(null); // State to handle avatar change
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+
+    React.useEffect(() => {
+        if (user && user.id) {
+            console.log('Fetching gospodarstwa for user ID:', user.id);
+
+            fetch(`/api/Domownik/GetAllGospodarstwa/${user.id}`)
+                .then((response) => {
+                    console.log('Response from API:', response);
+                    if (!response.ok) {
+                        throw new Error(`API responded with ${response.status} - ${response.statusText}`);
+                    }
+                    return response.text();
+                })
+                .then((text) => {
+                    try {
+                        const data = JSON.parse(text);
+                        setGospodarstwa(data);
+                    } catch (error) {
+                        console.error('Failed to parse JSON response:', error, text);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error fetching gospodarstwa:', error);
+                });
+        } else {
+            console.log('User or user.id is not available');
+        }
+    }, [user]);
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -42,97 +76,107 @@ function Navbar() {
         setAnchorElUser(null);
     };
 
+    const handleGospodarstwoChange = (event) => {
+        setSelectedGospodarstwo(event.target.value);
+        console.log('Selected gospodarstwo:', event.target.value);
+    };
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
+    const handleAvatarChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setAvatar(reader.result); // Save base64 image data
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleProfileClick = () => {
+        // Handle the logic for profile settings if needed
+        console.log('Profile clicked');
+    };
+
     return (
         <AppBar>
             <Container sx={{ width: '100%' }}>
                 <Toolbar disableGutters>
-
-                    {/* Login Button with margin-right */}
                     <Button
                         startIcon={<LoginIcon />}
                         onClick={() => navigate('/login')}
                         sx={{
                             color: 'inherit',
-                            mr: 2,  // Adds margin-right to create space between Login and Home
-                            '&:hover': {
-                                backgroundColor: 'transparent',
-                            },
+                            mr: 2,
+                            '&:hover': { backgroundColor: 'transparent' },
+                            display: 'flex',
+                            alignItems: 'center',
+                            height: 40,
                         }}
                     >
                         <Typography variant="h6">Login</Typography>
                     </Button>
 
-                    {/* Home Button */}
                     <Button
                         startIcon={<HomeIcon />}
                         onClick={() => navigate('/')}
                         sx={{
                             color: 'inherit',
-                            '&:hover': {
-                                backgroundColor: 'transparent',
-                            },
+                            '&:hover': { backgroundColor: 'transparent' },
+                            display: 'flex',
+                            alignItems: 'center',
+                            height: 40,
+                            mr: 2,
                         }}
                     >
                         <Typography variant="h6">Home</Typography>
-                        {user ? <Typography variant="h6" sx={{ marginLeft: '1rem' }}>Witaj {user.userdata.email}</Typography> : null}
                     </Button>
 
-                    {/* Responsive Menu and Other Components */}
-                    <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-                        <IconButton
-                            size="large"
-                            aria-label="account of current user"
-                            aria-controls="menu-appbar"
-                            aria-haspopup="true"
-                            onClick={handleOpenNavMenu}
-                            color="inherit"
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <Menu
-                            id="menu-appbar"
-                            anchorEl={anchorElNav}
-                            anchorOrigin={{
-                                vertical: 'bottom',
-                                horizontal: 'left',
-                            }}
-                            keepMounted
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'left',
-                            }}
-                            open={Boolean(anchorElNav)}
-                            onClose={handleCloseNavMenu}
-                            sx={{ display: { xs: 'block', md: 'none' } }}
-                        >
-                            {pages.map((page) => (
-                                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                                    <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
-                                </MenuItem>
-                            ))}
-                        </Menu>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mt: 0 }}>
+                        <GroupIcon sx={{ marginRight: 1, fontSize: 20 }} />
+                        <FormControl sx={{ minWidth: 200 }}>
+                            <InputLabel
+                                id="gospodarstwo-label"
+                                sx={{ color: 'white', textAlign: 'center' }}
+                            >
+                                Gospodarstwo
+                            </InputLabel>
+                            <Select
+                                labelId="gospodarstwo-label"
+                                id="gospodarstwo-select"
+                                value={selectedGospodarstwo || ""}
+                                label="Gospodarstwo"
+                                onChange={handleGospodarstwoChange}
+                                sx={{
+                                    height: 40,
+                                    '.MuiSelect-select': {
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        height: 40,
+                                        color: 'white',
+                                    },
+                                    '.MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
+                                }}
+                            >
+                                {gospodarstwa.length === 0 ? (
+                                    <MuiMenuItem value="">
+                                        <em>Brak gospodarstw do wybrania</em>
+                                    </MuiMenuItem>
+                                ) : (
+                                    gospodarstwa.map((gospodarstwo) => (
+                                        <MuiMenuItem key={gospodarstwo.id} value={gospodarstwo.id}>
+                                            {gospodarstwo.nazwa}
+                                        </MuiMenuItem>
+                                    ))
+                                )}
+                            </Select>
+                        </FormControl>
                     </Box>
-
-                    {/* Logo and Other Toolbar Elements */}
-                    <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
-                    <Typography
-                        variant="h5"
-                        noWrap
-                        component="a"
-                        href="#"
-                        sx={{
-                            mr: 2,
-                            display: { xs: 'flex', md: 'none' },
-                            flexGrow: 1,
-                            fontFamily: 'monospace',
-                            fontWeight: 700,
-                            letterSpacing: '.3rem',
-                            color: 'inherit',
-                            textDecoration: 'none',
-                        }}
-                    >
-                        LOGO
-                    </Typography>
 
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                         {pages.map((page) => (
@@ -146,35 +190,70 @@ function Navbar() {
                         ))}
                     </Box>
 
-                    <Box sx={{ flexGrow: 0 }}>
-                        <Tooltip title="Open settings">
-                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar alt="User Avatar" src="/static/images/avatar/2.jpg" />
-                            </IconButton>
-                        </Tooltip>
-                        <Menu
-                            sx={{ mt: '45px' }}
-                            id="menu-appbar"
-                            anchorEl={anchorElUser}
-                            anchorOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
-                            keepMounted
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
-                            open={Boolean(anchorElUser)}
-                            onClose={handleCloseUserMenu}
-                        >
-                            {settings.map((setting) => (
-                                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                    <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        {user ? (
+                            <>
+                                <Person sx={{ fontSize: 30, marginRight: '1rem' }} />
+                                <Typography variant="h6" sx={{ marginRight: '1rem' }}>
+                                    Witaj, <strong>{user.userdata.imie}</strong>!
+                                </Typography>
+                            </>
+                        ) : null}
+
+                        <Box sx={{ flexGrow: 0 }}>
+                            <Tooltip title="Open settings">
+                                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                                    <Avatar alt="User Avatar" src={avatar || "/static/images/avatar/2.jpg"} />
+                                </IconButton>
+                            </Tooltip>
+                            <Menu
+                                sx={{ mt: '45px' }}
+                                id="menu-appbar"
+                                anchorEl={anchorElUser}
+                                anchorOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                keepMounted
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                open={Boolean(anchorElUser)}
+                                onClose={handleCloseUserMenu}
+                            >
+                                {settings.map((setting) => (
+                                    <MenuItem
+                                        key={setting}
+                                        onClick={() => {
+                                            handleCloseUserMenu();
+                                            if (setting === 'Logout') {
+                                                handleLogout(); // Wylogowanie
+                                            } else if (setting === 'Profile') {
+                                                handleProfileClick(); // Obsługuje kliknięcie profilu
+                                            } else {
+                                                navigate(`/${setting.toLowerCase()}`);
+                                            }
+                                        }}
+                                    >
+                                        <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                                    </MenuItem>
+                                ))}
+                                {/* Option for changing avatar */}
+                                <MenuItem onClick={() => document.getElementById('avatar-upload').click()}>
+                                    <Typography sx={{ textAlign: 'center' }}>Change Avatar</Typography>
                                 </MenuItem>
-                            ))}
-                        </Menu>
+                            </Menu>
+                        </Box>
                     </Box>
+                    {/* Hidden file input for avatar upload */}
+                    <input
+                        type="file"
+                        id="avatar-upload"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={handleAvatarChange}
+                    />
                 </Toolbar>
             </Container>
         </AppBar>
@@ -182,5 +261,3 @@ function Navbar() {
 }
 
 export default Navbar;
-
-

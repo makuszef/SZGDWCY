@@ -21,6 +21,7 @@ import Gospodarstwo from "@/Gospodarstwo.jsx";
 import RegisterPage from './RegisterPage';
 import About from "@/About.jsx";
 import {AuthProvider} from "@/AuthContext.jsx";
+import Profile from "@/Profile.jsx";
 
 // Karty g��wne z przypisanymi ikonami i trasami
 const MainCards = [
@@ -44,6 +45,7 @@ function App() {
                 <Route path="/login" element={<AppLayout Content={<LoginPage/>}/>} />
                 <Route path="/about" element={<AppLayout Content={<About/>}/>} />
                 <Route path="/register" element={<AppLayout Content={<RegisterPage />} />} />
+                <Route path="/profile" element={<AppLayout Content={<Profile/>}/>} />
     
                 {/* Dynamiczne mapowanie tras */}
                 {MainCards.map(card => (
