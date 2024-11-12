@@ -6,8 +6,6 @@ using SZGD.Server.Data;
 using IronOcr;
 using SZGD.Server.Models;
 
-IronOcr.Installation.LicenseKey = 
-    "IRONSUITE.HU.MAKOWSKI.GMAIL.COM.23473-510061A268-CLDBP4Y-HMB5LJV7OEJA-ISOVQAKS4TCD-XVAG4XGXQRYX-FH6APF6TPRPE-Q2DYVEEQSHBU-H5DUT3CQKXWF-HTE2XU-TJEKZVD5HE6OEA-DEPLOYMENT.TRIAL-WMJPQQ.TRIAL.EXPIRES.06.DEC.2024";
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
