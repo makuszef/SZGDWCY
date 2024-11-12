@@ -2,53 +2,63 @@ import React, { useState } from 'react';
 import { TextField, Button, Box, Typography, Snackbar, Alert } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from './AuthContext';
+import { useAuth } from './AuthContext'; // Używamy kontekstu do sprawdzania stanu użytkownika
+import CorrectIcon from '@mui/icons-material/CheckCircle';
+
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
-    const { login } = useAuth();
-    const navigate = useNavigate(); // To redirect to another page after login
+    const { login, user } = useAuth(); // Uzyskujemy dane użytkownika z kontekstu
+    const navigate = useNavigate();
+
+    // Jeśli użytkownik jest już zalogowany, przekieruj na stronę główną
+    if (user) {
+        return (
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 5 }}>
+                <CorrectIcon sx={{ fontSize: 40, color: 'green', marginBottom: 2 }} />
+
+                <Typography variant="h4" mb={3}>Jesteś już zalogowany!</Typography>
+                <Typography variant="h6" mb={3}>Zalogowano pomyślnie jako {user.userdata.imie}.</Typography>
+                <Button variant="contained" color="primary" onClick={() => navigate('/gospodarstwa')}>
+                    Przejdź do gospodarstw
+                </Button>
+            </Box>
+        );
+    }
 
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            // Wysłanie zapytania POST do serwera logowania
             const response = await axios.post('https://localhost:7191/login', {
                 email,
                 password
             });
 
-            // Jeśli logowanie się powiedzie
             console.log('Login successful:', response.status);
             console.log("tokens", response.data);
-            setSuccessMessage('Login successl!');
-            // Teraz wyślij zapytanie GET do api/Domownik/{email}
+            setSuccessMessage('Login successful!');
+
             try {
                 const userResponse = await axios.get(`https://localhost:7191/api/Domownik/GetDomownikByEmail/${email}`);
                 console.log('User data:', userResponse.data);
                 const userData = { userdata: userResponse.data, tokens: response.data };
-                login(userData);
+                login(userData); // Logowanie użytkownika
+
+                setOpenSnackbar(true);
+                setTimeout(() => {
+                    navigate('/gospodarstwa');
+                }, 2000);
+
             } catch (error) {
                 console.error('Error fetching user data:', error.response ? error.response.data : error.message);
             }
-            
-
-            // Otwórz snackbar z komunikatem
-            setOpenSnackbar(true);
-
-            // Przekierowanie na stronę z gospodarstwem (gospodarstwa) po udanym logowaniu
-            setTimeout(() => {
-                navigate('/gospodarstwa'); // Zmieniamy '/buttons' na '/gospodarstwa'
-            }, 2000); // Przekierowanie po 2 sekundach
-
         } catch (error) {
-            // Obsługa błędów
             console.error('Login error:', error.response ? error.response.data : error.message);
             setSuccessMessage('Login failed. Please check your credentials.');
-            setOpenSnackbar(true); // Otwórz snackbar przy błędzie logowania
+            setOpenSnackbar(true);
         }
     };
 
@@ -85,12 +95,11 @@ const LoginPage = () => {
                 Don't have an account? <Link to="/register">Register here</Link>
             </Typography>
 
-            {/* Snackbar for login success or failure */}
             <Snackbar
                 open={openSnackbar}
                 autoHideDuration={6000}
                 onClose={handleSnackbarClose}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }} // Position the snackbar at the top
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
             >
                 <Alert severity={successMessage.includes('failed') ? "error" : "success"} onClose={handleSnackbarClose} sx={{ width: '100%' }}>
                     {successMessage}

@@ -18,23 +18,25 @@ const RegisterPage = () => {
         e.preventDefault();
 
         try {
-            const response = await axios.post('https://localhost:7191/register', {
+            const response = await axios.post(`https://localhost:7191/register`, {
                 email,
                 password,
-                phoneNumber,
-                firstName,
-                lastName
             });
 
             setSuccessMessage('Registration successful!');
             setOpenSnackbar(true);
-
-            axios.put(`https://localhost:7191/api/Domownik/${email}`, {
-                Imie: firstName,        // Pasuje do 'Imie' w DomownikDTO
-                Nazwisko: lastName,     // Pasuje do 'Nazwisko' w DomownikDTO
-                PhoneNumber: phoneNumber // Pasuje do 'PhoneNumber' w DomownikDTO
+            console.log(firstName, lastName, phoneNumber);
+            try {
+                const response2 = await axios.put(`https://localhost:7191/api/Domownik/${email}`, {
+                imie: firstName, 
+                nazwisko: lastName,
+                phoneNumber: phoneNumber,
             });
-
+                console.log(firstName, lastName, phoneNumber);
+            console.log('Registration successful:', response2.data);
+        } catch (error) {
+            console.error('Registration error:', error.response ? error.response.data : error.message);
+        }
 
             setEmail('');
             setPassword('');
