@@ -166,11 +166,11 @@ namespace SZGD.Server.Controllers
 
         // GET: api/Gospodarstwo/{id}/Pliki
         [HttpGet("{id}/Pliki")]
-        public async Task<ActionResult<IEnumerable<PrzeslanyPlik>>> GetPlikiByGospodarstwoId(int id)
+        public async Task<ActionResult<IEnumerable<PrzeslanyPlik>>> GetPlikiByParagonId(int id)
         {
             // Pobierz pliki powiązane z gospodarstwem o określonym Id
             var pliki = await _context.Pliki
-                .Where(p => p.GospodarstwoId == id)  // Filtruj po GospodarstwoId
+                .Where(p => p.ParagonId == id)  // Filtruj po GospodarstwoId
                 .ToListAsync();
 
             if (pliki == null || !pliki.Any())

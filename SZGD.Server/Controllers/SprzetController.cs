@@ -93,7 +93,44 @@ namespace SZGD.Server.Controllers
 
             return NoContent();
         }
+        [HttpGet("GetAllSprzet/{gospodarstwoId}")]
+        public async Task<ActionResult<IEnumerable<DomownikWGospodarstwie>>> GetAllGospodarstwaForDomownik(int gospodarstwoId)
+        {
+            var sprzet = await _context.Sprzet
+                .Where(g => g.GospodarstwoId == gospodarstwoId)
+                .ToListAsync();
+            if (sprzet == null || sprzet.Count == 0)
+            {
+                return NotFound(new { message = "No gospodarstwa found for this domownik" });
+            }
 
+            return Ok(sprzet);
+        }
+        // GET: api/Sprzet/{id}/Historia
+        [HttpGet("{id}/Historia")]
+        public async Task<ActionResult<IEnumerable<object>>> GetHistoriaBySprzetId(int id)
+        {
+            var historia = await _context.HistoriaUzyciaSprzetu
+                .Where(h => h.SprzetId == id)
+                .Include(h => h.DomownikWGospodarstwie)
+                .Select(h => new
+                {
+                    h.Id,
+                    ImieDomownika = h.DomownikWGospodarstwie.Domownik.Imie,
+                    NazwiskoDomownika = h.DomownikWGospodarstwie.Domownik.Nazwisko,
+                    h.DataUzycia,
+                    h.CzyWystapilaAwaria,
+                    h.KomentarzDoAwarii
+                })
+                .ToListAsync();
+
+            if (historia == null || !historia.Any())
+            {
+                return NotFound("Nie znaleziono historii użycia dla podanego sprzętu.");
+            }
+
+            return Ok(historia);
+        }
         private bool SprzetExists(int id)
         {
             return _context.Sprzet.Any(e => e.Id == id);

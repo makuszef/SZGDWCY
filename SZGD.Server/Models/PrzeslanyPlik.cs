@@ -1,19 +1,17 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace SZGD.Server.Models;
-
-public class PrzeslanyPlik
+namespace SZGD.Server.Models
 {
-    public int Id { get; set; }
-    public string NazwaPliku { get; set; }
-    public byte[] ZawartoscPliku { get; set; }
-    public int GospodarstwoId { get; set; }
-    [JsonIgnore]
-    public Gospodarstwo? Gospodarstwo { get; set; }
-
-    public PrzeslanyPlik(string nazwaPliku, byte[] zawartoscPliku)
+    public class PrzeslanyPlik
     {
-        NazwaPliku = nazwaPliku;
-        ZawartoscPliku = zawartoscPliku;
+        [Key, ForeignKey(nameof(Paragon))]
+        public int ParagonId { get; set; }
+        public string NazwaPliku { get; set; }
+        public byte[] ZawartoscPliku { get; set; }
+
+        [JsonIgnore]
+        public Paragon Paragon { get; set; }
     }
 }
