@@ -4,27 +4,34 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import { useAuth } from './AuthContext';
 
 export default function Sidebar({ ListItems }) {
     const [open, setOpen] = React.useState(false);
     const [buttonItems, setButtonItems] = React.useState(ListItems);
-    const navigate = useNavigate();  // Create navigate function
+    const navigate = useNavigate();
+    const { user } = useAuth();  // Access user data from the auth context
 
     useEffect(() => {
         setButtonItems(ListItems);
-    }, [ListItems]); // Tablica zale�no�ci
+    }, [ListItems]);
 
     const handleToggle = () => {
         setOpen(!open);
     };
 
     const handleNavigation = (path) => {
-        navigate(path);  // Use navigate to change the route
+        navigate(path);
     };
+
+    // Jeśli użytkownik nie jest zalogowany, nie renderuj sidebaru ani pustego div
+    if (!user) {
+        return null;  // Zwraca null, co sprawia, że komponent jest całkowicie niewidoczny
+    }
 
     return (
         <List
-            sx={{ width: '100%', maxWidth: 360 }}
+            sx={{ width: '100%', maxWidth: 240 }} // Szerokość sidebaru
             component="nav"
             aria-labelledby="nested-list-subheader"
         >
@@ -39,6 +46,3 @@ export default function Sidebar({ ListItems }) {
         </List>
     );
 }
-
-
-
