@@ -8,12 +8,19 @@ import {
     DialogActions,
     TextField,
     Typography,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import TableTemplate from './TableTemplate';
-import RowActions from './RowActions';
 import axios from 'axios';
+import { Home } from '@mui/icons-material'; // Import ikony Home
+
 
 const Domownicy = () => {
     const [domownicy, setDomownicy] = useState([]);
@@ -24,37 +31,24 @@ const Domownicy = () => {
     const [gospodarstwoId, setGospodarstwoId] = useState(sessionStorage.getItem('selectedGospodarstwoId'));
 
     const columns = [
-        { field: 'id', headerName: 'ID', width: 70 },
         { field: 'imie', headerName: 'Imie', width: 130 },
         { field: 'nazwisko', headerName: 'Nazwisko', width: 130 },
         { field: 'email', headerName: 'Email', width: 200 },
         { field: 'telefon', headerName: 'Telefon', width: 150 },
-        {
-            field: 'actions',
-            headerName: 'Akcje',
-            width: 130,
-            renderCell: (params) => (
-                <RowActions Row={params.row} Actions={rowActions} />
-            ),
-        },
+        { field: 'actions', headerName: 'Akcje', width: 130 },
     ];
 
-    // Pobieranie nazwy gospodarstwa i domowników, gdy ID gospodarstwa jest dostępne
     useEffect(() => {
-        console.log(gospodarstwoId);
         if (gospodarstwoId) {
-            // Pobierz nazwę gospodarstwa
             const fetchGospodarstwoName = async () => {
                 try {
                     const response = await axios.get(`https://localhost:7191/api/Gospodarstwo/${gospodarstwoId}`);
-                    setGospodarstwoName(gospodarstwoName);
-                    console.log(gospodarstwoName)
+                    setGospodarstwoName(response.data.nazwa);
                 } catch (error) {
                     console.error("Błąd podczas pobierania nazwy gospodarstwa:", error);
                 }
             };
 
-            // Pobierz domowników
             const fetchDomownicy = async () => {
                 try {
                     const response = await axios.get(`https://localhost:7191/api/Gospodarstwo/${gospodarstwoId}`);
@@ -64,12 +58,6 @@ const Domownicy = () => {
                         nazwisko: item.domownik.nazwisko,
                         email: item.domownik.email,
                         telefon: item.domownik.phoneNumber,
-                        czyWidziInformacjeMedyczneDomownikow: item.czyWidziInformacjeMedyczneDomownikow,
-                        czyWidziSprzet: item.czyWidziSprzet,
-                        czyWidziDomownikow: item.czyWidziDomownikow,
-                        czyMozeModyfikowacDomownikow: item.czyMozeModyfikowacDomownikow,
-                        czyMozeModyfikowacGospodarstwo: item.czyMozeModyfikowacGospodarstwo,
-                        czyMozePrzesylacPliki: item.czyMozePrzesylacPliki,
                     }));
                     setDomownicy(fetchedDomownicy);
                 } catch (error) {
@@ -80,7 +68,7 @@ const Domownicy = () => {
             fetchGospodarstwoName();
             fetchDomownicy();
         }
-    }, [gospodarstwoId]); // Zależność od gospodarstwaId
+    }, [gospodarstwoId]);
 
     const handleEditOpen = (domownik) => {
         setCurrentDomownik(domownik);
@@ -95,13 +83,8 @@ const Domownicy = () => {
 
     const handleDelete = async (domownikId) => {
         try {
-            // Wysyłanie żądania do API usuwającego domownika
             await axios.delete(`https://localhost:7191/api/Domownik/${domownikId}`);
-
-            // Usuwanie z lokalnego stanu
-            setDomownicy((prevDomownicy) =>
-                prevDomownicy.filter(domownik => domownik.id !== domownikId)
-            );
+            setDomownicy(prevDomownicy => prevDomownicy.filter(domownik => domownik.id !== domownikId));
         } catch (error) {
             console.error("Błąd podczas usuwania domownika:", error);
         }
@@ -109,35 +92,15 @@ const Domownicy = () => {
 
     const handleUpdate = async (updatedDomownik) => {
         try {
-            // Wysyłanie zaktualizowanych danych do API
             await axios.put(`https://localhost:7191/api/Domownik/${updatedDomownik.id}`, updatedDomownik);
-
-            // Aktualizowanie stanu po udanej edycji
-            setDomownicy((prevDomownicy) =>
-                prevDomownicy.map((domownik) =>
-                    domownik.id === updatedDomownik.id ? updatedDomownik : domownik
-                )
-            );
+            setDomownicy(prevDomownicy => prevDomownicy.map(domownik => domownik.id === updatedDomownik.id ? updatedDomownik : domownik));
         } catch (error) {
             console.error("Błąd podczas aktualizowania danych domownika:", error);
         }
     };
 
-    const rowActions = [
-        {
-            title: 'Edytuj',
-            icon: <EditIcon />,
-            onClick: (row) => handleEditOpen(row),
-        },
-        {
-            title: 'Usuń',
-            icon: <DeleteIcon />,
-            onClick: (row) => handleDelete(row.id),
-        },
-    ];
-
     const handleChange = (index, value) => {
-        setDialogData((prevData) => {
+        setDialogData(prevData => {
             const updatedData = [...prevData];
             updatedData[index].value = value;
             return updatedData;
@@ -157,24 +120,68 @@ const Domownicy = () => {
         setCurrentDomownik(null);
     };
 
-    const description = "Zarządzanie domownikami";
-
     return (
         <Box sx={{ width: '100%' }}>
-            {/* Wyświetlanie nazwy gospodarstwa */}
-            <Typography variant="h5" sx={{ mb: 2 }}>
-                Gospodarstwo: {gospodarstwoName || "Nie wybrano gospodarstwa"}
+            {/*<Home sx={{ marginRight: 2 }} /> /!* Ikona domu *!/*/}
+            <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
+                {/*Gospodarstwo: {gospodarstwoName || "Nie wybrano gospodarstwa"}*/}
+                Zarządzanie domownikami w gospodarstwie
             </Typography>
+            <br/>
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            {columns.map((column) => (
+                                <TableCell
+                                    key={column.field}
+                                    style={{
+                                        width: column.width,           // Zachowanie szerokości kolumny
+                                        fontWeight: 'bold',            // Pogrubienie tekstu
+                                        backgroundColor: '#f4f4f4',   // Jasne tło nagłówka
+                                        color: '#333',                 // Ciemny kolor tekstu
+                                        borderBottom: '2px solid #ddd', // Dodanie dolnej ramki
+                                        padding: '10px',               // Dodanie trochę paddingu, by zachować proporcje
+                                        textAlign: column.align || 'left', // Zachowanie oryginalnego wyrównania (lewe, środkowe itp.)
+                                    }}
+                                >
+                                    {column.headerName}
+                                </TableCell>
+                            ))}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {domownicy.map((domownik) => (
+                            <TableRow key={domownik.id}>
+                                <TableCell>{domownik.imie}</TableCell>
+                                <TableCell>{domownik.nazwisko}</TableCell>
+                                <TableCell>{domownik.email}</TableCell>
+                                <TableCell>{domownik.telefon}</TableCell>
+                                <TableCell>
+                                    <Button
+                                        onClick={() => handleEditOpen(domownik)}
+                                        startIcon={<EditIcon />}
+                                        variant="outlined"
+                                        color="primary"
+                                        sx={{ marginRight: 1 }}
+                                    >
+                                        Edytuj
+                                    </Button>
+                                    <Button
+                                        onClick={() => handleDelete(domownik.id)}
+                                        startIcon={<DeleteIcon />}
+                                        variant="outlined"
+                                        color="secondary"
+                                    >
+                                        Usuń
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
 
-            {/* Tabela domowników */}
-            <TableTemplate
-                passedResources={domownicy}
-                description={description}
-                columns={columns}
-                rowActions={rowActions}
-            />
-
-            {/* Modal edycji domownika */}
             <Dialog open={editOpen} onClose={() => setEditOpen(false)}>
                 <DialogTitle>Edytuj Domownika</DialogTitle>
                 <DialogContent>
@@ -194,8 +201,12 @@ const Domownicy = () => {
                     ))}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setEditOpen(false)} color="primary">Anuluj</Button>
-                    <Button onClick={handleSubmit} color="primary">Zapisz</Button>
+                    <Button onClick={() => setEditOpen(false)} color="primary">
+                        Anuluj
+                    </Button>
+                    <Button onClick={handleSubmit} color="primary">
+                        Zapisz
+                    </Button>
                 </DialogActions>
             </Dialog>
         </Box>

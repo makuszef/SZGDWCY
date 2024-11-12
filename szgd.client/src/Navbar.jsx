@@ -19,7 +19,7 @@ import Person from '@mui/icons-material/Person';
 import { Select, MenuItem as MuiMenuItem, InputLabel, FormControl } from '@mui/material';
 import { Typography } from '@mui/material';
 import GroupIcon from '@mui/icons-material/Group';
-import axios from 'axios'; // Upewnij się, że masz zainstalowany axios
+import axios from 'axios';
 
 const pages = [];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
@@ -29,53 +29,33 @@ function Navbar() {
     const [anchorElUser, setAnchorElUser] = React.useState(null);
     const [gospodarstwa, setGospodarstwa] = React.useState([]);
     const [selectedGospodarstwo, setSelectedGospodarstwo] = React.useState("");
-    const [avatar, setAvatar] = React.useState(null); // State to handle avatar change
+    const [avatar, setAvatar] = React.useState(null);
     const { user, logout } = useAuth();
     const navigate = useNavigate();
-    const [refresh, setRefresh] = React.useState(false); // To trigger refetching
+    const [refresh, setRefresh] = React.useState(false);
 
-    React.useEffect(() => {
-        if (user && user.id) {
-            console.log('Fetching gospodarstwa for user ID:', user.id);
-
-            fetch(`/api/Domownik/GetAllGospodarstwa/${user.id}`)
-                .then((response) => {
-                    console.log('Response from API:', response);
-                    if (!response.ok) {
-                        throw new Error(`API responded with ${response.status} - ${response.statusText}`);
-                    }
-                    return response.text();
-                })
-                .then((text) => {
-                    try {
-                        const data = JSON.parse(text);
-                        setGospodarstwa(data);
-                    } catch (error) {
-                        console.error('Failed to parse JSON response:', error, text);
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error fetching gospodarstwa:', error);
-                });
-        } else {
-            console.log('User or user.id is not available');
-        }
-    }, [user]);
-
+    // Fetching gospodarstwa for user
     React.useEffect(() => {
         if (user && user.userdata.id) {
             const fetchGospodarstwa = async () => {
                 try {
                     const response = await axios.get(`https://localhost:7191/api/Domownik/GetAllGospodarstwa/${user.userdata.id}`);
-                    console.log("Response from API /Domownik/GetAllGospodarstwa:", response.data);
-                    setGospodarstwa(response.data); // Set fetched gospodarstwa data
+                    setGospodarstwa(response.data);
                 } catch (error) {
                     console.error("Error fetching gospodarstwa:", error);
                 }
             };
             fetchGospodarstwa();
         }
-    }, [user, refresh]); // Fetch when the user changes or component mounts
+    }, [user, refresh]);
+
+    // Fetch selected gospodarstwo from sessionStorage on load
+    React.useEffect(() => {
+        const storedGospodarstwoId = sessionStorage.getItem('selectedGospodarstwoId');
+        if (storedGospodarstwoId) {
+            setSelectedGospodarstwo(storedGospodarstwoId); // Set the stored selected gospodarstwo ID
+        }
+    }, []);
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -93,22 +73,23 @@ function Navbar() {
         setAnchorElUser(null);
     };
 
-
-    // Funkcja obsługująca zmianę gospodarstwa
+    // Handle the change of selected gospodarstwo
     const handleGospodarstwoChange = (event) => {
         const selectedGospodarstwoId = event.target.value;
 
-        // Znalezienie wybranego gospodarstwa z listy
+        // Find the selected gospodarstwo from the list
         const selectedGospodarstwo = gospodarstwa.find(g => g.id === selectedGospodarstwoId);
 
-        // Zapisanie zarówno ID, jak i nazwy gospodarstwa w sessionStorage
+        // Save both the ID and name of the selected gospodarstwo in sessionStorage
         if (selectedGospodarstwo) {
             sessionStorage.setItem('selectedGospodarstwoId', selectedGospodarstwo.id);
             sessionStorage.setItem('selectedGospodarstwoName', selectedGospodarstwo.nazwa);
         }
 
-        // Ustawienie stanu na ID wybranego gospodarstwa
+        // Set the state with the selected gospodarstwo ID
         setSelectedGospodarstwo(selectedGospodarstwoId);
+
+        // Optionally reload the page to reflect changes
         window.location.reload();
         console.log('Selected gospodarstwo:', selectedGospodarstwoId);
     };
@@ -123,16 +104,15 @@ function Navbar() {
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setAvatar(reader.result); // Save base64 image data
+                setAvatar(reader.result);
             };
             reader.readAsDataURL(file);
         }
     };
 
     const handleProfileClick = () => {
-        // Redirect to profile page
         navigate('/profile');
-    }
+    };
 
     return (
         <AppBar>
@@ -212,17 +192,7 @@ function Navbar() {
 
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}></Box>
 
-                    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                        {pages.map((page) => (
-                            <Button
-                                key={page}
-                                onClick={handleCloseNavMenu}
-                                sx={{ my: 2, color: 'white', display: 'block' }}
-                            >
-                                {page}
-                            </Button>
-                        ))}
-                    </Box>
+                    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}></Box>
 
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         {user ? (
@@ -262,9 +232,9 @@ function Navbar() {
                                         onClick={() => {
                                             handleCloseUserMenu();
                                             if (setting === 'Logout') {
-                                                handleLogout(); // Log out
+                                                handleLogout();
                                             } else if (setting === 'Profile') {
-                                                handleProfileClick(); // Profile click
+                                                handleProfileClick();
                                             } else {
                                                 navigate('/profile');
                                             }

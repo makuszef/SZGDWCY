@@ -107,6 +107,31 @@ const ReceiptDetailsModal = ({ receipt, open, onClose }) => {
 };
 
 // Komponent do uploadu pliku
+// const FileUpload = ({ onFileUpload }) => {
+//     const [selectedFile, setSelectedFile] = useState(null);
+//
+//     const handleFileChange = (event) => {
+//         const file = event.target.files[0];
+//         setSelectedFile(file);
+//     };
+//
+//     const handleSubmit = (event) => {
+//         event.preventDefault();
+//         if (selectedFile) {
+//             onFileUpload(selectedFile);
+//         } else {
+//             alert("Proszę wybrać plik!");
+//         }
+//     };
+//
+//     return (
+//         <form onSubmit={handleSubmit}>
+//             <input type="file" onChange={handleFileChange} />
+//             <Button type="submit" variant="contained" color="primary">Wgraj Paragon</Button>
+//         </form>
+//     );
+// };
+
 const FileUpload = ({ onFileUpload }) => {
     const [selectedFile, setSelectedFile] = useState(null);
 
@@ -125,12 +150,63 @@ const FileUpload = ({ onFileUpload }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <input type="file" onChange={handleFileChange} />
-            <Button type="submit" variant="contained" color="primary">Wgraj Paragon</Button>
-        </form>
+        <Box
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                padding: 3,
+                borderRadius: 2,
+                boxShadow: 3,
+                width: 500,
+                backgroundColor: '#f9f9f9',
+                gap: 2,
+            }}
+        >
+            <Typography variant="h6" sx={{ mb: 1 }}>
+                Wgraj Paragon
+            </Typography>
+
+            <input
+                accept="image/*"
+                type="file"
+                onChange={handleFileChange}
+                style={{ display: 'none' }} // Ukrywamy standardowe pole
+                id="upload-button-file"
+            />
+            <label htmlFor="upload-button-file">
+                <Button
+                    variant="outlined"
+                    component="span"
+                    color="primary"
+                    fullWidth
+                    sx={{ padding: '10px' }}
+                >
+                    Wybierz plik
+                </Button>
+            </label>
+
+            {selectedFile && (
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                    Wybrany plik: {selectedFile.name}
+                </Typography>
+            )}
+
+            <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{ mt: 2, padding: '10px' }}
+            >
+                Wgraj Paragon
+            </Button>
+        </Box>
     );
 };
+
 
 // Komponent do wyświetlania listy zapisanych paragonów
 const SavedReceipts = ({ receipts, onSelectReceipt }) => (
