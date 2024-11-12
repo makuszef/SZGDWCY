@@ -93,9 +93,24 @@ function Navbar() {
         setAnchorElUser(null);
     };
 
+
+    // Funkcja obsługująca zmianę gospodarstwa
     const handleGospodarstwoChange = (event) => {
-        setSelectedGospodarstwo(event.target.value);
-        console.log('Selected gospodarstwo:', event.target.value);
+        const selectedGospodarstwoId = event.target.value;
+
+        // Znalezienie wybranego gospodarstwa z listy
+        const selectedGospodarstwo = gospodarstwa.find(g => g.id === selectedGospodarstwoId);
+
+        // Zapisanie zarówno ID, jak i nazwy gospodarstwa w sessionStorage
+        if (selectedGospodarstwo) {
+            sessionStorage.setItem('selectedGospodarstwoId', selectedGospodarstwo.id);
+            sessionStorage.setItem('selectedGospodarstwoName', selectedGospodarstwo.nazwa);
+        }
+
+        // Ustawienie stanu na ID wybranego gospodarstwa
+        setSelectedGospodarstwo(selectedGospodarstwoId);
+        window.location.reload();
+        console.log('Selected gospodarstwo:', selectedGospodarstwoId);
     };
 
     const handleLogout = () => {

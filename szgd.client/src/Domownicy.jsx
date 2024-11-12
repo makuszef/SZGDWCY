@@ -15,12 +15,13 @@ import TableTemplate from './TableTemplate';
 import RowActions from './RowActions';
 import axios from 'axios';
 
-const Domownicy = ({ gospodarstwoId }) => {
+const Domownicy = () => {
     const [domownicy, setDomownicy] = useState([]);
     const [editOpen, setEditOpen] = useState(false);
     const [currentDomownik, setCurrentDomownik] = useState(null);
     const [dialogData, setDialogData] = useState([]);
-    const [gospodarstwoName, setGospodarstwoName] = useState('');
+    const [gospodarstwoName, setGospodarstwoName] = useState(sessionStorage.getItem('selectedGospodarstwoName'));
+    const [gospodarstwoId, setGospodarstwoId] = useState(sessionStorage.getItem('selectedGospodarstwoId'));
 
     const columns = [
         { field: 'id', headerName: 'ID', width: 70 },
@@ -38,42 +39,48 @@ const Domownicy = ({ gospodarstwoId }) => {
         },
     ];
 
-    // Aktualizacja nazwy gospodarstwa przy każdym załadowaniu komponentu
+    // Pobieranie nazwy gospodarstwa i domowników, gdy ID gospodarstwa jest dostępne
     useEffect(() => {
-        const savedGospodarstwoName = sessionStorage.getItem('gospodarstwoName');
-        if (savedGospodarstwoName) {
-            setGospodarstwoName(savedGospodarstwoName);
-        }
-    }, []); // Pusty array dependency oznacza, że ten efekt wykonuje się tylko raz przy montowaniu
-
-    // Pobieranie danych domowników z API
-    useEffect(() => {
-        const fetchDomownicy = async () => {
-            try {
-                const response = await axios.get(`https://localhost:7191/api/Gospodarstwo/${gospodarstwoId}`);
-                const fetchedDomownicy = response.data.domownikWGospodarstwie.map(item => ({
-                    id: item.domownik.id,
-                    imie: item.domownik.imie,
-                    nazwisko: item.domownik.nazwisko,
-                    email: item.domownik.email,
-                    telefon: item.domownik.phoneNumber,
-                    czyWidziInformacjeMedyczneDomownikow: item.czyWidziInformacjeMedyczneDomownikow,
-                    czyWidziSprzet: item.czyWidziSprzet,
-                    czyWidziDomownikow: item.czyWidziDomownikow,
-                    czyMozeModyfikowacDomownikow: item.czyMozeModyfikowacDomownikow,
-                    czyMozeModyfikowacGospodarstwo: item.czyMozeModyfikowacGospodarstwo,
-                    czyMozePrzesylacPliki: item.czyMozePrzesylacPliki,
-                }));
-                setDomownicy(fetchedDomownicy);
-            } catch (error) {
-                console.error("Błąd podczas pobierania danych:", error);
-            }
-        };
-
+        console.log(gospodarstwoId);
         if (gospodarstwoId) {
+            // Pobierz nazwę gospodarstwa
+            const fetchGospodarstwoName = async () => {
+                try {
+                    const response = await axios.get(`https://localhost:7191/api/Gospodarstwo/${gospodarstwoId}`);
+                    setGospodarstwoName(gospodarstwoName);
+                    console.log(gospodarstwoName)
+                } catch (error) {
+                    console.error("Błąd podczas pobierania nazwy gospodarstwa:", error);
+                }
+            };
+
+            // Pobierz domowników
+            const fetchDomownicy = async () => {
+                try {
+                    const response = await axios.get(`https://localhost:7191/api/Gospodarstwo/${gospodarstwoId}`);
+                    const fetchedDomownicy = response.data.domownikWGospodarstwie.map(item => ({
+                        id: item.domownik.id,
+                        imie: item.domownik.imie,
+                        nazwisko: item.domownik.nazwisko,
+                        email: item.domownik.email,
+                        telefon: item.domownik.phoneNumber,
+                        czyWidziInformacjeMedyczneDomownikow: item.czyWidziInformacjeMedyczneDomownikow,
+                        czyWidziSprzet: item.czyWidziSprzet,
+                        czyWidziDomownikow: item.czyWidziDomownikow,
+                        czyMozeModyfikowacDomownikow: item.czyMozeModyfikowacDomownikow,
+                        czyMozeModyfikowacGospodarstwo: item.czyMozeModyfikowacGospodarstwo,
+                        czyMozePrzesylacPliki: item.czyMozePrzesylacPliki,
+                    }));
+                    setDomownicy(fetchedDomownicy);
+                } catch (error) {
+                    console.error("Błąd podczas pobierania danych domowników:", error);
+                }
+            };
+
+            fetchGospodarstwoName();
             fetchDomownicy();
         }
-    }, [gospodarstwoId]);
+    }, [gospodarstwoId]); // Zależność od gospodarstwaId
 
     const handleEditOpen = (domownik) => {
         setCurrentDomownik(domownik);
@@ -86,18 +93,34 @@ const Domownicy = ({ gospodarstwoId }) => {
         setEditOpen(true);
     };
 
-    const handleDelete = (domownikId) => {
-        setDomownicy((prevDomownicy) =>
-            prevDomownicy.filter(domownik => domownik.id !== domownikId)
-        );
+    const handleDelete = async (domownikId) => {
+        try {
+            // Wysyłanie żądania do API usuwającego domownika
+            await axios.delete(`https://localhost:7191/api/Domownik/${domownikId}`);
+
+            // Usuwanie z lokalnego stanu
+            setDomownicy((prevDomownicy) =>
+                prevDomownicy.filter(domownik => domownik.id !== domownikId)
+            );
+        } catch (error) {
+            console.error("Błąd podczas usuwania domownika:", error);
+        }
     };
 
-    const handleUpdate = (updatedDomownik) => {
-        setDomownicy((prevDomownicy) =>
-            prevDomownicy.map((domownik) =>
-                domownik.id === updatedDomownik.id ? updatedDomownik : domownik
-            )
-        );
+    const handleUpdate = async (updatedDomownik) => {
+        try {
+            // Wysyłanie zaktualizowanych danych do API
+            await axios.put(`https://localhost:7191/api/Domownik/${updatedDomownik.id}`, updatedDomownik);
+
+            // Aktualizowanie stanu po udanej edycji
+            setDomownicy((prevDomownicy) =>
+                prevDomownicy.map((domownik) =>
+                    domownik.id === updatedDomownik.id ? updatedDomownik : domownik
+                )
+            );
+        } catch (error) {
+            console.error("Błąd podczas aktualizowania danych domownika:", error);
+        }
     };
 
     const rowActions = [

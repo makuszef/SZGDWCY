@@ -14,129 +14,87 @@ import {
     InputLabel,
     FormControl,
     ListItemAvatar,
-    Avatar
+    Avatar,
+    IconButton,
+    Box
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { setGospodarstwo } from './features/resourceSlice.jsx';
 import axios from 'axios';
-import { useAuth } from './AuthContext';  // Import AuthContext
+import CloseIcon from '@mui/icons-material/Close';
+import { useAuth } from './AuthContext';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import PhoneIcon from '@mui/icons-material/Phone';
 
 function MyButtons() {
-    const { user } = useAuth(); // Get the current logged-in user
+    const { user } = useAuth();
     const [gospodarstwa, setGospodarstwa] = useState([]);
-    const [users, setUsers] = useState([]);  // State to store all users
+    const [users, setUsers] = useState([]);
     const [isModalOpen, setModalOpen] = useState(false);
     const [newGospodarstwoName, setNewGospodarstwoName] = useState('');
     const [selectedUsers, setSelectedUsers] = useState([]);
+    const [successMessage, setSuccessMessage] = useState('');
     const [refresh, setRefresh] = useState(false);
     const dispatch = useDispatch();
-
     const selectedGospodarstwo = useSelector((state) => state.resource.gospodarstwo);
 
-    // Fetch all domownicy (users)
     useEffect(() => {
         const fetchUsers = async () => {
             try {
                 const response = await axios.get('https://localhost:7191/api/Domownik');
-                console.log("Response from API /Domownik:", response.data);
-                setUsers(response.data);  // Set fetched users data
+                setUsers(response.data);
             } catch (error) {
                 console.error("Error fetching users:", error);
             }
         };
         fetchUsers();
     }, []);
-    // Fetch gospodarstwa for the logged-in user based on their domownikId
+
     useEffect(() => {
         if (user && user.userdata.id) {
             const fetchGospodarstwa = async () => {
                 try {
                     const response = await axios.get(`https://localhost:7191/api/Domownik/GetAllGospodarstwa/${user.userdata.id}`);
-                    console.log("Response from API /Domownik/GetAllGospodarstwa:", response.data);
-                    setGospodarstwa(response.data); // Set fetched gospodarstwa data
+                    setGospodarstwa(response.data);
                 } catch (error) {
                     console.error("Error fetching gospodarstwa:", error);
                 }
             };
             fetchGospodarstwa();
         }
-    }, [refresh]); // Fetch when the user changes or component mounts
+    }, [refresh]);
 
-    // Handle opening the modal
     const handleOpenModal = () => {
         setModalOpen(true);
     };
 
-    // Handle closing the modal
     const handleCloseModal = () => {
         setModalOpen(false);
         setNewGospodarstwoName('');
         setSelectedUsers([]);
+        setSuccessMessage('');
     };
 
-    // Handle creating a new gospodarstwo
     const handleCreateGospodarstwo = async (e) => {
         e.preventDefault();
-
         try {
-            // 1. Utwórz nowe gospodarstwo (wysyłanie POST na api/Gospodarstwo)
-            const gospodarstwoData = {
-                id: 0, // Może to być jakiekolwiek id, ale API zwróci prawidłowe id
-                nazwa: newGospodarstwoName
-            };
-            console.log(gospodarstwoData);
+            const gospodarstwoData = { id: 0, nazwa: newGospodarstwoName };
             const gospodarstwoResponse = await axios.post('https://localhost:7191/api/Gospodarstwo', gospodarstwoData);
-            console.log('Gospodarstwo created:', gospodarstwoResponse.data);
-
-            const gospodarstwoId = gospodarstwoResponse.data.id; // Pobierz id gospodarstwa
-
-            // 2. Dodaj domownika do gospodarstwa (wysyłanie POST na api/DomownikwGospodarstwie/DodajDomownikaDoGospodarstwa)
-            const domownikData = {
-                domownikId: user.userdata.id, // Załóżmy, że user jest dostępny w kontekście
-                gospodarstwoId: gospodarstwoId, // Używamy id z odpowiedzi poprzedniego zapytania
-                rola: 0 // Przykładowa rola, może to być coś, co ustalisz
-            };
-
-            const addDomownikResponse = await axios.post('https://localhost:7191/api/DomownikwGospodarstwie/DodajDomownikaDoGospodarstwa', domownikData);
-            console.log('Domownik added to Gospodarstwo:', addDomownikResponse.data);
+            const gospodarstwoId = gospodarstwoResponse.data.id;
+            console.log(gospodarstwoId);
+            
             const addDomownikPromises = selectedUsers.map((userId) => {
-                const domownikData = {
-                    domownikId: userId, // Użyjemy id każdego domownika z selectedUsers
-                    gospodarstwoId: gospodarstwoId, // Używamy id z odpowiedzi poprzedniego zapytania
-                    rola: 0 // Przykładowa rola, może być dostosowana
-                };
-
+                const domownikData = { domownikId: userId, gospodarstwoId};
                 return axios.post('https://localhost:7191/api/DomownikwGospodarstwie/DodajDomownikaDoGospodarstwa', domownikData);
             });
 
-            // Czekaj, aż wszystkie zapytania POST zakończą się
             await Promise.all(addDomownikPromises);
-            console.log('All selected users added to Gospodarstwo');
-            // Po udanym dodaniu, pokazujemy komunikat o sukcesie
-            setSuccessMessage('Gospodarstwo zostało utworzone, a domownik dodany!');
-            setOpenSnackbar(true);
-            setRefresh(true);
-            setRefresh(false);
+            setSuccessMessage(`Utworzono gospodarstwo: ${newGospodarstwoName}`);
+            setRefresh((prev) => !prev);
         } catch (error) {
-            // Obsługa błędów
             console.error('Error during process:', error.response ? error.response.data : error.message);
             setSuccessMessage('Coś poszło nie tak. Spróbuj ponownie!');
-            setOpenSnackbar(true); // Wyświetlamy snackbar w przypadku błędu
         }
-    };
-
-
-    // Handle user selection from dropdown
-    const handleUserSelection = (userId) => {
-        setSelectedUsers((prevSelected) => {
-            if (prevSelected.includes(userId)) {
-                return prevSelected.filter((id) => id !== userId);
-            } else {
-                return [...prevSelected, userId];
-            }
-        });
     };
 
     return (
@@ -147,9 +105,40 @@ function MyButtons() {
                 </Button>
             </Stack>
 
-            <Modal open={isModalOpen} onClose={handleCloseModal}>
-                <div style={{ backgroundColor: 'white', padding: 20, margin: '100px auto', width: 400, outline: 'none' }}>
-                    <Typography variant="h6">Utwórz nowe gospodarstwo</Typography>
+            <Modal
+                open={isModalOpen}
+                onClose={(_, reason) => {
+                    if (reason !== "backdropClick") handleCloseModal();
+                }}
+                BackdropProps={{ style: { pointerEvents: 'none' } }}
+            >
+                <Box
+                    sx={{
+                        position: 'relative',
+                        backgroundColor: 'white',
+                        padding: 2,
+                        margin: '100px auto',
+                        width: 400,
+                        outline: 'none',
+                        borderRadius: 1,
+                    }}
+                >
+                    <IconButton
+                        aria-label="close"
+                        onClick={handleCloseModal}
+                        sx={{ position: 'absolute', right: 8, top: 8 }}
+                    >
+                        <CloseIcon />
+                    </IconButton>
+
+                    <Typography variant="h6" gutterBottom>Utwórz nowe gospodarstwo</Typography>
+
+                    {successMessage && (
+                        <Typography variant="body2" color="success.main" gutterBottom>
+                            {successMessage}
+                        </Typography>
+                    )}
+
                     <TextField
                         label="Nazwa gospodarstwa"
                         value={newGospodarstwoName}
@@ -157,11 +146,12 @@ function MyButtons() {
                         fullWidth
                         margin="normal"
                     />
+
                     <Typography variant="body1">Wybierz członków:</Typography>
-                    <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Nazwa domownika</InputLabel>
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel id="select-users-label">Nazwa domownika</InputLabel>
                         <Select
-                            labelId="demo-simple-select-label"
+                            labelId="select-users-label"
                             multiple
                             value={selectedUsers}
                             onChange={(e) => setSelectedUsers(e.target.value)}
@@ -179,10 +169,16 @@ function MyButtons() {
                             )}
                         </Select>
                     </FormControl>
-                    <Button variant="contained" color="primary" onClick={handleCreateGospodarstwo} style={{ marginTop: 20 }}>
+
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleCreateGospodarstwo}
+                        style={{ marginTop: 20 }}
+                    >
                         Dodaj
                     </Button>
-                </div>
+                </Box>
             </Modal>
 
             <Typography variant="h6" style={{ marginTop: 20 }}>
@@ -197,7 +193,6 @@ function MyButtons() {
                                 style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}
                             >
                                 {gospodarstwo.nazwa}
-                                {console.log(gospodarstwo)}
                             </Typography>
                             <Typography variant="body2" style={{ marginLeft: 20 }}>
                                 Członkowie:
@@ -210,18 +205,14 @@ function MyButtons() {
                                             <ListItemText
                                                 primary={`${member.domownik.imie} ${member.domownik.nazwisko}`}
                                                 secondary={
-                                                    <React.Fragment>
-                                                        <Typography
-                                                            component="span"
-                                                            variant="body2"
-                                                            sx={{ color: 'white', display: 'inline' }}
-                                                        >
+                                                    <>
+                                                        <Typography component="span" variant="body2" sx={{ color: 'white', display: 'inline' }}>
                                                             Email: {member.domownik.email}
                                                         </Typography>
-                                                        <Typography sx={{ color: 'white'}}>
+                                                        <Typography sx={{ color: 'white' }}>
                                                             {"Telefon: " + member.domownik.telefon}
                                                         </Typography>
-                                                    </React.Fragment>
+                                                    </>
                                                 }
                                             />
                                         </ListItem>
