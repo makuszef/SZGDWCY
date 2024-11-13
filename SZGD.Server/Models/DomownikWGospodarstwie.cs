@@ -6,7 +6,7 @@ namespace SZGD.Server.Models
 
     public class DomownikWGospodarstwie
     {
-        public bool czyWlasciciel { get; set; } = true;
+        public bool CzyWlasciciel { get; set; } = true;
         public bool CzyWidziInformacjeMedyczneDomownikow { get; set; } = false;
         public bool CzyWidziSprzet { get; set; } = false;
         public bool CzyWidziDomownikow { get; set; } = false;

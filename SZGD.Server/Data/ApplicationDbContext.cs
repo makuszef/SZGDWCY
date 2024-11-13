@@ -67,12 +67,12 @@ namespace SZGD.Server.Data
                 .HasMany(s => s.HistoriaUzyciaSprzetu)
                 .WithOne(h => h.Sprzet)
                 .HasForeignKey(h => h.SprzetId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<HistoriaUzyciaSprzetu>()
                 .HasOne(h => h.DomownikWGospodarstwie)
                 .WithMany(dw => dw.HistoriaUzyciaSprzetu)
-                .HasForeignKey(h => new { h.GospodarstwoId, h.DomownikId })
+                .HasForeignKey(h => new {h.GospodarstwoId, h.DomownikId })
                 .OnDelete(DeleteBehavior.Cascade);
             Seed(modelBuilder);
         }
@@ -101,9 +101,9 @@ namespace SZGD.Server.Data
 
             // Seed data for DomownikWGospodarstwie 
             modelBuilder.Entity<DomownikWGospodarstwie>().HasData(
-                new DomownikWGospodarstwie { DomownikId = "1", GospodarstwoId = 1, czyWlasciciel = true}, 
-                new DomownikWGospodarstwie { DomownikId = "2", GospodarstwoId = 1, czyWlasciciel = true }, 
-                new DomownikWGospodarstwie { DomownikId = "3", GospodarstwoId = 2, czyWlasciciel = false } 
+                new DomownikWGospodarstwie { DomownikId = "1", GospodarstwoId = 1, CzyWlasciciel = true}, 
+                new DomownikWGospodarstwie { DomownikId = "2", GospodarstwoId = 1, CzyWlasciciel = true }, 
+                new DomownikWGospodarstwie { DomownikId = "3", GospodarstwoId = 2, CzyWlasciciel = false } 
             );
 
             // Seed data for Sprzet (Household Equipment)
@@ -128,8 +128,8 @@ namespace SZGD.Server.Data
 
             // Seed data for HistoriaUzyciaSprzetu (Household Equipment Usage History)
             modelBuilder.Entity<HistoriaUzyciaSprzetu>().HasData(
-                new HistoriaUzyciaSprzetu { Id = 1, SprzetId = 1, DomownikId = "1", GospodarstwoId = 1, DataUzycia = new DateTime(2023, 02, 10), CzyWystapilaAwaria = false, KomentarzDoAwarii = "" },
-                new HistoriaUzyciaSprzetu { Id = 2, SprzetId = 2, DomownikId = "2", GospodarstwoId = 1, DataUzycia = new DateTime(2023, 03, 12), CzyWystapilaAwaria = true, KomentarzDoAwarii = "Pęknięta uszczelka" }
+                new HistoriaUzyciaSprzetu { Id = 1, SprzetId = 1, DomownikId = "1", DataUzycia = new DateTime(2023, 02, 10), CzyWystapilaAwaria = false, KomentarzDoAwarii = "" },
+                new HistoriaUzyciaSprzetu { Id = 2, SprzetId = 2, DomownikId = "2",DataUzycia = new DateTime(2023, 03, 12), CzyWystapilaAwaria = true, KomentarzDoAwarii = "Pęknięta uszczelka" }
             );
 
         }

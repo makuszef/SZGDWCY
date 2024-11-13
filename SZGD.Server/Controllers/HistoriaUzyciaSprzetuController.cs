@@ -48,13 +48,6 @@ namespace SZGD.Server.Controllers
             {
                 return BadRequest($"Sprzęt o ID {newHistoria.SprzetId} nie istnieje.");
             }
-
-            var gospodarstwoExists = await _context.Gospodarstwa.AnyAsync(g => g.Id == newHistoria.GospodarstwoId);
-            if (!gospodarstwoExists)
-            {
-                return BadRequest($"Gospodarstwo o ID {newHistoria.GospodarstwoId} nie istnieje.");
-            }
-
             // Dodaj nową historię użycia sprzętu
             _context.HistoriaUzyciaSprzetu.Add(newHistoria);
             await _context.SaveChangesAsync();
