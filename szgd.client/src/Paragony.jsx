@@ -36,7 +36,7 @@ const ReceiptDetailsModal = ({ receipt, open, onClose }) => {
                     const fileUrl = URL.createObjectURL(blob);
 
                     // Stworzenie linku do pobrania
-                    const link = document.createElement('a');
+                    const link = document.createElement('a');   
                     link.href = fileUrl;
                     link.download = response.data.nazwaPliku || 'paragon.pdf'; // Użycie nazwy pliku z odpowiedzi lub domyślnej
                     document.body.appendChild(link);
