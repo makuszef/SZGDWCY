@@ -53,6 +53,7 @@ namespace SZGD.Server.Controllers
             {
                 DomownikId = request.DomownikId,
                 GospodarstwoId = request.GospodarstwoId,
+                CzyWlasciciel = request.CzyWlasciciel,
             };
 
             // Add the new entity to the context
@@ -138,5 +139,7 @@ namespace SZGD.Server.Controllers
     {
         public string DomownikId { get; set; }
         public int GospodarstwoId { get; set; }
+        
+        public bool CzyWlasciciel { get; set; }
     }
 }

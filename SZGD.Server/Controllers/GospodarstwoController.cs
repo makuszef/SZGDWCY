@@ -29,7 +29,8 @@ namespace SZGD.Server.Controllers
                 .ToListAsync();
             return Ok(gospodarstwa);
         }
-
+        
+        
         // GET: api/Gospodarstwo/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Gospodarstwo>> GetById(int id)

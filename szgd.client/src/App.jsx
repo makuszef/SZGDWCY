@@ -28,7 +28,7 @@ const MainCards = [
     { title: 'Harmonogram sprzatania', icon: <SprzatanieIcon />, route: "/sprzatanie", component: <div>Harmonogram sprzatania</div> },
     { title: 'Paragony i gwarancje', icon: <ReceiptIcon />, route: "/paragony", component: <Paragony /> },
     { title: 'Sprzet', icon: <BuildIcon />, route: "/sprzet", component: <Sprzet/> },
-    { title: 'Ankiety', icon: <PollIcon />, route: "/ankiety", component: <div>Ankiety</div> },
+    // { title: 'Ankiety', icon: <PollIcon />, route: "/ankiety", component: <Ankiety/>  },
     { title: 'Informacje zdrowotne', icon: <MedicalServicesIcon />, route: "/zdrowie", component: <div>Informacje zdrowotne</div> },
     { title: 'Zapasy', icon: <InventoryIcon />, route: "/zapasy", component: <div>Zapasy</div> },
     { title: 'Kontrola okien', icon: <WindowIcon />, route: "/kontrola-okien", component: <div>Kontrola okien</div> },

@@ -135,7 +135,7 @@ function Navbar() {
 
                     <Button
                         startIcon={<HomeIcon />}
-                        onClick={() => navigate('/')}
+                        onClick={() => navigate('/')}  //kafelki '/'
                         sx={{
                             color: 'inherit',
                             '&:hover': { backgroundColor: 'transparent' },
