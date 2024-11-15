@@ -118,12 +118,12 @@ namespace SZGD.Server.Controllers
         {
             var historia = await _context.HistoriaUzyciaSprzetu
                 .Where(h => h.SprzetId == id)
-                .Include(h => h.DomownikWGospodarstwie)
+                .Include(h => h.Domownik)
                 .Select(h => new
                 {
                     h.Id,
-                    ImieDomownika = h.DomownikWGospodarstwie.Domownik.Imie,
-                    NazwiskoDomownika = h.DomownikWGospodarstwie.Domownik.Nazwisko,
+                    ImieDomownika = h.Domownik.Imie,
+                    NazwiskoDomownika = h.Domownik.Nazwisko,
                     h.DataUzycia,
                     h.CzyWystapilaAwaria,
                     h.KomentarzDoAwarii

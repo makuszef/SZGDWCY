@@ -19,6 +19,7 @@ namespace SZGD.Server.Models
             Imie = imie;
             Nazwisko = nazwisko;
         }
+        public List<HistoriaUzyciaSprzetu>? HistoriaUzyciaSprzetu { get; set;}
     }
 
 }

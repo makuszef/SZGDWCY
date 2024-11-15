@@ -9,16 +9,14 @@ namespace SZGD.Server.Models
         public int Id { get; set; }
         public int SprzetId { get; set; }
 
-        [ForeignKey(nameof(DomownikWGospodarstwie))]
+        [ForeignKey(nameof(Domownik))]
         public string DomownikId { get; set; }
-
-        public int GospodarstwoId { get; set; }
-
+        
         [JsonIgnore]
         public Sprzet? Sprzet { get; set; }
 
         [JsonIgnore]
-        public DomownikWGospodarstwie? DomownikWGospodarstwie { get; set; }
+        public Domownik? Domownik { get; set; }
 
         public DateTime DataUzycia { get; set; }
         public bool CzyWystapilaAwaria { get; set; }

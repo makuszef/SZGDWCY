@@ -67,12 +67,12 @@ namespace SZGD.Server.Data
                 .HasMany(s => s.HistoriaUzyciaSprzetu)
                 .WithOne(h => h.Sprzet)
                 .HasForeignKey(h => h.SprzetId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<HistoriaUzyciaSprzetu>()
-                .HasOne(h => h.DomownikWGospodarstwie)
+                .HasOne(h => h.Domownik)
                 .WithMany(dw => dw.HistoriaUzyciaSprzetu)
-                .HasForeignKey(h => new {h.GospodarstwoId, h.DomownikId })
+                .HasForeignKey(h => new {h.DomownikId })
                 .OnDelete(DeleteBehavior.Cascade);
             Seed(modelBuilder);
         }
