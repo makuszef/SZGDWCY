@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Typography, Button, List, ListItem, ListItemText, Stack, Box } from '@mui/material';
 import axios from 'axios';
 import ZrobZdjecie from "@/ZrobZdjecie.jsx";
-
+import { Alert, AlertTitle } from '@mui/material';
+import WarningIcon from '@mui/icons-material/Warning';
+import {selectDomownikWGospodarstwie, selectDomownik} from "@/features/resourceSlice.jsx";
+import { useSelector, useDispatch } from 'react-redux';
 // Modal for displaying receipt details
 const ReceiptDetailsModal = ({ receipt, open, onClose }) => {
     if (!receipt) return null;
@@ -103,7 +106,9 @@ const ReceiptManager = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const gospodarstwoId = sessionStorage.getItem('selectedGospodarstwoId');
-
+    const [domownikWGospodarstwie, setDomownikWGospodarstwie] = useState(useSelector(selectDomownikWGospodarstwie));
+    console.log(domownikWGospodarstwie);
+    const dispatch = useDispatch()
     useEffect(() => {
         const fetchReceipts = async () => {
             try {
@@ -147,7 +152,26 @@ const ReceiptManager = () => {
 
     return (
         <Stack spacing={2}>
-            <FileUpload onFileUpload={handleFileUpload} gospodarstwoId={gospodarstwoId} />
+            {domownikWGospodarstwie?.czyMozePrzesylacPliki ? (
+                <FileUpload onFileUpload={handleFileUpload} gospodarstwoId={gospodarstwoId} />
+            ) : (
+                <Alert
+                    severity="error"
+                    icon={<WarningIcon />}
+                    sx={{
+                        backgroundColor: 'rgba(255, 0, 0, 0.1)', // Delikatne tło
+                        color: 'red',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: 2,
+                        borderRadius: '8px',
+                    }}
+                >
+                    <Typography>Nie masz uprawnień do przesyłania plików.</Typography>
+                </Alert>
+            )}
+
             {isLoading && <Typography>Ładowanie...</Typography>}
             {error && <Typography color="error">{error}</Typography>}
             <SavedReceipts receipts={receipts} onSelectReceipt={handleSelectReceipt} />

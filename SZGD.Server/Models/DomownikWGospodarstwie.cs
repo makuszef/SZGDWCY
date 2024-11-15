@@ -13,8 +13,6 @@ namespace SZGD.Server.Models
         public bool CzyMozeModyfikowacDomownikow { get; set; } = false;
         public bool CzyMozeModyfikowacGospodarstwo { get; set; } = false;
         public bool CzyMozePrzesylacPliki { get; set; } = false;
-        [JsonIgnore]
-        public List<HistoriaUzyciaSprzetu>? HistoriaUzyciaSprzetu { get; set; }
 
         [ForeignKey(nameof(Domownik))]
         public string DomownikId { get; set; }

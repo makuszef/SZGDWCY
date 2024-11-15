@@ -5,10 +5,14 @@ export const resourceSlice = createSlice({
     initialState: {
         gospodarstwo: null,  // Store a single gospodarstwo object
         domownik: null,      // Store a single domownik object
+        domownikWGospodarstwie: {},
     },
     reducers: {
         setGospodarstwo: (state, action) => {
             state.gospodarstwo = action.payload; // Set gospodarstwo
+        },
+        setDomownikWGospodarstwie: (state, action) => {
+            state.domownikWGospodarstwie = action.payload; // Set gospodarstwo
         },
         clearGospodarstwo: (state) => {
             state.gospodarstwo = null; // Clear gospodarstwo
@@ -28,10 +32,12 @@ export const {
     clearGospodarstwo,
     setDomownik,
     clearDomownik,
+    setDomownikWGospodarstwie
 } = resourceSlice.actions;
 
 // Selectors
 export const selectGospodarstwo = (state) => state.resource.gospodarstwo; // Select the gospodarstwo
 export const selectDomownik = (state) => state.resource.domownik; // Select the single domownik
+export const selectDomownikWGospodarstwie = (state) => state.resource.domownikWGospodarstwie; // Select the single domownik
 
 export default resourceSlice.reducer;

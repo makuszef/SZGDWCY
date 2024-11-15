@@ -20,10 +20,10 @@ import { Select, MenuItem as MuiMenuItem, InputLabel, FormControl } from '@mui/m
 import { Typography } from '@mui/material';
 import GroupIcon from '@mui/icons-material/Group';
 import axios from 'axios';
-
+import {setDomownikWGospodarstwie} from "@/features/resourceSlice.jsx";
 const pages = [];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-
+import { useSelector, useDispatch } from 'react-redux';
 function Navbar() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -33,7 +33,7 @@ function Navbar() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [refresh, setRefresh] = React.useState(false);
-
+    const dispatch = useDispatch()
     // Fetching gospodarstwa for user
     React.useEffect(() => {
         if (user && user.userdata.id) {
@@ -79,11 +79,15 @@ function Navbar() {
 
         // Find the selected gospodarstwo from the list
         const selectedGospodarstwo = gospodarstwa.find(g => g.id === selectedGospodarstwoId);
-
         // Save both the ID and name of the selected gospodarstwo in sessionStorage
+        const DomownickwGospodarstwie = selectedGospodarstwo.domownikWGospodarstwie.filter(domownik => domownik.domownikId === user.userdata.id);
+        
         if (selectedGospodarstwo) {
+            dispatch(setDomownikWGospodarstwie(JSON.stringify(DomownickwGospodarstwie)));
+            sessionStorage.setItem('DomownickwGospodarstwie', JSON.stringify(DomownickwGospodarstwie));
             sessionStorage.setItem('selectedGospodarstwoId', selectedGospodarstwo.id);
             sessionStorage.setItem('selectedGospodarstwoName', selectedGospodarstwo.nazwa);
+            sessionStorage.setItem('wybraneGospodarstwo', JSON.stringify(selectedGospodarstwo));
         }
 
         // Set the state with the selected gospodarstwo ID
