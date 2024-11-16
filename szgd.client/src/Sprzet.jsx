@@ -28,7 +28,7 @@ const Sprzet = () => {
     const [editOpen, setEditOpen] = useState(false);
     const [addOpen, setAddOpen] = useState(false);
     const [currentResource, setCurrentResource] = useState(null);
-    const [gospodarstwoId, setGospodarstwoId] = useState(1);
+    const [gospodarstwoId, setGospodarstwoId] = useState(sessionStorage.getItem('selectedGospodarstwoId'));
     const [historyOpen, setHistoryOpen] = useState(false);
     const [historyData, setHistoryData] = useState([]);
     const [reportOpen, setReportOpen] = useState(false);

@@ -70,7 +70,7 @@ const CameraComponent = ({ gospodarstwoId }) => {
 
         try {
             const response = await axios.post(
-                `https://192.168.0.20:7191/api/AnalizeFile/upload/${gospodarstwoId}`,
+                `https://localhost:7191/api/AnalizeFile/upload/${gospodarstwoId}`,
                 formData,
                 {
                     headers: { 'Content-Type': 'multipart/form-data' },
