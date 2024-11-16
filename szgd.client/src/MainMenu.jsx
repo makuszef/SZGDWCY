@@ -39,7 +39,6 @@ const MainMenu = ({ cards }) => {
 
     return (
         <div>
-        {selectedGospodarstwo ? 
                 <Grid container spacing={2} style={{ padding: 16 }}>
                 {cards.map((card, index) => (
                     <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
@@ -56,7 +55,7 @@ const MainMenu = ({ cards }) => {
                         </StyledCard>
                     </Grid>
                 ))}
-            </Grid> : <Gospodarstwo/>}
+            </Grid> 
         </div>
         
     );

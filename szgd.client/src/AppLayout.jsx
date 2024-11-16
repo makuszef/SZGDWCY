@@ -12,6 +12,7 @@ import InventoryIcon from '@mui/icons-material/Inventory'; // Icon for inventory
 import WindowIcon from '@mui/icons-material/Window'; // Icon for window control
 import HomeIcon from '@mui/icons-material/Home';
 import { useAuth } from './AuthContext';
+import Gospodarstwo from "@/Gospodarstwo.jsx";
 
 const MainCards = [
     { title: 'Harmonogram sprzątania', icon: <SprzatanieIcon />, route: "/sprzatanie", component: <div>Harmonogram sprzątania</div> },
@@ -22,6 +23,7 @@ const MainCards = [
     { title: 'Zapasy', icon: <InventoryIcon />, route: "/zapasy", component: <div>Zapasy</div> },
     { title: 'Kontrola okien', icon: <WindowIcon />, route: "/kontrola-okien", component: <div>Kontrola okien</div> },
     { title: 'Domownicy', icon: <HomeIcon />, route: "/domownicy", component: <div>Domownicy</div> },
+    { title: 'Gospodarstwa', icon: <HomeIcon />, route: "/gospodarstwa", component: <div>Gospodarstwa</div>},
 ];
 
 const AppLayout = ({ Content, Cards }) => {

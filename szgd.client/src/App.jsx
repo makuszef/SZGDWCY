@@ -17,7 +17,7 @@ import Sprzet from './Sprzet'
 import Domownicy from './Domownicy';
 import Paragony from './Paragony.jsx';
 import LoginPage from './LoginPage';
-import Gospodarstwo from "@/Gospodarstwo.jsx";
+import Gospodarstwo from "./Gospodarstwo";
 import RegisterPage from './RegisterPage';
 import About from "@/About.jsx";
 import {AuthProvider} from "@/AuthContext.jsx";
@@ -28,11 +28,12 @@ const MainCards = [
     { title: 'Harmonogram sprzatania', icon: <SprzatanieIcon />, route: "/sprzatanie", component: <div>Harmonogram sprzatania</div> },
     { title: 'Paragony i gwarancje', icon: <ReceiptIcon />, route: "/paragony", component: <Paragony /> },
     { title: 'Sprzet', icon: <BuildIcon />, route: "/sprzet", component: <Sprzet/> },
-    // { title: 'Ankiety', icon: <PollIcon />, route: "/ankiety", component: <Ankiety/>  },
-    { title: 'Informacje zdrowotne', icon: <MedicalServicesIcon />, route: "/zdrowie", component: <div>Informacje zdrowotne</div> },
+    { title: 'Ankiety', icon: <PollIcon />, route: "/ankiety", component: <div>Ankiety</div>},
+    {title: 'Informacje zdrowotne', icon: <MedicalServicesIcon />, route: "/zdrowie", component: <div>Informacje zdrowotne</div> },
     { title: 'Zapasy', icon: <InventoryIcon />, route: "/zapasy", component: <div>Zapasy</div> },
     { title: 'Kontrola okien', icon: <WindowIcon />, route: "/kontrola-okien", component: <div>Kontrola okien</div> },
     { title: 'Domownicy', icon: <HomeIcon />, route: "/domownicy", component: <Domownicy gospodarstwoId={1}/>},
+    { title: 'Gospodarstwa', icon: <HomeIcon />, route: "/gospodarstwa", component: <Gospodarstwo/>},
 ];
 
 function App() {
