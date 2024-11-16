@@ -88,21 +88,34 @@ namespace SZGD.Server.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Sprzet/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSprzet(int id)
         {
+            // Znajdź sprzęt
             var sprzet = await _context.Sprzet.FindAsync(id);
             if (sprzet == null)
             {
                 return NotFound("Sprzęt nie został znaleziony.");
             }
 
+            // Znajdź rekordy w Historii Użycia Sprzętu, które mają sprzetId = id
+            var historiaUzycia = _context.HistoriaUzyciaSprzetu.Where(h => h.SprzetId == id).ToList();
+
+            // Usuwanie powiązanych rekordów w Historii Użycia
+            if (historiaUzycia.Any())
+            {
+                _context.HistoriaUzyciaSprzetu.RemoveRange(historiaUzycia);
+            }
+
+            // Usuwanie samego sprzętu
             _context.Sprzet.Remove(sprzet);
+    
+            // Zapisz zmiany w bazie danych
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return NoContent(); // Zwróć odpowiedź 204 (No Content) po pomyślnym usunięciu
         }
+
         [HttpGet("GetAllSprzet/{gospodarstwoId}")]
         public async Task<ActionResult<IEnumerable<DomownikWGospodarstwie>>> GetAllGospodarstwaForDomownik(int gospodarstwoId)
         {

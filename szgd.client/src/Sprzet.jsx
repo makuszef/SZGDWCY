@@ -13,7 +13,7 @@ import {
     Select,
     MenuItem,
     Checkbox,
-    FormControlLabel
+    FormControlLabel, Snackbar, Alert
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -43,6 +43,10 @@ const Sprzet = () => {
     const gospodarstwo = useSelector(selectGospodarstwo);
     const gospodarstwoId = gospodarstwo.id;
     const { user, logout } = useAuth();
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+
     const columns = [
         { field: 'nazwa', headerName: 'Nazwa', width: 130 },
         { field: 'typ', headerName: 'Typ', width: 130 },
@@ -73,9 +77,34 @@ const Sprzet = () => {
     const handleEditOpen = (resource) => {
         setCurrentResource(resource);
         setNewNazwa(resource.nazwa);
-        setNewTyp(resource.typ); // Przechowujemy typ jako string
+        setNewTyp(resource.typ);
         setNewOpis(resource.opis);
         setEditOpen(true);
+    };
+
+    const handleEditSubmit = async () => {
+        const updatedResource = {
+            ...currentResource,
+            nazwa: newNazwa,
+            typ: newTyp,
+            opis: newOpis,
+        };
+
+        try {
+            await axios.put(`https://localhost:7191/api/Sprzet`, updatedResource);
+            setResources(resources.map(resource =>
+                resource.id === currentResource.id ? updatedResource : resource
+            ));
+            setSnackbarMessage('Sprzęt zaktualizowany');
+            setSnackbarSeverity('success');
+            setOpenSnackbar(true);
+            setEditOpen(false);
+        } catch (error) {
+            console.error("Error updating equipment:", error);
+            setSnackbarMessage('Błąd podczas aktualizacji sprzętu');
+            setSnackbarSeverity('error');
+            setOpenSnackbar(true);
+        }
     };
 
     const handleDelete = async (resourceId) => {
@@ -95,8 +124,12 @@ const Sprzet = () => {
             setHistoryOpen(true);
         } catch (error) {
             console.error("Error fetching history data:", error);
+            setSnackbarMessage('Nie odnotowano uzycia sprzetu');
+            setSnackbarSeverity('error');  // Określamy, że jest to błąd
+            setOpenSnackbar(true);  // Otwarcie Snackbar
         }
     };
+
 
     const openReportDialog = (resource) => {
         setCurrentResource(resource);
@@ -230,7 +263,37 @@ const Sprzet = () => {
                     <Button onClick={handleAddResource} color="primary">Dodaj</Button>
                 </DialogActions>
             </Dialog>
-
+            {/* Dialog for editing resource */}
+            <Dialog open={editOpen} onClose={() => setEditOpen(false)}>
+                <DialogTitle>Edytuj sprzęt</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        label="Nazwa"
+                        fullWidth
+                        margin="dense"
+                        value={newNazwa}
+                        onChange={(e) => setNewNazwa(e.target.value)}
+                    />
+                    <TextField
+                        label="Typ"
+                        fullWidth
+                        margin="dense"
+                        value={newTyp}
+                        onChange={(e) => setNewTyp(e.target.value)}
+                    />
+                    <TextField
+                        label="Opis"
+                        fullWidth
+                        margin="dense"
+                        value={newOpis}
+                        onChange={(e) => setNewOpis(e.target.value)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setEditOpen(false)} color="primary">Anuluj</Button>
+                    <Button onClick={handleEditSubmit} color="primary">Zapisz zmiany</Button>
+                </DialogActions>
+            </Dialog>
             {/* Dialog do zgłoszenia użycia */}
             <Dialog open={reportOpen} onClose={() => setReportOpen(false)}>
                 <DialogTitle>Zgłoś użycie sprzętu</DialogTitle>
@@ -293,6 +356,19 @@ const Sprzet = () => {
                     <Button onClick={() => setHistoryOpen(false)} color="primary">Zamknij</Button>
                 </DialogActions>
             </Dialog>
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={() => setOpenSnackbar(false)}
+            >
+                <Alert
+                    onClose={() => setOpenSnackbar(false)}
+                    severity={snackbarSeverity}
+                    sx={{ width: '100%' }}
+                >
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 };
