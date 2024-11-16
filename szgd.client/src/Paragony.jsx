@@ -4,7 +4,7 @@ import axios from 'axios';
 import ZrobZdjecie from "@/ZrobZdjecie.jsx";
 import { Alert, AlertTitle } from '@mui/material';
 import WarningIcon from '@mui/icons-material/Warning';
-import {selectDomownikWGospodarstwie, selectDomownik} from "@/features/resourceSlice.jsx";
+import {selectDomownikWGospodarstwie, selectDomownik, selectGospodarstwo} from "@/features/resourceSlice.jsx";
 import { useSelector, useDispatch } from 'react-redux';
 // Modal for displaying receipt details
 const ReceiptDetailsModal = ({ receipt, open, onClose }) => {
@@ -85,18 +85,33 @@ const FileUpload = ({ onFileUpload, gospodarstwoId }) => {
         </Box>
     );
 };
+const SavedReceipts = ({ receipts, onSelectReceipt }) => {
+    if (!receipts || receipts.length === 0) {
+        return <Typography>Nie zapisano żadnych paragonów.</Typography>;
+    }
 
-// Component for listing saved receipts
-const SavedReceipts = ({ receipts, onSelectReceipt }) => (
-    <Box>
-        <Typography variant="h6" gutterBottom>Zapisane Paragony</Typography>
-        <List>{receipts.map(receipt => (
-            <ListItem button key={receipt.id} onClick={() => onSelectReceipt(receipt.id)} sx={listItemStyle}>
-                <ListItemText primary={`${receipt.date} - ${receipt.storeName}`} secondary={`${receipt.totalAmount} PLN`} />
-            </ListItem>
-        ))}</List>
-    </Box>
-);
+    return (
+        <Box>
+            <Typography variant="h6" gutterBottom>Zapisane Paragony</Typography>
+            <List>
+                {receipts.map((receipt) => (
+                    <ListItem
+                        button
+                        key={receipt.id}
+                        onClick={() => onSelectReceipt(receipt.id)}
+                        sx={listItemStyle}
+                    >
+                        <ListItemText
+                            primary={`${receipt.date} - ${receipt.storeName}`}
+                            secondary={`${receipt.totalAmount} PLN`}
+                        />
+                    </ListItem>
+                ))}
+            </List>
+        </Box>
+    );
+};
+
 
 // Main component managing receipt upload and display
 const ReceiptManager = () => {
@@ -105,33 +120,44 @@ const ReceiptManager = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-    const gospodarstwoId = sessionStorage.getItem('selectedGospodarstwoId');
-    const [domownikWGospodarstwie, setDomownikWGospodarstwie] = useState(useSelector(selectDomownikWGospodarstwie));
+    const [przeladuj, setPrzeladuj] = useState(1);
+    
+    const domownikWGospodarstwie = useSelector(selectDomownikWGospodarstwie);
+    const gospodarstwo = useSelector(selectGospodarstwo);
+    const gospodarstwoId = gospodarstwo.id;
     console.log(domownikWGospodarstwie);
-    const dispatch = useDispatch()
+    console.log(gospodarstwoId);
+    console.log(gospodarstwo);
     useEffect(() => {
         const fetchReceipts = async () => {
             try {
-                const { data } = await axios.get('https://localhost:7191/api/paragon');
+                const { data } = await axios.get(`https://localhost:7191/api/paragon/ByGospodarstwo/${gospodarstwoId}`);
                 setReceipts(data);
             } catch (err) {
                 console.error("Błąd podczas pobierania paragonów:", err);
-                setError("Nie udało się pobrać zapisanych paragonów.");
+                setError("");
+                setReceipts([]);
             }
         };
         fetchReceipts();
-    }, []);
+    }, [przeladuj, gospodarstwoId]);
 
     const handleFileUpload = async (file) => {
         try {
             setIsLoading(true);
             setError(null);
+
             const formData = new FormData();
             formData.append('file', file);
 
-            await axios.post(`https://localhost:7191/api/AnalizeFile/upload/${gospodarstwoId}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
+            const response = await axios.post(
+                `https://localhost:7191/api/AnalizeFile/upload/${gospodarstwoId}`,
+                formData,
+                {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                }
+            );
+            setPrzeladuj(przeladuj + 1);
         } catch (err) {
             console.error("Błąd podczas wysyłania pliku:", err);
             setError("Wystąpił błąd podczas przetwarzania pliku.");
@@ -139,6 +165,7 @@ const ReceiptManager = () => {
             setIsLoading(false);
         }
     };
+
 
     const handleSelectReceipt = async (receiptId) => {
         try {
@@ -155,6 +182,7 @@ const ReceiptManager = () => {
             {domownikWGospodarstwie?.czyMozePrzesylacPliki ? (
                 <FileUpload onFileUpload={handleFileUpload} gospodarstwoId={gospodarstwoId} />
             ) : (
+                
                 <Alert
                     severity="error"
                     icon={<WarningIcon />}

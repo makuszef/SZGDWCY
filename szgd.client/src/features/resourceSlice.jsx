@@ -3,15 +3,17 @@ import { createSlice } from '@reduxjs/toolkit';
 export const resourceSlice = createSlice({
     name: 'resource',
     initialState: {
-        gospodarstwo: null,  // Store a single gospodarstwo object
+        gospodarstwo: {},  // Store a single gospodarstwo object
         domownik: null,      // Store a single domownik object
         domownikWGospodarstwie: {},
     },
     reducers: {
         setGospodarstwo: (state, action) => {
+            console.log('redux stan', action.payload);
             state.gospodarstwo = action.payload; // Set gospodarstwo
         },
         setDomownikWGospodarstwie: (state, action) => {
+            console.log('redux stan', action.payload);
             state.domownikWGospodarstwie = action.payload; // Set gospodarstwo
         },
         clearGospodarstwo: (state) => {

@@ -22,23 +22,27 @@ import ReportIcon from '@mui/icons-material/ReportProblem';
 import TableTemplate from './TableTemplate';
 import RowActions from './RowActions';
 import axios from 'axios';
+import { useSelector } from "react-redux";
+import { selectGospodarstwo } from "@/features/resourceSlice.jsx";
+import {useAuth} from "@/AuthContext.jsx";
 
 const Sprzet = () => {
     const [resources, setResources] = useState([]);
     const [editOpen, setEditOpen] = useState(false);
     const [addOpen, setAddOpen] = useState(false);
     const [currentResource, setCurrentResource] = useState(null);
-    const [gospodarstwoId, setGospodarstwoId] = useState(sessionStorage.getItem('selectedGospodarstwoId'));
     const [historyOpen, setHistoryOpen] = useState(false);
     const [historyData, setHistoryData] = useState([]);
     const [reportOpen, setReportOpen] = useState(false);
     const [newStatus, setNewStatus] = useState('');
     const [czyWystapilaAwaria, setCzyWystapilaAwaria] = useState(false);
     const [komentarzDoAwarii, setKomentarzDoAwarii] = useState('');
-
     const [newNazwa, setNewNazwa] = useState('');
     const [newTyp, setNewTyp] = useState('');
-
+    const [newOpis, setNewOpis] = useState('');
+    const gospodarstwo = useSelector(selectGospodarstwo);
+    const gospodarstwoId = gospodarstwo.id;
+    const { user, logout } = useAuth();
     const columns = [
         { field: 'nazwa', headerName: 'Nazwa', width: 130 },
         { field: 'typ', headerName: 'Typ', width: 130 },
@@ -56,12 +60,21 @@ const Sprzet = () => {
 
     useEffect(() => {
         axios.get(`https://localhost:7191/api/sprzet/GetAllSprzet/${gospodarstwoId}`)
-            .then(response => setResources(response.data))
-            .catch(error => console.error(error));
-    }, [gospodarstwoId]);
+            .then(response => {
+                setResources(response.data);  // Ustawienie danych, jeśli zapytanie się uda
+            })
+            .catch(error => {
+                console.error(error);  // Logowanie błędu do konsoli
+                setResources([]);  // Ustawienie pustej tablicy w przypadku błędu
+            });
+    }, [gospodarstwoId]);  // Hook uruchamiany po zmianie gospodarstwoId
+
 
     const handleEditOpen = (resource) => {
         setCurrentResource(resource);
+        setNewNazwa(resource.nazwa);
+        setNewTyp(resource.typ); // Przechowujemy typ jako string
+        setNewOpis(resource.opis);
         setEditOpen(true);
     };
 
@@ -94,46 +107,50 @@ const Sprzet = () => {
     };
 
     const handleReportSubmit = async () => {
-            // Wywołanie PUT do aktualizacji statusu
-            const updateRequestBody = {
-                id: currentResource.id,
-                gospodarstwoId: "1",
-                nazwa: currentResource.nazwa,
-                typ: currentResource.typ,
-                status: newStatus,
-                opis: "brak"
-            };
-            await axios.put(`https://localhost:7191/api/Sprzet/${currentResource.id}`, updateRequestBody);
+        // Wywołanie PUT do aktualizacji statusu
+        const updateRequestBody = {
+            id: currentResource.id,
+            gospodarstwoId: gospodarstwoId,
+            nazwa: currentResource.nazwa,
+            typ: currentResource.typ,
+            status: newStatus,
+            opis: currentResource.opis
+        };
+        if (updateRequestBody.status = "W Naprawie") {
+            updateRequestBody.status = "WNaprawie";
+        }
+        console.log(updateRequestBody);
+        await axios.put(`https://localhost:7191/api/Sprzet`, updateRequestBody);
 
-            // Wywołanie POST do historii użycia sprzętu
-            const historyRequestBody = {
-                id: 0,
-                sprzetId: currentResource.id,
-                domownikId: "1",
-                gospodarstwoId: "1",
-                dataUzycia: new Date().toISOString(),
-                czyWystapilaAwaria: czyWystapilaAwaria,
-                komentarzDoAwarii: komentarzDoAwarii
-            };
-            await axios.post("https://localhost:7191/api/HistoriaUzyciaSprzetu", historyRequestBody);
+        // Wywołanie POST do historii użycia sprzętu
+        const historyRequestBody = {
+            id: 0,
+            sprzetId: currentResource.id,
+            domownikId: user.userdata.id,
+            gospodarstwoId: gospodarstwoId,
+            dataUzycia: new Date().toISOString(),
+            czyWystapilaAwaria: czyWystapilaAwaria,
+            komentarzDoAwarii: komentarzDoAwarii
+        };
+        await axios.post("https://localhost:7191/api/HistoriaUzyciaSprzetu", historyRequestBody);
 
-            setReportOpen(false);
-            window.location.reload();
+        setReportOpen(false);
     };
 
     const handleAddResource = async () => {
         const newResource = {
-            id: 0,
-            gospodarstwoId: gospodarstwoId,
+            id: 0, // Zakładamy, że serwer generuje ID
+            gospodarstwoId: gospodarstwoId, // Pobierane z Redux Store
             nazwa: newNazwa,
-            typ: newTyp,
-            status: 0, // Ustawienie statusu na 0 (Dostepny)
-            opis: ""
+            typ: newTyp, // Typ jako string
+            status: "Dostepny", // Domyślnie ustawiamy "Dostepny"
+            opis: newOpis
         };
+
         try {
             const response = await axios.post("https://localhost:7191/api/Sprzet", newResource);
-            setResources([...resources, response.data]);
-            setAddOpen(false);
+            setResources([...resources, response.data]); // Dodanie nowego sprzętu do stanu
+            setAddOpen(false); // Zamknięcie dialogu
         } catch (error) {
             console.error("Error adding new equipment:", error);
         }
@@ -164,17 +181,55 @@ const Sprzet = () => {
 
     return (
         <Box sx={{ width: '1000px' }}>
-            <TableTemplate
-                passedResources={resources}
-                description="Zarządzanie sprzętem"
-                columns={columns}
-                rowActions={rowActions}
-            />
+            {resources != null && resources.length > 0 ? (
+                <TableTemplate
+                    passedResources={resources}
+                    description="Zarządzanie sprzętem"
+                    columns={columns}
+                    rowActions={rowActions}
+                />
+            ) : (
+                <div></div>
+            )}
+
+
             <Box mt={2}>
                 <Button variant="contained" color="primary" onClick={() => setAddOpen(true)}>
                     Dodaj sprzęt
                 </Button>
             </Box>
+
+            {/* Dialog do dodawania nowego sprzętu */}
+            <Dialog open={addOpen} onClose={() => setAddOpen(false)}>
+                <DialogTitle>Dodaj nowy sprzęt</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        label="Nazwa"
+                        fullWidth
+                        margin="dense"
+                        value={newNazwa}
+                        onChange={(e) => setNewNazwa(e.target.value)}
+                    />
+                    <TextField
+                        label="Typ"
+                        fullWidth
+                        margin="dense"
+                        value={newTyp}
+                        onChange={(e) => setNewTyp(e.target.value)} // Typ jako string
+                    />
+                    <TextField
+                        label="Opis"
+                        fullWidth
+                        margin="dense"
+                        value={newOpis}
+                        onChange={(e) => setNewOpis(e.target.value)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setAddOpen(false)} color="primary">Anuluj</Button>
+                    <Button onClick={handleAddResource} color="primary">Dodaj</Button>
+                </DialogActions>
+            </Dialog>
 
             {/* Dialog do zgłoszenia użycia */}
             <Dialog open={reportOpen} onClose={() => setReportOpen(false)}>
@@ -188,8 +243,8 @@ const Sprzet = () => {
                             label="Status"
                         >
                             <MenuItem value="Dostepny">Dostepny</MenuItem>
-                            <MenuItem value="W Naprawie">WNaprawie</MenuItem>
-                            <MenuItem value="Zajety">Zajety</MenuItem>
+                            <MenuItem value="W Naprawie">W Naprawie</MenuItem>
+                            <MenuItem value="Zajety">Zajęty</MenuItem>
                             <MenuItem value="Wycofany">Wycofany</MenuItem>
                         </Select>
                     </FormControl>

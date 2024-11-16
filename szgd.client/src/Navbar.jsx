@@ -20,11 +20,11 @@ import { Select, MenuItem as MuiMenuItem, InputLabel, FormControl } from '@mui/m
 import { Typography } from '@mui/material';
 import GroupIcon from '@mui/icons-material/Group';
 import axios from 'axios';
-import {setDomownikWGospodarstwie} from "@/features/resourceSlice.jsx";
+import {setDomownikWGospodarstwie, setGospodarstwo} from "@/features/resourceSlice.jsx";
 const pages = [];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 import { useSelector, useDispatch } from 'react-redux';
-function Navbar() {
+const Navbar = () => {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
     const [gospodarstwa, setGospodarstwa] = React.useState([]);
@@ -80,14 +80,16 @@ function Navbar() {
         // Find the selected gospodarstwo from the list
         const selectedGospodarstwo = gospodarstwa.find(g => g.id === selectedGospodarstwoId);
         // Save both the ID and name of the selected gospodarstwo in sessionStorage
-        const DomownickwGospodarstwie = selectedGospodarstwo.domownikWGospodarstwie.filter(domownik => domownik.domownikId === user.userdata.id);
+        const DomownickwGospodarstwie = selectedGospodarstwo.domownikWGospodarstwie.filter(domownik => domownik.domownikId === user.userdata.id)[0];
         
         if (selectedGospodarstwo) {
-            dispatch(setDomownikWGospodarstwie(JSON.stringify(DomownickwGospodarstwie)));
+            dispatch(setDomownikWGospodarstwie(DomownickwGospodarstwie));
             sessionStorage.setItem('DomownickwGospodarstwie', JSON.stringify(DomownickwGospodarstwie));
             sessionStorage.setItem('selectedGospodarstwoId', selectedGospodarstwo.id);
             sessionStorage.setItem('selectedGospodarstwoName', selectedGospodarstwo.nazwa);
             sessionStorage.setItem('wybraneGospodarstwo', JSON.stringify(selectedGospodarstwo));
+            dispatch(setGospodarstwo(selectedGospodarstwo));
+            useSelector(state => {console.log(state)});
         }
 
         // Set the state with the selected gospodarstwo ID

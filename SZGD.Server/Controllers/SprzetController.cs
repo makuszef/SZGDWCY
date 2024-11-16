@@ -42,21 +42,31 @@ namespace SZGD.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<Sprzet>> CreateSprzet([FromBody] Sprzet newSprzet)
         {
-            _context.Sprzet.Add(newSprzet);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetSprzet), new { id = newSprzet.Id }, newSprzet);
+            if (newSprzet == null || string.IsNullOrEmpty(newSprzet.Nazwa) || string.IsNullOrEmpty(newSprzet.Typ))
+            {
+                return BadRequest("Invalid input.");
+            }
+
+            try
+            {
+                // Dodanie nowego sprzętu do bazy
+                _context.Sprzet.Add(newSprzet);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(GetSprzet), new { id = newSprzet.Id }, newSprzet);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+            
         }
 
 
         // PUT: api/Sprzet/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateSprzet(int id, [FromBody] Sprzet updatedSprzet)
+        [HttpPut()]
+        public async Task<IActionResult> UpdateSprzet([FromBody] Sprzet updatedSprzet)
         {
-            if (id != updatedSprzet.Id)
-            {
-                return BadRequest();
-            }
-
             _context.Entry(updatedSprzet).State = EntityState.Modified;
 
             try
@@ -65,7 +75,7 @@ namespace SZGD.Server.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!SprzetExists(id))
+                if (!SprzetExists(updatedSprzet.Id))
                 {
                     return NotFound("Sprzęt nie został znaleziony.");
                 }
