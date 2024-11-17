@@ -169,8 +169,17 @@ const Sprzet = () => {
             czyWystapilaAwaria: czyWystapilaAwaria,
             komentarzDoAwarii: komentarzDoAwarii
         };
-        await axios.post("https://localhost:7191/api/HistoriaUzyciaSprzetu", historyRequestBody);
-
+        try {
+            const response = await axios.post("https://localhost:7191/api/HistoriaUzyciaSprzetu", historyRequestBody);
+            setSnackbarMessage('Operacja powiodła się');
+            setSnackbarSeverity('success');
+            setOpenSnackbar(true);
+        }
+        catch (e) {
+            setSnackbarMessage('Operacja nie powiodła się');
+            setSnackbarSeverity('error');
+            setOpenSnackbar(true);
+        }
         setReportOpen(false);
     };
 
@@ -188,6 +197,9 @@ const Sprzet = () => {
             const response = await axios.post("https://localhost:7191/api/Sprzet", newResource);
             setResources([...resources, response.data]); // Dodanie nowego sprzętu do stanu
             setAddOpen(false); // Zamknięcie dialogu
+            setSnackbarMessage('Operacja powiodła się');
+            setSnackbarSeverity('success');
+            setOpenSnackbar(true);
         } catch (error) {
             console.error("Error adding new equipment:", error);
         }

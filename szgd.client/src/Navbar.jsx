@@ -20,7 +20,7 @@ import { Select, MenuItem as MuiMenuItem, InputLabel, FormControl } from '@mui/m
 import { Typography } from '@mui/material';
 import GroupIcon from '@mui/icons-material/Group';
 import axios from 'axios';
-import {setDomownikWGospodarstwie, setGospodarstwo} from "@/features/resourceSlice.jsx";
+import {setDomownikWGospodarstwie, setGospodarstwo, selectGospodarstwo} from "@/features/resourceSlice.jsx";
 const pages = [];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 import { useSelector, useDispatch } from 'react-redux';
@@ -35,6 +35,8 @@ const Navbar = () => {
     const navigate = useNavigate();
     const [refresh, setRefresh] = React.useState(false);
     const dispatch = useDispatch()
+    const wybraneGospodarstwo = useSelector(selectGospodarstwo);
+    console.log(wybraneGospodarstwo);
     axios.defaults.headers.common['Authorization'] = `Bearer ${user?.tokens.accessToken}`;
     // Fetching gospodarstwa for user
     React.useEffect(() => {
@@ -96,9 +98,7 @@ const Navbar = () => {
 
         // Set the state with the selected gospodarstwo ID
         setSelectedGospodarstwo(selectedGospodarstwoId);
-
-        // Optionally reload the page to reflect changes
-        window.location.reload();
+        
         console.log('Selected gospodarstwo:', selectedGospodarstwoId);
     };
 
@@ -166,9 +166,10 @@ const Navbar = () => {
                                 Gospodarstwo
                             </InputLabel>
                             <Select
+                                
                                 labelId="gospodarstwo-label"
                                 id="gospodarstwo-select"
-                                value={selectedGospodarstwo || ""}
+                                value={wybraneGospodarstwo.id || ""}
                                 label="Gospodarstwo"
                                 onChange={handleGospodarstwoChange}
                                 sx={{

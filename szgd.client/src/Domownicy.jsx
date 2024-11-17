@@ -24,8 +24,9 @@ import {useAuth} from "@/AuthContext.jsx";
 import {useSelector} from "react-redux";
 import {selectDomownikWGospodarstwie, selectGospodarstwo} from "@/features/resourceSlice.jsx";
 import NoGospodarstwoAlert from "@/NoGosporarstwo.jsx"; // Import ikony Home
-
-
+import EmailIcon from '@mui/icons-material/Email';
+import Tooltip from '@mui/material/Tooltip';
+import PhoneIcon from '@mui/icons-material/Phone';
 const Domownicy = () => {
     const [domownicy, setDomownicy] = useState([]);
     const [editOpen, setEditOpen] = useState(false);
@@ -152,19 +153,39 @@ const Domownicy = () => {
                             <TableRow key={domownik.id}>
                                 <TableCell>{domownik.imie}</TableCell>
                                 <TableCell>{domownik.nazwisko}</TableCell>
-                                <TableCell>{domownik.email}</TableCell>
-                                <TableCell>{domownik.telefon}</TableCell>
+                                <TableCell>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        {domownik.email}
+                                        {domownik?.email && <Tooltip title="Wyślij e-mail">
+                                            <EmailIcon
+                                                sx={{marginLeft: 1, cursor: 'pointer'}}
+                                                onClick={() => window.location.href = `mailto:${domownik.email}`}
+                                            />
+                                        </Tooltip>}
+                                    </Box>
+                                </TableCell>
+                                <TableCell>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        {domownik.telefon}
+                                        {domownik?.telefon && <Tooltip title="Zadzwoń">
+                                            <PhoneIcon
+                                                sx={{marginLeft: 1, cursor: 'pointer'}}
+                                                onClick={() => window.location.href = `tel:48${domownik.telefon}`}
+                                            />
+                                        </Tooltip>}
+                                    </Box>
+                                </TableCell>
                                 {domownikWGospodarstwie?.czyMozeModyfikowacDomownikow && (
                                     <TableCell>
-                                        <Button
+                                        {domownik.id === user.userdata.id && <Button
                                             onClick={() => handleEditOpen(domownik)}
-                                            startIcon={<EditIcon />}
+                                            startIcon={<EditIcon/>}
                                             variant="outlined"
                                             color="primary"
-                                            sx={{ marginRight: 1 }}
+                                            sx={{marginRight: 1}}
                                         >
                                             Edytuj
-                                        </Button>
+                                        </Button>}
                                         <Button
                                             onClick={() => handleDelete(domownik.id)}
                                             startIcon={<DeleteIcon />}

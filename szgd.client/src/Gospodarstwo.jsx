@@ -27,6 +27,10 @@ import { useAuth } from './AuthContext';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import Tooltip from "@mui/material/Tooltip";
+import EmailIcon from "@mui/icons-material/Email";
+import HomeIcon from '@mui/icons-material/Home';
+import ContactsIcon from '@mui/icons-material/Contacts';
 function MyButtons() {
     const { user } = useAuth();
     const [gospodarstwa, setGospodarstwa] = useState([]);
@@ -331,9 +335,19 @@ function MyButtons() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Gospodarstwo</TableCell>
-                            <TableCell>Liczba członków</TableCell>
-                            <TableCell>Akcje</TableCell>
+                            <TableCell>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    Gospodarstwo <HomeIcon sx={{ marginLeft: 1 }} />
+                                </Box>
+                            </TableCell>
+                            <TableCell>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    Liczba członków <ContactsIcon sx={{ marginLeft: 1 }} />
+                                </Box>
+                            </TableCell>
+                            <TableCell>
+                                Akcje
+                            </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
