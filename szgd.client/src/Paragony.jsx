@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Typography, Button, List, ListItem, ListItemText, Stack, Box } from '@mui/material';
+import {Modal, Typography, Button, List, ListItem, ListItemText, Stack, Box, CircularProgress} from '@mui/material';
 import axios from 'axios';
 import ZrobZdjecie from "@/ZrobZdjecie.jsx";
 import { Alert, AlertTitle } from '@mui/material';
 import WarningIcon from '@mui/icons-material/Warning';
 import {selectDomownikWGospodarstwie, selectDomownik, selectGospodarstwo} from "@/features/resourceSlice.jsx";
 import { useSelector, useDispatch } from 'react-redux';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import DownloadIcon from '@mui/icons-material/Download';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import CloseIcon from '@mui/icons-material/Close';
 // Modal for displaying receipt details
 const ReceiptDetailsModal = ({ receipt, open, onClose }) => {
     if (!receipt) return null;
@@ -45,8 +49,8 @@ const ReceiptDetailsModal = ({ receipt, open, onClose }) => {
                 <List dense>{receipt.items.map((item, idx) => (
                     <ListItem key={idx}><ListItemText primary={`${item.name} - ${item.price} PLN`} /></ListItem>
                 ))}</List>
-                <Button onClick={handleDownload} variant="contained" color="secondary" sx={{ mt: 2 }}>Pobierz Paragon</Button>
-                <Button onClick={onClose} variant="contained" color="primary" sx={{ mt: 2 }}>Zamknij</Button>
+                <Button onClick={handleDownload} variant="contained" color="primary" sx={{ mt: 2 }} startIcon={<DownloadIcon/>}>Pobierz Paragon</Button>
+                <Button onClick={onClose} variant="contained" color="primary" sx={{ mt: 2 }} startIcon={<CloseIcon/>}>Zamknij</Button>
             </Box>
         </Modal>
     );
@@ -67,19 +71,18 @@ const FileUpload = ({ onFileUpload, gospodarstwoId }) => {
     return (
         <Box >
             {/* File Upload Section */}
-            <Box sx={{ mt: 4 }} component="form" onSubmit={handleSubmit} sx={uploadStyle}>
+            <Box sx={{ mt: 4 }} component="form" onSubmit={handleSubmit}>
                 <Typography variant="h6">Wgraj Paragon</Typography>
                 <input accept="image/*" type="file" id="upload-file" hidden onChange={handleFileChange} />
                 <label htmlFor="upload-file">
-                    <Button variant="outlined" component="span" color="primary" fullWidth>Wybierz plik</Button>
+                    <Button variant="outlined" component="span" color="primary" fullWidth startIcon={<FileUploadIcon/>}>Wybierz plik</Button>
                 </label>
                 {selectedFile && <Typography variant="body2">Wybrany plik: {selectedFile.name}</Typography>}
-                <Button type="submit" variant="contained" color="primary" fullWidth>Wgraj Paragon</Button>
+                <Button type="submit" variant="contained" color="primary" fullWidth startIcon={<AttachFileIcon/>}>Wgraj Paragon</Button>
             </Box>
 
             {/* Photo Capture Section */}
             <Box sx={{ mt: 4 }}>
-                <Typography variant="h6">Zrób Zdjęcie</Typography>
                 <ZrobZdjecie gospodarstwoId={gospodarstwoId} />
             </Box>
         </Box>
@@ -130,13 +133,15 @@ const ReceiptManager = () => {
     console.log(gospodarstwo);
     useEffect(() => {
         const fetchReceipts = async () => {
-            try {
-                const { data } = await axios.get(`https://localhost:7191/api/paragon/ByGospodarstwo/${gospodarstwoId}`);
-                setReceipts(data);
-            } catch (err) {
-                console.error("Błąd podczas pobierania paragonów:", err);
-                setError("");
-                setReceipts([]);
+            if (gospodarstwo?.id) {
+                try {
+                    const {data} = await axios.get(`https://localhost:7191/api/paragon/ByGospodarstwo/${gospodarstwoId}`);
+                    setReceipts(data);
+                } catch (err) {
+                    console.error("Błąd podczas pobierania paragonów:", err);
+                    setError("");
+                    setReceipts([]);
+                }
             }
         };
         fetchReceipts();
@@ -178,11 +183,12 @@ const ReceiptManager = () => {
     };
 
     return (
-        <Stack spacing={2}>
+        <Box>
+        {gospodarstwo?.id ? (<Stack spacing={2}>
             {domownikWGospodarstwie?.czyMozePrzesylacPliki ? (
                 <FileUpload onFileUpload={handleFileUpload} gospodarstwoId={gospodarstwoId} />
             ) : (
-                
+
                 <Alert
                     severity="error"
                     icon={<WarningIcon />}
@@ -200,11 +206,14 @@ const ReceiptManager = () => {
                 </Alert>
             )}
 
-            {isLoading && <Typography>Ładowanie...</Typography>}
+            {isLoading && <Box sx={{ display: 'flex' }}>
+                <CircularProgress />
+            </Box>}
             {error && <Typography color="error">{error}</Typography>}
             <SavedReceipts receipts={receipts} onSelectReceipt={handleSelectReceipt} />
             <ReceiptDetailsModal receipt={selectedReceipt} open={isModalOpen} onClose={() => setIsModalOpen(false)} />
-        </Stack>
+        </Stack>) : (<Typography>Wybierz gospodarstwo, żeby obejrzeć paragony</Typography>)}
+        </Box>
     );
 };
 

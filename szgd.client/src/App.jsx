@@ -13,6 +13,7 @@ import MedicalServicesIcon from '@mui/icons-material/MedicalServices'; // Ikona 
 import InventoryIcon from '@mui/icons-material/Inventory';            // Ikona zapas�w
 import WindowIcon from '@mui/icons-material/Window';                 // Ikona kontroli okien
 import HomeIcon from '@mui/icons-material/Home';                     // Ikona domownik�w
+import PeopleIcon from '@mui/icons-material/People';
 import Sprzet from './Sprzet'
 import Domownicy from './Domownicy';
 import Paragony from './Paragony.jsx';
@@ -33,7 +34,7 @@ const MainCards = [
     {title: 'Informacje zdrowotne', icon: <MedicalServicesIcon />, route: "/zdrowie", component: <div>Informacje zdrowotne</div> },
     { title: 'Zapasy', icon: <InventoryIcon />, route: "/zapasy", component: <div>Zapasy</div> },
     { title: 'Kontrola okien', icon: <WindowIcon />, route: "/kontrola-okien", component: <div>Kontrola okien</div> },
-    { title: 'Domownicy', icon: <HomeIcon />, route: "/domownicy", component: <Domownicy gospodarstwoId={1}/>},
+    { title: 'Domownicy', icon: <PeopleIcon />, route: "/domownicy", component: <Domownicy gospodarstwoId={1}/>},
     { title: 'Gospodarstwa', icon: <HomeIcon />, route: "/gospodarstwa", component: <Gospodarstwo/>},
 ];
 

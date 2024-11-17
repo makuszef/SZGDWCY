@@ -11,10 +11,14 @@ export const resourceSlice = createSlice({
         setGospodarstwo: (state, action) => {
             console.log('redux stan', action.payload);
             state.gospodarstwo = action.payload; // Set gospodarstwo
+            sessionStorage.setItem('wybraneGospodarstwo', JSON.stringify(action.payload));
+            sessionStorage.setItem('selectedGospodarstwoId', action.payload.id);
+            sessionStorage.setItem('selectedGospodarstwoName', action.payload.nazwa);
         },
         setDomownikWGospodarstwie: (state, action) => {
             console.log('redux stan', action.payload);
             state.domownikWGospodarstwie = action.payload; // Set gospodarstwo
+            sessionStorage.setItem('DomownikWGospodarstwie', JSON.stringify(action.payload));
         },
         clearGospodarstwo: (state) => {
             state.gospodarstwo = null; // Clear gospodarstwo

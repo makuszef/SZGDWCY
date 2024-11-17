@@ -24,6 +24,7 @@ import {setDomownikWGospodarstwie, setGospodarstwo} from "@/features/resourceSli
 const pages = [];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 import { useSelector, useDispatch } from 'react-redux';
+import {useEffect} from "react";
 const Navbar = () => {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -34,6 +35,7 @@ const Navbar = () => {
     const navigate = useNavigate();
     const [refresh, setRefresh] = React.useState(false);
     const dispatch = useDispatch()
+    
     // Fetching gospodarstwa for user
     React.useEffect(() => {
         if (user && user.userdata.id) {

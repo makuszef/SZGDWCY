@@ -19,7 +19,10 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
-import { Home } from '@mui/icons-material'; // Import ikony Home
+import { Home } from '@mui/icons-material';
+import {useAuth} from "@/AuthContext.jsx";
+import {useSelector} from "react-redux";
+import {selectDomownikWGospodarstwie, selectGospodarstwo} from "@/features/resourceSlice.jsx"; // Import ikony Home
 
 
 const Domownicy = () => {
@@ -27,9 +30,13 @@ const Domownicy = () => {
     const [editOpen, setEditOpen] = useState(false);
     const [currentDomownik, setCurrentDomownik] = useState(null);
     const [dialogData, setDialogData] = useState([]);
-    const [gospodarstwoName, setGospodarstwoName] = useState(sessionStorage.getItem('selectedGospodarstwoName'));
-    const [gospodarstwoId, setGospodarstwoId] = useState(sessionStorage.getItem('selectedGospodarstwoId'));
-
+    const { user } = useAuth(); // Access user data from the auth context
+    const domownikWGospodarstwie = useSelector(selectDomownikWGospodarstwie);
+    const gospodarstwo = useSelector(selectGospodarstwo);
+    const gospodarstwoId = gospodarstwo.id;
+    console.log(domownikWGospodarstwie);
+    console.log(gospodarstwoId);
+    console.log(gospodarstwo);
     const columns = [
         { field: 'imie', headerName: 'Imie', width: 130 },
         { field: 'nazwisko', headerName: 'Nazwisko', width: 130 },
@@ -40,15 +47,6 @@ const Domownicy = () => {
 
     useEffect(() => {
         if (gospodarstwoId) {
-            const fetchGospodarstwoName = async () => {
-                try {
-                    const response = await axios.get(`https://localhost:7191/api/Gospodarstwo/${gospodarstwoId}`);
-                    setGospodarstwoName(response.data.nazwa);
-                } catch (error) {
-                    console.error("Błąd podczas pobierania nazwy gospodarstwa:", error);
-                }
-            };
-
             const fetchDomownicy = async () => {
                 try {
                     const response = await axios.get(`https://localhost:7191/api/Gospodarstwo/${gospodarstwoId}`);
@@ -64,8 +62,7 @@ const Domownicy = () => {
                     console.error("Błąd podczas pobierania danych domowników:", error);
                 }
             };
-
-            fetchGospodarstwoName();
+            
             fetchDomownicy();
         }
     }, [gospodarstwoId]);
@@ -121,11 +118,12 @@ const Domownicy = () => {
     };
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box>
+        {gospodarstwo && gospodarstwo.id ? (<Box sx={{ width: '100%' }}>
             {/*<Home sx={{ marginRight: 2 }} /> /!* Ikona domu *!/*/}
             <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
                 {/*Gospodarstwo: {gospodarstwoName || "Nie wybrano gospodarstwa"}*/}
-                Zarządzanie domownikami w gospodarstwie
+                Zarządzanie domownikami w gospodarstwie {gospodarstwo?.nazwa}
             </Typography>
             <br/>
             <TableContainer component={Paper}>
@@ -157,25 +155,29 @@ const Domownicy = () => {
                                 <TableCell>{domownik.nazwisko}</TableCell>
                                 <TableCell>{domownik.email}</TableCell>
                                 <TableCell>{domownik.telefon}</TableCell>
-                                <TableCell>
-                                    <Button
-                                        onClick={() => handleEditOpen(domownik)}
-                                        startIcon={<EditIcon />}
-                                        variant="outlined"
-                                        color="primary"
-                                        sx={{ marginRight: 1 }}
-                                    >
-                                        Edytuj
-                                    </Button>
-                                    <Button
-                                        onClick={() => handleDelete(domownik.id)}
-                                        startIcon={<DeleteIcon />}
-                                        variant="outlined"
-                                        color="secondary"
-                                    >
-                                        Usuń
-                                    </Button>
-                                </TableCell>
+                                {domownikWGospodarstwie?.czyMozeModyfikowacDomownikow && (
+                                    <TableCell>
+                                        <Button
+                                            onClick={() => handleEditOpen(domownik)}
+                                            startIcon={<EditIcon />}
+                                            variant="outlined"
+                                            color="primary"
+                                            sx={{ marginRight: 1 }}
+                                        >
+                                            Edytuj
+                                        </Button>
+                                        <Button
+                                            onClick={() => handleDelete(domownik.id)}
+                                            startIcon={<DeleteIcon />}
+                                            variant="outlined"
+                                            color="secondary"
+                                        >
+                                            Usuń
+                                        </Button>
+                                    </TableCell>
+                                )}
+
+
                             </TableRow>
                         ))}
                     </TableBody>
@@ -209,6 +211,7 @@ const Domownicy = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+        </Box>) : (<Typography>Wybierz gospodarstwo, żeby zobaczyć domowników</Typography>)}
         </Box>
     );
 };

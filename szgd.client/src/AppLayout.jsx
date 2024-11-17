@@ -9,6 +9,7 @@ import BuildIcon from '@mui/icons-material/Build'; // Icon for equipment
 import PollIcon from '@mui/icons-material/Poll'; // Icon for surveys
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices'; // Icon for health information
 import InventoryIcon from '@mui/icons-material/Inventory'; // Icon for inventory
+import PeopleIcon from '@mui/icons-material/People';
 import WindowIcon from '@mui/icons-material/Window'; // Icon for window control
 import HomeIcon from '@mui/icons-material/Home';
 import { useAuth } from './AuthContext';
@@ -22,7 +23,7 @@ const MainCards = [
     { title: 'Informacje zdrowotne', icon: <MedicalServicesIcon />, route: "/zdrowie", component: <div>Informacje zdrowotne</div> },
     { title: 'Zapasy', icon: <InventoryIcon />, route: "/zapasy", component: <div>Zapasy</div> },
     { title: 'Kontrola okien', icon: <WindowIcon />, route: "/kontrola-okien", component: <div>Kontrola okien</div> },
-    { title: 'Domownicy', icon: <HomeIcon />, route: "/domownicy", component: <div>Domownicy</div> },
+    { title: 'Domownicy', icon: <PeopleIcon />, route: "/domownicy", component: <div>Domownicy</div> },
     { title: 'Gospodarstwa', icon: <HomeIcon />, route: "/gospodarstwa", component: <div>Gospodarstwa</div>},
 ];
 
@@ -48,9 +49,8 @@ const AppLayout = ({ Content, Cards }) => {
                 {user && ( // Only render Sidebar if the user is logged in
                     <Box
                         sx={{
-                            minWidth: '200px', // Set a minimum width for the sidebar
                             bgcolor: (theme) => theme.palette.primary.main, // Sidebar background color using primary theme color
-                            height: `calc(100vh - ${navbarHeight}px)`, // Sidebar height minus the Navbar height
+                            height: `100%`, // Sidebar height minus the Navbar height
                             position: 'fixed',
                             top: `${navbarHeight}px`, // Position the sidebar below the navbar
                             left: 0,

@@ -1,13 +1,19 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button } from '@mui/material';
+import {Box, Button, CircularProgress} from '@mui/material';
 import axios from 'axios';
-
+import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
+import CloseIcon from '@mui/icons-material/Close';
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemButton from "@mui/material/ListItemButton";
+import UndoIcon from '@mui/icons-material/Undo';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
 const CameraComponent = ({ gospodarstwoId }) => {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const [photo, setPhoto] = useState(null);
     const [isCameraActive, setIsCameraActive] = useState(false);  // State to control camera visibility
-
+    const [isLoading, setIsLoading] = useState(false);
     // Start and stop camera based on isCameraActive state
     useEffect(() => {
         let stream;
@@ -60,7 +66,7 @@ const CameraComponent = ({ gospodarstwoId }) => {
 
     const uploadPhoto = async () => {
         if (!photo) return;
-
+        setIsLoading(true);
         // Convert data URL to a Blob
         const blob = await (await fetch(photo)).blob();
 
@@ -80,6 +86,9 @@ const CameraComponent = ({ gospodarstwoId }) => {
         } catch (error) {
             console.error('Upload failed:', error);
         }
+        finally {
+            setIsLoading(false);
+        }
     };
 
     const retakePhoto = () => {
@@ -96,7 +105,7 @@ const CameraComponent = ({ gospodarstwoId }) => {
         <div>
             {/* Show button to start the camera */}
             {!isCameraActive && !photo && (
-                <Button variant="contained" color="primary" onClick={() => setIsCameraActive(true)}>
+                <Button variant="contained" color="primary" onClick={() => setIsCameraActive(true)} startIcon={<AddAPhotoIcon/>}>
                     Zrób Zdjęcie
                 </Button>
             )}
@@ -105,10 +114,10 @@ const CameraComponent = ({ gospodarstwoId }) => {
             {isCameraActive && !photo && (
                 <div>
                     <video ref={videoRef} autoPlay playsInline style={{ width: '100%' }} />
-                    <Button variant="contained" color="primary" onClick={takePhoto} style={{ marginTop: '10px' }}>
-                        Take Photo
+                    <Button variant="contained" color="primary" onClick={takePhoto} style={{ marginTop: '10px' }} startIcon={<AddAPhotoIcon/>}>
+                        Zrób Zdjęcie
                     </Button>
-                    <Button variant="outlined" color="secondary" onClick={closeCamera} style={{ marginTop: '10px' }}>
+                    <Button variant="outlined" color="secondary" onClick={closeCamera} style={{ marginTop: '10px' }} startIcon={<CloseIcon/>}>
                         Zamknij
                     </Button>
                 </div>
@@ -118,17 +127,20 @@ const CameraComponent = ({ gospodarstwoId }) => {
             {photo && (
                 <div>
                     <img src={photo} alt="Captured" style={{ width: '100%', marginBottom: '10px' }} />
-                    <Button variant="outlined" color="primary" onClick={uploadPhoto}>
-                        Upload Photo
+                    <Button variant="outlined" color="primary" onClick={uploadPhoto} startIcon={<FileUploadIcon/>}>
+                        Prześlij zdjęcie
                     </Button>
-                    <Button variant="contained" color="secondary" onClick={retakePhoto} style={{ marginLeft: '10px' }}>
-                        Retake Photo
+                    <Button variant="contained" color="secondary" onClick={retakePhoto} startIcon={<UndoIcon/>} style={{ marginLeft: '10px' }}>
+                        Zrób zdjęcie ponownie
                     </Button>
                 </div>
             )}
 
             {/* Hidden canvas for capturing the photo */}
             <canvas ref={canvasRef} style={{ display: 'none' }} />
+            {isLoading && <Box sx={{ display: 'flex' }}>
+                <CircularProgress />
+            </Box>}
         </div>
     );
 };

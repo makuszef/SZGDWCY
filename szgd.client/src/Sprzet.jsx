@@ -23,9 +23,9 @@ import TableTemplate from './TableTemplate';
 import RowActions from './RowActions';
 import axios from 'axios';
 import { useSelector } from "react-redux";
-import { selectGospodarstwo } from "@/features/resourceSlice.jsx";
+import {selectDomownikWGospodarstwie, selectGospodarstwo} from "@/features/resourceSlice.jsx";
 import {useAuth} from "@/AuthContext.jsx";
-
+import AddIcon from '@mui/icons-material/Add';
 const Sprzet = () => {
     const [resources, setResources] = useState([]);
     const [editOpen, setEditOpen] = useState(false);
@@ -41,6 +41,7 @@ const Sprzet = () => {
     const [newTyp, setNewTyp] = useState('');
     const [newOpis, setNewOpis] = useState('');
     const gospodarstwo = useSelector(selectGospodarstwo);
+    const domownikWGospodarstwie = useSelector(selectDomownikWGospodarstwie);
     const gospodarstwoId = gospodarstwo.id;
     const { user, logout } = useAuth();
     const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -63,14 +64,16 @@ const Sprzet = () => {
     ];
 
     useEffect(() => {
-        axios.get(`https://localhost:7191/api/sprzet/GetAllSprzet/${gospodarstwoId}`)
-            .then(response => {
-                setResources(response.data);  // Ustawienie danych, jeśli zapytanie się uda
-            })
-            .catch(error => {
-                console.error(error);  // Logowanie błędu do konsoli
-                setResources([]);  // Ustawienie pustej tablicy w przypadku błędu
-            });
+        if (gospodarstwo?.id) {
+            axios.get(`https://localhost:7191/api/sprzet/GetAllSprzet/${gospodarstwoId}`)
+                .then(response => {
+                    setResources(response.data);  // Ustawienie danych, jeśli zapytanie się uda
+                })
+                .catch(error => {
+                    console.error(error);  // Logowanie błędu do konsoli
+                    setResources([]);  // Ustawienie pustej tablicy w przypadku błędu
+                });
+        }
     }, [gospodarstwoId]);  // Hook uruchamiany po zmianie gospodarstwoId
 
 
@@ -213,7 +216,8 @@ const Sprzet = () => {
     ];
 
     return (
-        <Box sx={{ width: '1000px' }}>
+        <Box>
+        {gospodarstwo?.id ? (<Box sx={{ width: '1000px' }}>
             {resources != null && resources.length > 0 ? (
                 <TableTemplate
                     passedResources={resources}
@@ -227,7 +231,7 @@ const Sprzet = () => {
 
 
             <Box mt={2}>
-                <Button variant="contained" color="primary" onClick={() => setAddOpen(true)}>
+                <Button variant="contained" color="primary" onClick={() => setAddOpen(true)} startIcon={<AddIcon/>}>
                     Dodaj sprzęt
                 </Button>
             </Box>
@@ -369,7 +373,9 @@ const Sprzet = () => {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
+        </Box>) : (<Typography>Wybierz gospodastwo, żeby obejrzeć sprzęt</Typography>)}
         </Box>
+        
     );
 };
 

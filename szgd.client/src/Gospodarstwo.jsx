@@ -24,7 +24,9 @@ import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import CloseIcon from '@mui/icons-material/Close';
 import { useAuth } from './AuthContext';
-
+import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from '@mui/icons-material/Add';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 function MyButtons() {
     const { user } = useAuth();
     const [gospodarstwa, setGospodarstwa] = useState([]);
@@ -154,10 +156,10 @@ function MyButtons() {
         <div>
 
             <Stack direction="row" spacing={2}>
-                <Button variant="contained" color="primary" onClick={handleOpenCreateGospodarstwoModal}>
+                <Button variant="contained" color="primary" onClick={handleOpenCreateGospodarstwoModal} startIcon={<AddIcon/>}>
                     Utwórz gospodarstwo
                 </Button>
-                <Button variant="contained" color="secondary" onClick={handleOpenAddUsersModal}>
+                <Button variant="contained" color="secondary" onClick={handleOpenAddUsersModal} startIcon={<PersonAddIcon/>}>
                     Dodaj domownika do gospodarstwa
                 </Button>
             </Stack>
@@ -351,6 +353,7 @@ function MyButtons() {
                                         variant="outlined"
                                         size="small"
                                         onClick={() => handleSelectGospodarstwo(gospodarstwo.id)}
+                                        startIcon={<EditIcon/>}
                                     >
                                         Zarządzaj
                                     </Button>
