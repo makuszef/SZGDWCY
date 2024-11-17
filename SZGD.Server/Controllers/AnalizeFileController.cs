@@ -3,12 +3,14 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Azure;
+using Microsoft.AspNetCore.Authorization;
 using SZGD.Server.Data;
 using SZGD.Server.Models;
 using SZGD.Server.Sterowanie;
 
 namespace SZGD.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AnalizeFileController : ControllerBase

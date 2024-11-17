@@ -24,7 +24,9 @@ import About from "@/About.jsx";
 import {AuthProvider} from "@/AuthContext.jsx";
 import Profile from "@/Profile.jsx";
 import store from "@/store.jsx";
+import {useEffect} from "react";
 import { Provider } from 'react-redux';
+import axios from 'axios'
 // Karty g��wne z przypisanymi ikonami i trasami
 const MainCards = [
     { title: 'Harmonogram sprzatania', icon: <SprzatanieIcon />, route: "/sprzatanie", component: <div>Harmonogram sprzatania</div> },
@@ -37,7 +39,7 @@ const MainCards = [
     { title: 'Domownicy', icon: <PeopleIcon />, route: "/domownicy", component: <Domownicy gospodarstwoId={1}/>},
     { title: 'Gospodarstwa', icon: <HomeIcon />, route: "/gospodarstwa", component: <Gospodarstwo/>},
 ];
-
+const userinfo = localStorage.getItem('user');
 function App() {
     return (
         <Provider store={store}>

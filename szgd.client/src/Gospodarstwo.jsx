@@ -42,7 +42,7 @@ function MyButtons() {
     const [selectedGospodarstwo, setSelectedGospodarstwo] = useState(null); // Stan lokalny do przechowywania wybranego gospodarstwa
 
     const dispatch = useDispatch();
-
+    axios.defaults.headers.common['Authorization'] = `Bearer ${user?.tokens.accessToken}`;
     useEffect(() => {
         const fetchUsers = async () => {
             try {

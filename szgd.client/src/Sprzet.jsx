@@ -26,6 +26,7 @@ import { useSelector } from "react-redux";
 import {selectDomownikWGospodarstwie, selectGospodarstwo} from "@/features/resourceSlice.jsx";
 import {useAuth} from "@/AuthContext.jsx";
 import AddIcon from '@mui/icons-material/Add';
+import NoGospodarstwoAlert from "@/NoGosporarstwo.jsx";
 const Sprzet = () => {
     const [resources, setResources] = useState([]);
     const [editOpen, setEditOpen] = useState(false);
@@ -47,7 +48,7 @@ const Sprzet = () => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('error');
-
+    axios.defaults.headers.common['Authorization'] = `Bearer ${user?.tokens.accessToken}`;
     const columns = [
         { field: 'nazwa', headerName: 'Nazwa', width: 130 },
         { field: 'typ', headerName: 'Typ', width: 130 },
@@ -373,7 +374,7 @@ const Sprzet = () => {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
-        </Box>) : (<Typography>Wybierz gospodastwo, żeby obejrzeć sprzęt</Typography>)}
+        </Box>) : (<NoGospodarstwoAlert/>)}
         </Box>
         
     );

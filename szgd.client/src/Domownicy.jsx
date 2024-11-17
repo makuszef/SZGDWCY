@@ -22,7 +22,8 @@ import axios from 'axios';
 import { Home } from '@mui/icons-material';
 import {useAuth} from "@/AuthContext.jsx";
 import {useSelector} from "react-redux";
-import {selectDomownikWGospodarstwie, selectGospodarstwo} from "@/features/resourceSlice.jsx"; // Import ikony Home
+import {selectDomownikWGospodarstwie, selectGospodarstwo} from "@/features/resourceSlice.jsx";
+import NoGospodarstwoAlert from "@/NoGosporarstwo.jsx"; // Import ikony Home
 
 
 const Domownicy = () => {
@@ -34,9 +35,7 @@ const Domownicy = () => {
     const domownikWGospodarstwie = useSelector(selectDomownikWGospodarstwie);
     const gospodarstwo = useSelector(selectGospodarstwo);
     const gospodarstwoId = gospodarstwo.id;
-    console.log(domownikWGospodarstwie);
-    console.log(gospodarstwoId);
-    console.log(gospodarstwo);
+    axios.defaults.headers.common['Authorization'] = `Bearer ${user?.tokens.accessToken}`;
     const columns = [
         { field: 'imie', headerName: 'Imie', width: 130 },
         { field: 'nazwisko', headerName: 'Nazwisko', width: 130 },
@@ -211,7 +210,7 @@ const Domownicy = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </Box>) : (<Typography>Wybierz gospodarstwo, żeby zobaczyć domowników</Typography>)}
+        </Box>) : (<NoGospodarstwoAlert/>)}
         </Box>
     );
 };

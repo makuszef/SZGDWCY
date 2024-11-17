@@ -6,7 +6,7 @@ import { useAuth } from './AuthContext'; // Zakładam, że masz AuthContext
 const Profile = ({ avatar, onAvatarChange }) => {
     const [userInfo, setUserInfo] = useState({});
     const { user } = useAuth();  // Pobieramy dane użytkownika z AuthContext
-
+    axios.defaults.headers.common['Authorization'] = `Bearer ${user?.tokens.accessToken}`;
     useEffect(() => {
         if (user && user.id) {
             // Zapytanie do API po dane użytkownika

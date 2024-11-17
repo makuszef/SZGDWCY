@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {Modal, Typography, Button, List, ListItem, ListItemText, Stack, Box, CircularProgress} from '@mui/material';
 import axios from 'axios';
 import ZrobZdjecie from "@/ZrobZdjecie.jsx";
@@ -10,6 +10,8 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import DownloadIcon from '@mui/icons-material/Download';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CloseIcon from '@mui/icons-material/Close';
+import NoGospodarstwoAlert from "@/NoGosporarstwo.jsx";
+import {useAuth} from "@/AuthContext.jsx";
 // Modal for displaying receipt details
 const ReceiptDetailsModal = ({ receipt, open, onClose }) => {
     if (!receipt) return null;
@@ -124,13 +126,11 @@ const ReceiptManager = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [przeladuj, setPrzeladuj] = useState(1);
-    
+    const {user} = useAuth();
     const domownikWGospodarstwie = useSelector(selectDomownikWGospodarstwie);
     const gospodarstwo = useSelector(selectGospodarstwo);
     const gospodarstwoId = gospodarstwo.id;
-    console.log(domownikWGospodarstwie);
-    console.log(gospodarstwoId);
-    console.log(gospodarstwo);
+    axios.defaults.headers.common['Authorization'] = `Bearer ${user?.tokens.accessToken}`;
     useEffect(() => {
         const fetchReceipts = async () => {
             if (gospodarstwo?.id) {
@@ -212,7 +212,7 @@ const ReceiptManager = () => {
             {error && <Typography color="error">{error}</Typography>}
             <SavedReceipts receipts={receipts} onSelectReceipt={handleSelectReceipt} />
             <ReceiptDetailsModal receipt={selectedReceipt} open={isModalOpen} onClose={() => setIsModalOpen(false)} />
-        </Stack>) : (<Typography>Wybierz gospodarstwo, żeby obejrzeć paragony</Typography>)}
+        </Stack>) : (<NoGospodarstwoAlert/>)}
         </Box>
     );
 };

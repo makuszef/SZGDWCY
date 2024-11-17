@@ -35,7 +35,7 @@ const Navbar = () => {
     const navigate = useNavigate();
     const [refresh, setRefresh] = React.useState(false);
     const dispatch = useDispatch()
-    
+    axios.defaults.headers.common['Authorization'] = `Bearer ${user?.tokens.accessToken}`;
     // Fetching gospodarstwa for user
     React.useEffect(() => {
         if (user && user.userdata.id) {

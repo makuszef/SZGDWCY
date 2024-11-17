@@ -4,9 +4,11 @@ using SZGD.Server.Data; // Assuming your DbContext is in this namespace
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SZGD.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ParagonController : ControllerBase

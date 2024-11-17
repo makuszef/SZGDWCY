@@ -5,9 +5,11 @@ using SZGD.Server.Data; // Assuming your DbContext is in this namespace
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SZGD.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class DomownikWGospodarstwieController : ControllerBase

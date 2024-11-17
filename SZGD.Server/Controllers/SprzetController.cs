@@ -3,11 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using SZGD.Server.Data;
 using SZGD.Server.Models;
 
 namespace SZGD.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class SprzetController : ControllerBase

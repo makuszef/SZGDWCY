@@ -22,7 +22,7 @@ const RegisterPage = () => {
                 email,
                 password,
             });
-
+            
             setSuccessMessage('Registration successful!');
             setOpenSnackbar(true);
             console.log(firstName, lastName, phoneNumber);

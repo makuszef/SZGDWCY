@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using SZGD.Server.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace SZGD.Server.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class GospodarstwoController : ControllerBase

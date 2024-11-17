@@ -2,11 +2,13 @@ using SZGD.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using SZGD.Server.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace SZGD.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class DomownikController : ControllerBase
@@ -73,6 +75,7 @@ namespace SZGD.Server.Controllers
         }
 
         // PUT: api/Domownik/{id}
+        [AllowAnonymous]
         [HttpPut("{email}")]
         public async Task<ActionResult> UpdateDomownik(string email, [FromBody] DomownikDTO DomownikDTO)
         {

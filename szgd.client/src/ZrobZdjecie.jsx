@@ -8,13 +8,16 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemButton from "@mui/material/ListItemButton";
 import UndoIcon from '@mui/icons-material/Undo';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
+import {useAuth} from "@/AuthContext.jsx";
 const CameraComponent = ({ gospodarstwoId }) => {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const [photo, setPhoto] = useState(null);
     const [isCameraActive, setIsCameraActive] = useState(false);  // State to control camera visibility
     const [isLoading, setIsLoading] = useState(false);
+    const {user} = useAuth();
     // Start and stop camera based on isCameraActive state
+    axios.defaults.headers.common['Authorization'] = `Bearer ${user?.tokens.accessToken}`;
     useEffect(() => {
         let stream;
         const startCamera = async () => {
