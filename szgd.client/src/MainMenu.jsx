@@ -11,8 +11,10 @@ import {
 import { styled } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 import Gospodarstwo from './Gospodarstwo';
+import {useAuth} from "@/AuthContext.jsx";
+import NoGosporarstwo from "@/NoGosporarstwo.jsx";
 const MainMenu = ({ cards }) => {
-
+    const { user } = useAuth();
     const selectedGospodarstwo = useSelector((state) => state.resource.gospodarstwo);
 
     const navigate = useNavigate();  // Create navigate function
@@ -39,7 +41,7 @@ const MainMenu = ({ cards }) => {
 
     return (
         <div>
-                <Grid container spacing={2} style={{ padding: 16 }}>
+            {user?.userdata ? <Grid container spacing={2} style={{padding: 16}}>
                 {cards.map((card, index) => (
                     <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
                         <StyledCard
@@ -48,14 +50,14 @@ const MainMenu = ({ cards }) => {
                             onMouseLeave={e => e.currentTarget.style.opacity = 0.7}>
                             <CardContent>
                                 <Typography variant="h5">{card.title}</Typography>
-                                <IconButton disableRipple style={{ fontSize: '90px'}}>
-                                    {React.cloneElement(card.icon, { fontSize: 'inherit'})}
+                                <IconButton disableRipple style={{fontSize: '90px'}}>
+                                    {React.cloneElement(card.icon, {fontSize: 'inherit'})}
                                 </IconButton>
                             </CardContent>
                         </StyledCard>
                     </Grid>
                 ))}
-            </Grid> 
+            </Grid> : <NoGosporarstwo/>}
         </div>
         
     );

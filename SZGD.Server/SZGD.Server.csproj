@@ -12,6 +12,7 @@
   <ItemGroup>
     <PackageReference Include="Azure.AI.DocumentIntelligence" Version="1.0.0-beta.3" />
     <PackageReference Include="Azure.AI.FormRecognizer" Version="4.1.0" />
+    <PackageReference Include="Fido2" Version="4.0.0-beta.14" />
     <PackageReference Include="Google.Cloud.Vision.V1" Version="3.7.0" />
     <PackageReference Include="IronOcr" Version="2024.10.3" />
     <PackageReference Include="IronOcr.Languages.Polish" Version="2020.11.2" />
