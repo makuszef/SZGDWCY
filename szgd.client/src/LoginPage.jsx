@@ -40,7 +40,7 @@ const LoginPage = () => {
             console.log('Login successful:', response.status);
             console.log("tokens", response.data);
             setSuccessMessage('Login successful!');
-
+            axios.defaults.headers.common['Authorization'] = `Bearer ${response?.data.accessToken}`;
             try {
                 const userResponse = await axios.get(`https://localhost:7191/api/Domownik/GetDomownikByEmail/${email}`);
                 console.log('User data:', userResponse.data);

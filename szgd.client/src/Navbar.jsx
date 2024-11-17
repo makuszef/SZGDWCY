@@ -141,12 +141,12 @@ const Navbar = () => {
                         <Typography variant="h6">Login</Typography>
                     </Button>
 
-                    <Button
-                        startIcon={<HomeIcon />}
+                    {user?.userdata && <Button
+                        startIcon={<HomeIcon/>}
                         onClick={() => navigate('/')}  //kafelki '/'
                         sx={{
                             color: 'inherit',
-                            '&:hover': { backgroundColor: 'transparent' },
+                            '&:hover': {backgroundColor: 'transparent'},
                             display: 'flex',
                             alignItems: 'center',
                             height: 40,
@@ -154,14 +154,14 @@ const Navbar = () => {
                         }}
                     >
                         <Typography variant="h6">Home</Typography>
-                    </Button>
+                    </Button>}
 
-                    <Box sx={{ display: 'flex', alignItems: 'center', mt: 0 }}>
-                        <GroupIcon sx={{ marginRight: 1, fontSize: 20 }} />
-                        <FormControl sx={{ minWidth: 200 }}>
+                    {user?.userdata && <Box sx={{display: 'flex', alignItems: 'center', mt: 0}}>
+                        <GroupIcon sx={{marginRight: 1, fontSize: 20}}/>
+                        <FormControl sx={{minWidth: 200}}>
                             <InputLabel
                                 id="gospodarstwo-label"
-                                sx={{ color: 'white', textAlign: 'center' }}
+                                sx={{color: 'white', textAlign: 'center'}}
                             >
                                 Gospodarstwo
                             </InputLabel>
@@ -179,8 +179,8 @@ const Navbar = () => {
                                         height: 40,
                                         color: 'white',
                                     },
-                                    '.MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
-                                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
+                                    '.MuiOutlinedInput-notchedOutline': {borderColor: 'white'},
+                                    '&:hover .MuiOutlinedInput-notchedOutline': {borderColor: 'white'},
                                 }}
                             >
                                 {gospodarstwa.length === 0 ? (
@@ -196,7 +196,7 @@ const Navbar = () => {
                                 )}
                             </Select>
                         </FormControl>
-                    </Box>
+                    </Box>}
 
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}></Box>
 
@@ -212,14 +212,14 @@ const Navbar = () => {
                             </>
                         ) : null}
 
-                        <Box sx={{ flexGrow: 0 }}>
+                        {user?.userdata && <Box sx={{flexGrow: 0}}>
                             <Tooltip title="Open settings">
-                                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                    <Avatar alt="User Avatar" src={avatar || "/static/images/avatar/2.jpg"} />
+                                <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
+                                    <Avatar alt="User Avatar" src={avatar || "/static/images/avatar/2.jpg"}/>
                                 </IconButton>
                             </Tooltip>
                             <Menu
-                                sx={{ mt: '45px' }}
+                                sx={{mt: '45px'}}
                                 id="menu-appbar"
                                 anchorEl={anchorElUser}
                                 anchorOrigin={{
@@ -248,15 +248,15 @@ const Navbar = () => {
                                             }
                                         }}
                                     >
-                                        <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                                        <Typography sx={{textAlign: 'center'}}>{setting}</Typography>
                                     </MenuItem>
                                 ))}
                                 {/* Option for changing avatar */}
                                 <MenuItem onClick={() => document.getElementById('avatar-upload').click()}>
-                                    <Typography sx={{ textAlign: 'center' }}>Change Avatar</Typography>
+                                    <Typography sx={{textAlign: 'center'}}>Change Avatar</Typography>
                                 </MenuItem>
                             </Menu>
-                        </Box>
+                        </Box>}
                     </Box>
 
                     {/* Hidden file input for avatar upload */}
