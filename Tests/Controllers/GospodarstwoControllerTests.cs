@@ -1,220 +1,130 @@
 namespace Tests.Controllers;
-
-using Xunit;
-using SZGD.Server.Controllers;
-using SZGD.Server.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SZGD.Server.Controllers;
+using SZGD.Server.Data;
+using SZGD.Server.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+using System.Threading.Tasks;
+using Xunit;
 
-
-public class GospodarstwoControllerTests
+public class GospodarstwoControllerTests : IDisposable
 {
+    private readonly ApplicationDbContext _context;
+
     public GospodarstwoControllerTests()
     {
-        // Resetowanie statycznej listy przed każdym testem
-        typeof(GospodarstwoController)
-            .GetField("_gospodarstwa", BindingFlags.NonPublic | BindingFlags.Static)
-            .SetValue(null, new List<Gospodarstwo>());
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(databaseName: "TestGospodarstwoDatabase")
+            .Options;
+        _context = new ApplicationDbContext(options);
     }
-    
+
+    public void Dispose()
+    {
+        _context.Database.EnsureDeleted();  // Usuwa bazę danych po każdym teście
+        _context.Dispose();
+    }
+
     [Fact]
-    public void GetAll_ReturnsOkResult_WithListOfGospodarstwa()
+    public async Task GetAll_ReturnsAllGospodarstwa()
     {
         // Arrange
-        var controller = new GospodarstwoController();
-        var gospodarstwo1 = new Gospodarstwo { nazwa = "Gospodarstwo 1", czlonkowie = new List<Domownik>() };
-        var gospodarstwo2 = new Gospodarstwo { nazwa = "Gospodarstwo 2", czlonkowie = new List<Domownik>() };
-        controller.Create(gospodarstwo1);
-        controller.Create(gospodarstwo2);
+        _context.Gospodarstwa.Add(new Gospodarstwo { Id = 1, nazwa = "Dom A" });
+        _context.Gospodarstwa.Add(new Gospodarstwo { Id = 2, nazwa = "Dom B" });
+        await _context.SaveChangesAsync();
+
+        var controller = new GospodarstwoController(_context);
 
         // Act
-        var result = controller.GetAll();
+        var result = await controller.GetAll();
 
         // Assert
-        var actionResult = Assert.IsType<ActionResult<List<Gospodarstwo>>>(result);
-        var okResult = Assert.IsType<OkObjectResult>(actionResult.Result);
-        var gospodarstwa = Assert.IsType<List<Gospodarstwo>>(okResult.Value);
+        var okResult = Assert.IsType<OkObjectResult>(result.Result);
+        var gospodarstwa = Assert.IsAssignableFrom<List<Gospodarstwo>>(okResult.Value);
         Assert.Equal(2, gospodarstwa.Count);
     }
-    
+
     [Fact]
-    public void GetById_ExistingId_ReturnsOkResult()
+    public async Task GetById_ReturnsGospodarstwo_WhenExists()
     {
         // Arrange
-        var controller = new GospodarstwoController();
-        var gospodarstwo = new Gospodarstwo { nazwa = "Gospodarstwo Testowe", czlonkowie = new List<Domownik>() };
-        controller.Create(gospodarstwo);
+        _context.Gospodarstwa.Add(new Gospodarstwo { Id = 1, nazwa = "Dom A" });
+        await _context.SaveChangesAsync();
+
+        var controller = new GospodarstwoController(_context);
 
         // Act
-        var result = controller.GetById(gospodarstwo.Id);
+        var result = await controller.GetById(1);
 
         // Assert
-        var actionResult = Assert.IsType<ActionResult<Gospodarstwo>>(result);
-        var okResult = Assert.IsType<OkObjectResult>(actionResult.Result);
-        var returnedGospodarstwo = Assert.IsType<Gospodarstwo>(okResult.Value);
-        Assert.Equal(gospodarstwo.Id, returnedGospodarstwo.Id);
-        Assert.Equal(gospodarstwo.nazwa, returnedGospodarstwo.nazwa);
+        var okResult = Assert.IsType<OkObjectResult>(result.Result);
+        var gospodarstwo = Assert.IsType<Gospodarstwo>(okResult.Value);
+        Assert.Equal("Dom A", gospodarstwo.nazwa);
     }
 
     [Fact]
-    public void GetById_UnknownId_ReturnsNotFound()
+    public async Task GetById_ReturnsNotFound_WhenDoesNotExist()
     {
         // Arrange
-        var controller = new GospodarstwoController();
+        var controller = new GospodarstwoController(_context);
 
         // Act
-        var result = controller.GetById(999);
+        var result = await controller.GetById(1);
 
         // Assert
-        var actionResult = Assert.IsType<ActionResult<Gospodarstwo>>(result);
-        Assert.IsType<NotFoundResult>(actionResult.Result);
+        Assert.IsType<NotFoundResult>(result.Result);
     }
 
     [Fact]
-    public void Create_ValidGospodarstwo_ReturnsCreatedAtActionResult()
+    public async Task Create_AddsNewGospodarstwo()
     {
         // Arrange
-        var controller = new GospodarstwoController();
-        var gospodarstwo = new Gospodarstwo { nazwa = "Nowe Gospodarstwo", czlonkowie = new List<Domownik>() };
+        var controller = new GospodarstwoController(_context);
+        var newGospodarstwo = new DodajGospodarstwoRequest { id = 3, nazwa = "Dom C" };
 
         // Act
-        var result = controller.Create(gospodarstwo);
+        var result = await controller.Create(newGospodarstwo);
 
         // Assert
-        var actionResult = Assert.IsType<ActionResult<Gospodarstwo>>(result);
-        var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
-        var returnedGospodarstwo = Assert.IsType<Gospodarstwo>(createdAtActionResult.Value);
-        Assert.Equal(gospodarstwo.nazwa, returnedGospodarstwo.nazwa);
-        Assert.NotEqual(0, returnedGospodarstwo.Id);
+        var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result.Result);
+        var gospodarstwo = Assert.IsType<Gospodarstwo>(createdAtActionResult.Value);
+        Assert.Equal("Dom C", gospodarstwo.nazwa);
     }
 
     [Fact]
-    public void Update_ExistingId_ReturnsNoContent()
+    public async Task Update_UpdatesExistingGospodarstwo()
     {
         // Arrange
-        var controller = new GospodarstwoController();
-        var gospodarstwo = new Gospodarstwo { nazwa = "Gospodarstwo Do Aktualizacji", czlonkowie = new List<Domownik>() };
-        controller.Create(gospodarstwo);
+        _context.Gospodarstwa.Add(new Gospodarstwo { Id = 1, nazwa = "Dom A" });
+        await _context.SaveChangesAsync();
 
-        var updatedGospodarstwo = new Gospodarstwo { nazwa = "Zaktualizowane Gospodarstwo", czlonkowie = new List<Domownik>() };
+        var controller = new GospodarstwoController(_context);
+        var updatedGospodarstwo = new Gospodarstwo { Id = 1, nazwa = "Dom Zaktualizowany" };
 
         // Act
-        var result = controller.Update(gospodarstwo.Id, updatedGospodarstwo);
+        var result = await controller.Update(1, updatedGospodarstwo);
 
         // Assert
         Assert.IsType<NoContentResult>(result);
-        var fetchedGospodarstwo = controller.GetById(gospodarstwo.Id);
-        var actionResult = Assert.IsType<ActionResult<Gospodarstwo>>(fetchedGospodarstwo);
-        var okResult = Assert.IsType<OkObjectResult>(actionResult.Result);
-        var returnedGospodarstwo = Assert.IsType<Gospodarstwo>(okResult.Value);
-        Assert.Equal(updatedGospodarstwo.nazwa, returnedGospodarstwo.nazwa);
+        var gospodarstwo = await _context.Gospodarstwa.FindAsync(1);
+        Assert.Equal("Dom Zaktualizowany", gospodarstwo.nazwa);
     }
 
     [Fact]
-    public void Update_UnknownId_ReturnsNotFound()
+    public async Task Delete_RemovesGospodarstwo()
     {
         // Arrange
-        var controller = new GospodarstwoController();
-        var updatedGospodarstwo = new Gospodarstwo { nazwa = "Nieistniejące Gospodarstwo", czlonkowie = new List<Domownik>() };
+        _context.Gospodarstwa.Add(new Gospodarstwo { Id = 1, nazwa = "Dom A" });
+        await _context.SaveChangesAsync();
+
+        var controller = new GospodarstwoController(_context);
 
         // Act
-        var result = controller.Update(999, updatedGospodarstwo);
-
-        // Assert
-        Assert.IsType<NotFoundResult>(result);
-    }
-
-    [Fact]
-    public void Delete_ExistingId_ReturnsNoContent()
-    {
-        // Arrange
-        var controller = new GospodarstwoController();
-        var gospodarstwo = new Gospodarstwo { nazwa = "Gospodarstwo Do Usunięcia", czlonkowie = new List<Domownik>() };
-        controller.Create(gospodarstwo);
-
-        // Act
-        var result = controller.Delete(gospodarstwo.Id);
+        var result = await controller.Delete(1);
 
         // Assert
         Assert.IsType<NoContentResult>(result);
-        var fetchResult = controller.GetById(gospodarstwo.Id);
-        var actionResult = Assert.IsType<ActionResult<Gospodarstwo>>(fetchResult);
-        Assert.IsType<NotFoundResult>(actionResult.Result);
+        Assert.Null(await _context.Gospodarstwa.FindAsync(1));
     }
-
-    [Fact]
-    public void Delete_UnknownId_ReturnsNotFound()
-    {
-        // Arrange
-        var controller = new GospodarstwoController();
-
-        // Act
-        var result = controller.Delete(999);
-
-        // Assert
-        Assert.IsType<NotFoundResult>(result);
-    }
-
-    [Fact]
-    public void AddDomownik_ExistingGospodarstwo_AddsDomownik()
-    {
-        // Arrange
-        var controller = new GospodarstwoController();
-        var gospodarstwo = new Gospodarstwo { nazwa = "Gospodarstwo z Domownikami", czlonkowie = new List<Domownik>() };
-        controller.Create(gospodarstwo);
-
-        var newDomownik = new Domownik
-        {
-            Imie = "Jan",
-            Nazwisko = "Kowalski",
-            Email = "jan.kowalski@example.com",
-            Telefon = "123456789",
-            Nazwa_uzytkownika = "jkowalski"
-        };
-
-        // Act
-        var result = controller.AddDomownik(gospodarstwo.Id, newDomownik);
-
-        // Assert
-        var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result);
-        var returnedDomownik = Assert.IsType<Domownik>(createdAtActionResult.Value);
-        Assert.Equal(newDomownik.Imie, returnedDomownik.Imie);
-        Assert.Equal(1, returnedDomownik.id_domownika);
-
-        // Sprawdzenie, czy domownik został dodany do gospodarstwa
-        var fetchResult = controller.GetById(gospodarstwo.Id);
-        var actionResult = Assert.IsType<ActionResult<Gospodarstwo>>(fetchResult);
-        var okResult = Assert.IsType<OkObjectResult>(actionResult.Result);
-        var updatedGospodarstwo = Assert.IsType<Gospodarstwo>(okResult.Value);
-        Assert.Single(updatedGospodarstwo.czlonkowie);
-        Assert.Equal(newDomownik.Imie, updatedGospodarstwo.czlonkowie.First().Imie);
-    }
-
-    [Fact]
-    public void AddDomownik_UnknownGospodarstwo_ReturnsNotFound()
-    {
-        // Arrange
-        var controller = new GospodarstwoController();
-        var newDomownik = new Domownik
-        {
-            Imie = "Anna",
-            Nazwisko = "Nowak",
-            Email = "anna.nowak@example.com",
-            Telefon = "987654321",
-            Nazwa_uzytkownika = "anowak"
-        };
-
-        // Act
-        var result = controller.AddDomownik(999, newDomownik);
-
-        // Assert
-        var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
-        var message = Assert.IsType<string>(notFoundResult.Value);
-        Assert.Equal("Gospodarstwo o podanym ID nie istnieje.", message);
-    }
-
-    
-    
 }
