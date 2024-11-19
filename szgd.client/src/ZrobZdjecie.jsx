@@ -9,6 +9,76 @@ import ListItemButton from "@mui/material/ListItemButton";
 import UndoIcon from '@mui/icons-material/Undo';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import {useAuth} from "@/AuthContext.jsx";
+/**
+ * CameraComponent allows the user to capture a photo using the device's rear camera,
+ * upload it to a server, and retake the photo if needed.
+ *
+ * @param {Object} props - The component props.
+ * @param {string} props.gospodarstwoId - The unique ID for the gospodarstwo.
+ */
+
+/**
+ * Reference for the video element that displays the camera feed.
+ * @type {React.MutableRefObject<HTMLVideoElement | null>}
+ */
+
+/**
+ * Reference for the hidden canvas element used to capture the image.
+ * @type {React.MutableRefObject<HTMLCanvasElement | null>}
+ */
+
+/**
+ * State for storing the captured photo as a data URL.
+ * @type {[string | null, React.Dispatch<React.SetStateAction<string | null>>]}
+ */
+
+/**
+ * State to control whether the camera is active or not.
+ * @type {[boolean, React.Dispatch<React.SetStateAction<boolean>>]}
+ */
+
+/**
+ * State to control the loading state during photo upload.
+ * @type {[boolean, React.Dispatch<React.SetStateAction<boolean>>]}
+ */
+
+/**
+ * The user object fetched from the authentication context.
+ * @type {Object | null}
+ */
+
+/**
+ * Effect hook to start/stop the camera when `isCameraActive` state changes.
+ * Starts the camera if active, and stops it when inactive.
+ */
+
+/**
+ * Starts the camera and displays the feed in the video element.
+ * @async
+ * @returns {Promise<void>}
+ */
+
+/**
+ * Captures a photo from the video feed and stores it as a data URL.
+ * Updates the photo state and stops the camera after capturing.
+ */
+
+/**
+ * Uploads the captured photo to the server.
+ * Converts the data URL to a Blob and sends it as a multipart/form-data.
+ *
+ * @async
+ * @returns {Promise<void>}
+ */
+
+/**
+ * Allows the user to retake the photo by clearing the current photo and restarting the camera.
+ */
+
+/**
+ * Closes the camera without taking a photo.
+ */
+
 const CameraComponent = ({ gospodarstwoId }) => {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);

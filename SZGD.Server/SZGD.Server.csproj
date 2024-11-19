@@ -7,6 +7,12 @@
     <SpaRoot>..\szgd.client</SpaRoot>
     <SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
     <SpaProxyServerUrl>https://localhost:5173</SpaProxyServerUrl>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>bin\Debug\SZGD.Server.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DocumentationFile>bin\Debug\SZGD.Server.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -51,6 +57,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="docs\api\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 

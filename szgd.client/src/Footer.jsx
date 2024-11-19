@@ -1,6 +1,19 @@
 // Footer.jsx
 import { AppBar, Toolbar, Typography, Button, Container } from '@mui/material';
 import {Info, Mail } from '@mui/icons-material'; // Importing icons
+/**
+ * Footer component for the application.
+ * Displays copyright information and a navigation link to the "About" page.
+ *
+ * @returns {JSX.Element} React component for the application footer.
+ */
+
+/**
+ * Renders the application footer using Material-UI's AppBar and Toolbar components.
+ * Includes a copyright notice and an "About" button with an icon.
+ *
+ * @function Footer
+ */
 
 const Footer = () => {
     return (

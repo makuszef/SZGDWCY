@@ -13,6 +13,80 @@ import CloseIcon from '@mui/icons-material/Close';
 import NoGospodarstwoAlert from "@/NoGosporarstwo.jsx";
 import {useAuth} from "@/AuthContext.jsx";
 // Modal for displaying receipt details
+/**
+ * ReceiptDetailsModal is a modal that displays detailed information about a receipt.
+ * It shows the receipt's date, store name, total amount, items, and provides an option to download the receipt.
+ *
+ * @param {Object} props - The component props.
+ * @param {Object} props.receipt - The receipt data to be displayed in the modal.
+ * @param {boolean} props.open - Controls whether the modal is open or not.
+ * @param {function} props.onClose - Function to close the modal when invoked.
+ */
+
+/**
+ * FileUpload component allows users to upload a receipt file, either by selecting a file from their device or by taking a photo.
+ * The selected file is passed to a callback function `onFileUpload` for further processing.
+ *
+ * @param {Object} props - The component props.
+ * @param {function} props.onFileUpload - Callback function to handle the file upload.
+ * @param {string} props.gospodarstwoId - The ID of the gospodarstwo for associating the upload.
+ */
+
+/**
+ * SavedReceipts displays a list of saved receipts. It allows the user to select a receipt to view more details.
+ *
+ * @param {Array} props.receipts - The list of saved receipts to display.
+ * @param {function} props.onSelectReceipt - Callback function to handle receipt selection.
+ */
+
+/**
+ * Main component for managing receipt uploads and display.
+ * Handles file uploads, viewing and selecting receipts, and downloading receipt details.
+ *
+ * @returns {JSX.Element} The rendered component.
+ */
+
+/**
+ * Fetches the list of receipts for the current gospodarstwo and updates the state.
+ * Triggered on component mount or when `przeladuj` state changes.
+ *
+ * @async
+ * @function
+ */
+
+/**
+ * Handles file uploads by appending the selected file to a FormData object and sending it to the server.
+ * On success, the state is updated to trigger reloading the receipt list.
+ *
+ * @param {File} file - The file to be uploaded.
+ * @async
+ */
+
+/**
+ * Handles receipt selection by fetching receipt details from the server and opening the modal to display them.
+ *
+ * @param {string} receiptId - The ID of the selected receipt.
+ * @async
+ */
+
+/**
+ * Styles used for the modal in ReceiptDetailsModal.
+ * The modal is centered on the screen and has a custom background color, padding, and a shadow effect.
+ * @type {Object}
+ */
+
+/**
+ * Styles for the file upload section in FileUpload component.
+ * This includes the layout of the form and buttons for uploading files.
+ * @type {Object}
+ */
+
+/**
+ * Styles for list items representing each receipt in the SavedReceipts component.
+ * Each item is clickable and highlights when hovered.
+ * @type {Object}
+ */
+
 const ReceiptDetailsModal = ({ receipt, open, onClose }) => {
     if (!receipt) return null;
 

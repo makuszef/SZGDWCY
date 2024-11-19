@@ -27,6 +27,93 @@ import {selectDomownikWGospodarstwie, selectGospodarstwo} from "@/features/resou
 import {useAuth} from "@/AuthContext.jsx";
 import AddIcon from '@mui/icons-material/Add';
 import NoGospodarstwoAlert from "@/NoGosporarstwo.jsx";
+/**
+ * Komponent Sprzet zarządza sprzętem w gospodarstwie, umożliwia dodawanie, edytowanie, usuwanie i przeglądanie historii sprzętu.
+ * Używa komponentów Material-UI oraz integracji z API.
+ *
+ * @component
+ * @returns {JSX.Element} Komponent renderujący tabelę sprzętu z funkcjonalnością dodawania, edytowania, usuwania oraz przeglądania historii.
+ */
+
+/**
+ * Hook uruchamiany po zmianie ID gospodarstwa. Pobiera dane o sprzęcie i aktualizuje stan komponentu.
+ *
+ * @function useEffect
+ */
+
+/**
+ * Funkcja obsługująca otwieranie okna edycji sprzętu.
+ * Ustawia wartości aktualnego sprzętu w stanach lokalnych.
+ *
+ * @function handleEditOpen
+ * @param {Object} resource - Obiekt reprezentujący wybrany sprzęt do edycji.
+ */
+
+/**
+ * Funkcja obsługująca wysyłanie danych edytowanego sprzętu do API w celu zapisania zmian.
+ * W przypadku powodzenia aktualizuje dane w stanie komponentu.
+ *
+ * @function handleEditSubmit
+ */
+
+/**
+ * Funkcja obsługująca usuwanie sprzętu.
+ * Usuwa sprzęt z bazy danych oraz aktualizuje stan komponentu.
+ *
+ * @function handleDelete
+ * @param {number} resourceId - ID sprzętu do usunięcia.
+ */
+
+/**
+ * Funkcja obsługująca wyświetlanie historii użycia sprzętu.
+ * Pobiera dane historii i ustawia je w stanie komponentu.
+ *
+ * @function handleHistory
+ * @param {number} resourceId - ID sprzętu, dla którego ma zostać wyświetlona historia.
+ */
+
+/**
+ * Funkcja otwierająca formularz zgłaszania użycia sprzętu, umożliwia określenie statusu i awarii.
+ *
+ * @function openReportDialog
+ * @param {Object} resource - Obiekt reprezentujący sprzęt, dla którego zgłaszane jest użycie.
+ */
+
+/**
+ * Funkcja obsługująca wysyłanie raportu o użyciu sprzętu, w tym aktualizację statusu sprzętu oraz zapis do historii użycia.
+ *
+ * @function handleReportSubmit
+ */
+
+/**
+ * Funkcja obsługująca dodawanie nowego sprzętu.
+ * Wysyła dane nowego sprzętu do API i aktualizuje stan komponentu.
+ *
+ * @function handleAddResource
+ */
+
+/**
+ * Zestaw akcji dla wierszy w tabeli, umożliwia wywołanie funkcji edycji, usuwania, zgłaszania użycia oraz historii.
+ *
+ * @constant
+ * @type {Array<Object>}
+ * @property {string} title - Tytuł akcji.
+ * @property {JSX.Element} icon - Ikona reprezentująca akcję.
+ * @property {Function} onClick - Funkcja wywoływana po kliknięciu akcji.
+ */
+
+/**
+ * Renderuje komponent z tabelą sprzętu, umożliwia zarządzanie sprzętem oraz wyświetlanie formularzy.
+ *
+ * @returns {JSX.Element} Zwraca JSX z tabelą sprzętu oraz formularzami do dodawania, edytowania, raportowania i przeglądania historii.
+ */
+
+/**
+ * Komponent wyświetlający komunikat o braku gospodarstwa.
+ * Wykorzystywany, gdy użytkownik nie jest przypisany do żadnego gospodarstwa.
+ *
+ * @returns {JSX.Element} Komunikat o braku gospodarstwa.
+ */
 const Sprzet = () => {
     const [resources, setResources] = useState([]);
     const [editOpen, setEditOpen] = useState(false);

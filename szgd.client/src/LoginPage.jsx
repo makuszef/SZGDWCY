@@ -5,6 +5,26 @@ import axios from 'axios';
 import { useAuth } from './AuthContext'; // Używamy kontekstu do sprawdzania stanu użytkownika
 import CorrectIcon from '@mui/icons-material/CheckCircle';
 
+/**
+ * LoginPage component
+ * Renders a login form and handles user authentication.
+ *
+ * @returns {JSX.Element} The login page component.
+ */
+
+/**
+ * Handles the login process by sending user credentials to the server.
+ * Updates the global user state on success and displays feedback messages.
+ *
+ * @param {React.FormEvent<HTMLFormElement>} e - The form submission event.
+ * @returns {Promise<void>} A promise resolving after the login process completes.
+ */
+
+/**
+ * Closes the snackbar displaying feedback messages.
+ *
+ * @returns {void}
+ */
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
