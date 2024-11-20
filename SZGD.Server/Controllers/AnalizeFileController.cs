@@ -75,11 +75,12 @@ public async Task<IActionResult> PrzeslijPlik(IFormFile file, int gospodarstwoId
     // Add the parsed receipt data to Paragony and PozycjeParagonu tables
     var paragon = new Paragon
     {
-        Date = receiptData.Date,
-        StoreName = receiptData.StoreName,
-        TotalAmount = receiptData.TotalAmount,
+        Date = receiptData.Date ?? DateTime.Now.ToString(),
+        StoreName = receiptData.StoreName ?? "Nieznany sklep",
+        TotalAmount = receiptData.TotalAmount ,
         GospodarstwoId = gospodarstwoId,
     };
+    if (paragon.Date == null) paragon.Date = DateTime.Now.ToString();
     uploadedFile.Paragon = paragon;
     _context.Pliki.Add(uploadedFile);
     _context.Paragony.Add(paragon);

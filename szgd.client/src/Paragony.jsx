@@ -12,6 +12,7 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CloseIcon from '@mui/icons-material/Close';
 import NoGospodarstwoAlert from "@/NoGosporarstwo.jsx";
 import {useAuth} from "@/AuthContext.jsx";
+import {RANDOM} from "mysql/lib/PoolSelector.js";
 // Modal for displaying receipt details
 /**
  * ReceiptDetailsModal is a modal that displays detailed information about a receipt.
@@ -90,19 +91,25 @@ import {useAuth} from "@/AuthContext.jsx";
 const ReceiptDetailsModal = ({ receipt, open, onClose }) => {
     if (!receipt) return null;
 
-    const handleDownload = async () => {
+    const handleDownload  = async () => {
         try {
             const { id, nazwaPliku } = receipt;
             if (id) {
                 const response = await axios.get(`https://localhost:7191/api/PrzeslanyPlik/${id}`);
+                console.log(response.data);
                 if (response.data?.zawartoscPliku) {
+                    // Decode Base64 to binary data
                     const blob = new Blob([Uint8Array.from(atob(response.data.zawartoscPliku), c => c.charCodeAt(0))], {
-                        type: 'application/pdf',
+                        type: 'image/jpeg', // Change this to the correct MIME type for your image (e.g., 'image/png' or 'image/jpg')
                     });
+
+                    // Create a download link
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
-                    link.download = nazwaPliku || 'paragon.pdf';
+                    link.download = response.data?.nazwaPliku || "obraz.jpg"; // Default file name if none is provided
                     link.click();
+
+                    // Clean up
                     URL.revokeObjectURL(link.href);
                 } else {
                     alert("Nie znaleziono zawartości pliku.");
@@ -113,6 +120,7 @@ const ReceiptDetailsModal = ({ receipt, open, onClose }) => {
             alert("Wystąpił błąd podczas pobierania pliku.");
         }
     };
+
 
     return (
         <Modal open={open} onClose={onClose}>
@@ -143,7 +151,10 @@ const FileUpload = ({ onFileUpload, gospodarstwoId }) => {
         if (selectedFile) onFileUpload(selectedFile);
         else alert("Proszę wybrać plik!");
     };
-
+    const [przeladuj, setPrzeladuj] = useState(1);
+    const refreshParent = () => {
+        setPrzeladuj((przeladuj) => przeladuj + 1); // Increment the key to force a re-render
+    };
     return (
         <Box >
             {/* File Upload Section */}
@@ -159,7 +170,7 @@ const FileUpload = ({ onFileUpload, gospodarstwoId }) => {
 
             {/* Photo Capture Section */}
             <Box sx={{ mt: 4 }}>
-                <ZrobZdjecie gospodarstwoId={gospodarstwoId} />
+                <ZrobZdjecie gospodarstwoId={gospodarstwoId} onCompletion={refreshParent}/>
             </Box>
         </Box>
     );
@@ -169,11 +180,14 @@ const SavedReceipts = ({ receipts, onSelectReceipt }) => {
         return <Typography>Nie zapisano żadnych paragonów.</Typography>;
     }
 
+    // Sort receipts by date in descending order
+    const sortedReceipts = [...receipts].sort((a, b) => new Date(b.date) - new Date(a.date));
+
     return (
         <Box>
             <Typography variant="h6" gutterBottom>Zapisane Paragony</Typography>
             <List>
-                {receipts.map((receipt) => (
+                {sortedReceipts.map((receipt) => (
                     <ListItem
                         button
                         key={receipt.id}
@@ -192,6 +206,7 @@ const SavedReceipts = ({ receipts, onSelectReceipt }) => {
 };
 
 
+
 // Main component managing receipt upload and display
 const ReceiptManager = () => {
     const [receipts, setReceipts] = useState([]);
@@ -205,19 +220,23 @@ const ReceiptManager = () => {
     const gospodarstwo = useSelector(selectGospodarstwo);
     const gospodarstwoId = gospodarstwo.id;
     axios.defaults.headers.common['Authorization'] = `Bearer ${user?.tokens.accessToken}`;
-    useEffect(() => {
-        const fetchReceipts = async () => {
-            if (gospodarstwo?.id) {
-                try {
-                    const {data} = await axios.get(`https://localhost:7191/api/paragon/ByGospodarstwo/${gospodarstwoId}`);
-                    setReceipts(data);
-                } catch (err) {
-                    console.error("Błąd podczas pobierania paragonów:", err);
-                    setError("");
-                    setReceipts([]);
-                }
+    const refreshParent = () => {
+        setPrzeladuj((przeladuj) => przeladuj + 1); // Increment the key to force a re-render
+    };
+    const fetchReceipts = async () => {
+        if (gospodarstwo?.id) {
+            try {
+                const {data} = await axios.get(`https://localhost:7191/api/paragon/ByGospodarstwo/${gospodarstwoId}`);
+                setReceipts(data);
+                console.log(receipts);
+            } catch (err) {
+                console.error("Błąd podczas pobierania paragonów:", err);
+                setError("");
+                setReceipts([]);
             }
-        };
+        }
+    };
+    useEffect(() => {
         fetchReceipts();
     }, [przeladuj, gospodarstwoId]);
 
@@ -236,7 +255,6 @@ const ReceiptManager = () => {
                     headers: { 'Content-Type': 'multipart/form-data' },
                 }
             );
-            setPrzeladuj(przeladuj + 1);
         } catch (err) {
             console.error("Błąd podczas wysyłania pliku:", err);
             setError("Wystąpił błąd podczas przetwarzania pliku.");
@@ -244,7 +262,11 @@ const ReceiptManager = () => {
             setIsLoading(false);
         }
     };
-
+    const onFileUpload = async (file) => {
+        console.log('hello')
+        await handleFileUpload(file); // Wait for handleFileUpload to complete
+        await fetchReceipts(); // Call fetchReceipts afterward
+    };
 
     const handleSelectReceipt = async (receiptId) => {
         try {
@@ -260,7 +282,7 @@ const ReceiptManager = () => {
         <Box>
         {gospodarstwo?.id ? (<Stack spacing={2}>
             {domownikWGospodarstwie?.czyMozePrzesylacPliki ? (
-                <FileUpload onFileUpload={handleFileUpload} gospodarstwoId={gospodarstwoId} />
+                <FileUpload onFileUpload={onFileUpload} gospodarstwoId={gospodarstwoId} />
             ) : (
 
                 <Alert
