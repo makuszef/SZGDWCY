@@ -27,6 +27,68 @@ import NoGospodarstwoAlert from "@/NoGosporarstwo.jsx"; // Import ikony Home
 import EmailIcon from '@mui/icons-material/Email';
 import Tooltip from '@mui/material/Tooltip';
 import PhoneIcon from '@mui/icons-material/Phone';
+
+/**
+ * Component for managing household members ("Domownicy") within a selected "Gospodarstwo" (household).
+ * Allows viewing, editing, and deleting members.
+ *
+ * @returns {JSX.Element} React component for managing household members.
+ */
+
+/**
+ * Fetches and sets the list of household members for the selected "Gospodarstwo".
+ * Triggered when `gospodarstwoId` changes.
+ *
+ * @function fetchDomownicy
+ */
+
+/**
+ * Opens the edit dialog for a specific household member.
+ * Populates the dialog with member details for editing.
+ *
+ * @param {Object} domownik - The household member to edit.
+ * @function handleEditOpen
+ */
+
+/**
+ * Deletes a specific household member from the list.
+ * Sends a delete request to the API and updates the state.
+ *
+ * @param {string} domownikId - The ID of the household member to delete.
+ * @function handleDelete
+ */
+
+/**
+ * Updates a specific household member's details.
+ * Sends an update request to the API and updates the state.
+ *
+ * @param {Object} updatedDomownik - The updated household member details.
+ * @function handleUpdate
+ */
+
+/**
+ * Updates the dialog data when a field value changes.
+ * Used for managing input fields in the edit dialog.
+ *
+ * @param {number} index - The index of the dialog data field to update.
+ * @param {string} value - The new value for the field.
+ * @function handleChange
+ */
+
+/**
+ * Submits the updated details of a household member.
+ * Sends the changes to the server and closes the edit dialog.
+ *
+ * @function handleSubmit
+ */
+
+/**
+ * Renders a table displaying the list of household members for the current "Gospodarstwo".
+ * Includes actions for editing and deleting members if permissions allow.
+ *
+ * @component HouseholdMemberTable
+ */
+
 const Domownicy = () => {
     const [domownicy, setDomownicy] = useState([]);
     const [editOpen, setEditOpen] = useState(false);

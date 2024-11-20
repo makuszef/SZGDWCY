@@ -2,6 +2,25 @@ import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { Paper, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+/**
+ * TableTemplate
+ * A reusable table component that uses Material-UI's DataGrid to display data with customizable columns and actions.
+ *
+ * @param {Object} props - Component properties.
+ * @param {Array} props.passedResources - Array of row data to be displayed in the table.
+ * @param {string} props.description - Description or title for the table.
+ * @param {Array} props.columns - Array of column definitions for the DataGrid.
+ * @param {Function} props.rowActions - Callback for handling row-specific actions (optional).
+ * @returns {JSX.Element} The TableTemplate component.
+ */
+
+/**
+ * Handles the click event on a row in the DataGrid. Logs the selected row's ID.
+ *
+ * @param {Object} params - Parameters containing row information.
+ * @param {Object} params.row - The data of the clicked row.
+ * @returns {void}
+ */
 
 function TableTemplate({ passedResources, description, columns, rowActions }) {
     const navigate = useNavigate();

@@ -31,6 +31,99 @@ import Tooltip from "@mui/material/Tooltip";
 import EmailIcon from "@mui/icons-material/Email";
 import HomeIcon from '@mui/icons-material/Home';
 import ContactsIcon from '@mui/icons-material/Contacts';
+
+/**
+ * Renders the main buttons for managing "Gospodarstwa" (households).
+ * Provides modals for creating households and adding members.
+ *
+ * @returns {JSX.Element} React component for household management.
+ */
+
+/**
+ * Fetches and sets the list of users.
+ * Triggered on component mount.
+ *
+ * @function fetchUsers
+ */
+
+/**
+ * Fetches and sets the list of "Gospodarstwa" (households) associated with the logged-in user.
+ * Triggered when user data changes.
+ *
+ * @function fetchGospodarstwa
+ */
+
+/**
+ * Creates a new "Gospodarstwo" (household) and assigns selected users to it.
+ * Handles both the creation of the household and adding members.
+ *
+ * @param {Event} e - Form submission event.
+ * @function handleCreateGospodarstwo
+ */
+
+/**
+ * Selects a specific "Gospodarstwo" (household) by its ID.
+ * Updates the state for the selected household.
+ *
+ * @param {string} gospodarstwoId - ID of the selected household.
+ * @function handleSelectGospodarstwo
+ */
+
+/**
+ * Adds selected users to the currently selected "Gospodarstwo" (household).
+ * Handles API calls for assigning users to the household.
+ *
+ * @function handleAddDomownikToGospodarstwo
+ */
+
+/**
+ * Opens the modal for creating a new "Gospodarstwo".
+ * Updates the state to display the modal.
+ *
+ * @function handleOpenCreateGospodarstwoModal
+ */
+
+/**
+ * Closes the modal for creating a new "Gospodarstwo".
+ * Resets the modal state.
+ *
+ * @function handleCloseCreateGospodarstwoModal
+ */
+
+/**
+ * Opens the modal for adding users to a "Gospodarstwo".
+ * Updates the state to display the modal.
+ *
+ * @function handleOpenAddUsersModal
+ */
+
+/**
+ * Closes the modal for adding users to a "Gospodarstwo".
+ * Resets the modal state.
+ *
+ * @function handleCloseAddUsersModal
+ */
+
+/**
+ * Filters the "Gospodarstwa" (households) to display only those where the user is an owner.
+ *
+ * @constant {Array} filteredGospodarstwa - Filtered list of households.
+ */
+
+/**
+ * Renders the list of "Gospodarstwa" (households) the user belongs to.
+ * Includes options to manage each household.
+ *
+ * @component HouseholdList
+ */
+
+/**
+ * Renders the details of a selected "Gospodarstwo".
+ * Displays the list of members in the household.
+ *
+ * @component GospodarstwoDetails
+ */
+
 function MyButtons() {
     const { user } = useAuth();
     const [gospodarstwa, setGospodarstwa] = useState([]);
