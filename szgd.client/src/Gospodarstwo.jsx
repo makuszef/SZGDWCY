@@ -124,7 +124,7 @@ import ContactsIcon from '@mui/icons-material/Contacts';
  * @component GospodarstwoDetails
  */
 
-function Gospodarstwo() {
+function MyButtons() {
     const { user } = useAuth();
     const [gospodarstwa, setGospodarstwa] = useState([]);
     const [users, setUsers] = useState([]);
@@ -499,4 +499,4 @@ function Gospodarstwo() {
     );
 }
 
-export default Gospodarstwo;
+export default MyButtons;
