@@ -79,7 +79,7 @@ import {useAuth} from "@/AuthContext.jsx";
  * Closes the camera without taking a photo.
  */
 
-const CameraComponent = ({ gospodarstwoId }) => {
+const CameraComponent = ({ gospodarstwoId, onCompletion }) => {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const [photo, setPhoto] = useState(null);
@@ -156,6 +156,7 @@ const CameraComponent = ({ gospodarstwoId }) => {
                 }
             );
             console.log('Upload successful:', response.data);
+            onCompletion();
         } catch (error) {
             console.error('Upload failed:', error);
         }
@@ -163,7 +164,10 @@ const CameraComponent = ({ gospodarstwoId }) => {
             setIsLoading(false);
         }
     };
-
+    const onPhotoUpload = async (file) => {
+        console.log('hello')
+        await uploadPhoto; // Wait for handleFileUpload to complete
+    };
     const retakePhoto = () => {
         setPhoto(null); // Clear the current photo
         setIsCameraActive(true); // Restart the camera

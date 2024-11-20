@@ -20,6 +20,7 @@ import {
     IconButton,
     Box
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import CloseIcon from '@mui/icons-material/Close';
@@ -137,7 +138,7 @@ function MyButtons() {
     const [successMessage2, setSuccessMessage2] = useState('');
     const [gospodarstwoDetails, setGospodarstwoDetails] = useState(null); // Nowy stan dla szczegółów gospodarstwa
     const [selectedGospodarstwo, setSelectedGospodarstwo] = useState(null); // Stan lokalny do przechowywania wybranego gospodarstwa
-
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     axios.defaults.headers.common['Authorization'] = `Bearer ${user?.tokens.accessToken}`;
     useEffect(() => {
@@ -478,7 +479,7 @@ function MyButtons() {
                                     <Button
                                         variant="outlined"
                                         size="small"
-                                        onClick={() => handleSelectGospodarstwo(gospodarstwo.id)}
+                                        onClick={() => navigate('/domownicy')}
                                         startIcon={<EditIcon/>}
                                     >
                                         Zarządzaj
