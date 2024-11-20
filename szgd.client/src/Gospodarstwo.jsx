@@ -417,7 +417,7 @@ function MyButtons() {
                             multiple
                             value={selectedUsers}
                             onChange={(e) => setSelectedUsers(e.target.value)}
-                            renderValue={(selected) => selected.join(', ')}
+                            renderValue={(selected) => selected.map((id) => users.find((u) => u.id === id)?.userName).join(', ')}
                         >
                             {unassignedUsers.map((user) => (
                                 <MenuItem key={user.id} value={user.id}>
