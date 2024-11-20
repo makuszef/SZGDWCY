@@ -152,16 +152,17 @@ function MyButtons() {
         fetchUsers();
     }, []);
 
+    const fetchGospodarstwa = async () => {
+        try {
+            const response = await axios.get(`https://localhost:7191/api/Domownik/GetAllGospodarstwa/${user.userdata.id}`);
+            setGospodarstwa(response.data);
+        } catch (error) {
+            console.error("Error fetching gospodarstwa:", error);
+        }
+    };
+    
     useEffect(() => {
         if (user && user.userdata.id) {
-            const fetchGospodarstwa = async () => {
-                try {
-                    const response = await axios.get(`https://localhost:7191/api/Domownik/GetAllGospodarstwa/${user.userdata.id}`);
-                    setGospodarstwa(response.data);
-                } catch (error) {
-                    console.error("Error fetching gospodarstwa:", error);
-                }
-            };
             fetchGospodarstwa();
         }
     }, [user]);
@@ -182,6 +183,17 @@ function MyButtons() {
 
             await Promise.all(addDomownikPromises);
             setSuccessMessage1(`Utworzono gospodarstwo: ${newGospodarstwoName}`);
+            setNewGospodarstwoName('');
+            setSelectedUsers([]);
+
+            // Odśwież listę gospodarstw
+            if (user && user.userdata.id) {
+                await fetchGospodarstwa(); // Wywołanie funkcji pobierającej gospodarstwa
+            }
+
+            // Zamknięcie modala po sukcesie
+            handleCloseCreateGospodarstwoModal();
+            
         } catch (error) {
             console.error('Error during process:', error.response ? error.response.data : error.message);
             setSuccessMessage1('Coś poszło nie tak. Spróbuj ponownie!');
