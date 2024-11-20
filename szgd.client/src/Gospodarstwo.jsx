@@ -224,6 +224,13 @@ function MyButtons() {
 
             await Promise.all(addDomownikPromises);
             setSuccessMessage2('Pomyślnie dodano domowników do gospodarstwa.');
+
+            // Odśwież listę gospodarstw
+            await fetchGospodarstwa();
+
+            // Zamknij modal po sukcesie
+            handleCloseAddUsersModal();
+            
         } catch (error) {
             console.error('Błąd podczas dodawania domowników:', error.response ? error.response.data : error.message);
             setSuccessMessage2('Coś poszło nie tak przy dodawaniu domowników. Spróbuj ponownie!');
