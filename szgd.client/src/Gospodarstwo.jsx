@@ -242,6 +242,7 @@ function MyButtons() {
 
     const handleOpenCreateGospodarstwoModal = () => {
         setCreateGospodarstwoModalOpen(true);
+        setSelectedUsers([user.userdata.id]); // Dodaj aktualnie zalogowanego użytkownika
     };
 
     const handleCloseCreateGospodarstwoModal = () => {
@@ -326,19 +327,36 @@ function MyButtons() {
                     {/* Wybór członków gospodarstwa */}
                     <Typography variant="body1">Wybierz członków:</Typography>
                     <FormControl fullWidth margin="normal">
-                        <InputLabel id="select-users-label">Nazwa domownika</InputLabel>
                         <Select
                             labelId="select-users-label"
                             multiple
                             value={selectedUsers}
-                            onChange={(e) => setSelectedUsers(e.target.value)}
-                            renderValue={(selected) => selected.map((id) => users.find((u) => u.id === id)?.userName).join(', ')}
+                            onChange={(e) => {
+                                const selected = e.target.value;
+                                // Upewnij się, że aktualny użytkownik pozostaje na liście
+                                if (!selected.includes(user.userdata.id)) {
+                                    setSelectedUsers([user.userdata.id, ...selected.filter((id) => id !== user.userdata.id)]);
+                                } else {
+                                    setSelectedUsers(selected);
+                                }
+                            }}
+                            renderValue={(selected) =>
+                                selected
+                                    .map((id) => users.find((u) => u.id === id)?.userName || '')
+                                    .join(', ')
+                            }
                         >
                             {users.length > 0 ? (
-                                users.map((user) => (
-                                    <MenuItem key={user.id} value={user.id}>
-                                        <Checkbox checked={selectedUsers.includes(user.id)} />
-                                        <ListItemText primary={user.imie} />
+                                users.map((userItem) => (
+                                    <MenuItem key={userItem.id} value={userItem.id} disabled={userItem.id === user.userdata.id}>
+                                        {userItem.id === user.userdata.id ? (
+                                            <ListItemText primary={`${userItem.imie} (Zalogowany)`} />
+                                        ) : (
+                                            <>
+                                                <Checkbox checked={selectedUsers.includes(userItem.id)} />
+                                                <ListItemText primary={userItem.imie} />
+                                            </>
+                                        )}
                                     </MenuItem>
                                 ))
                             ) : (

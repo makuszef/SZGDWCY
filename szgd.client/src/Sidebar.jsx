@@ -88,6 +88,11 @@ export default function Sidebar({ ListItems }) {
         return null;  // Zwraca null, co sprawia, że komponent jest całkowicie niewidoczny
     }
 
+    // Ukrywanie SideBar, gdy użytkownik jest w MainMenu
+    if (location.pathname === '/') { // Ścieżka odpowiadająca MainMenu
+        return null;
+    }
+
     return (
         <List
             sx={{ width: '100%', maxWidth: 240 }} // Szerokość sidebaru
