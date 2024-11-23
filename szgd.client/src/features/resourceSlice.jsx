@@ -6,6 +6,7 @@ export const resourceSlice = createSlice({
         gospodarstwo: {},  // Store a single gospodarstwo object
         domownik: null,      // Store a single domownik object
         domownikWGospodarstwie: {},
+        utworzonoGospodarstwo: 1,
     },
     reducers: {
         setGospodarstwo: (state, action) => {
@@ -14,6 +15,10 @@ export const resourceSlice = createSlice({
             sessionStorage.setItem('wybraneGospodarstwo', JSON.stringify(action.payload));
             sessionStorage.setItem('selectedGospodarstwoId', action.payload.id);
             sessionStorage.setItem('selectedGospodarstwoName', action.payload.nazwa);
+        },
+        setUtworzonoGospodarstwo: (state, action) => {
+            console.log('redux stan', action.payload);
+            state.utworzonoGospodarstwo = action.payload; // Set gospodarstwo
         },
         setDomownikWGospodarstwie: (state, action) => {
             console.log('redux stan', action.payload);
@@ -38,12 +43,13 @@ export const {
     clearGospodarstwo,
     setDomownik,
     clearDomownik,
-    setDomownikWGospodarstwie
+    setDomownikWGospodarstwie,
+    setUtworzonoGospodarstwo
 } = resourceSlice.actions;
 
 // Selectors
 export const selectGospodarstwo = (state) => state.resource.gospodarstwo; // Select the gospodarstwo
 export const selectDomownik = (state) => state.resource.domownik; // Select the single domownik
 export const selectDomownikWGospodarstwie = (state) => state.resource.domownikWGospodarstwie; // Select the single domownik
-
+export const selectUtworzonoGospodarstwo = (state) => state.resource.utworzonoGospodarstwo;
 export default resourceSlice.reducer;

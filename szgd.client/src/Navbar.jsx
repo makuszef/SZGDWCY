@@ -20,7 +20,12 @@ import { Select, MenuItem as MuiMenuItem, InputLabel, FormControl } from '@mui/m
 import { Typography } from '@mui/material';
 import GroupIcon from '@mui/icons-material/Group';
 import axios from 'axios';
-import {setDomownikWGospodarstwie, setGospodarstwo, selectGospodarstwo} from "@/features/resourceSlice.jsx";
+import {
+    setDomownikWGospodarstwie,
+    setGospodarstwo,
+    selectGospodarstwo,
+    selectUtworzonoGospodarstwo
+} from "@/features/resourceSlice.jsx";
 const pages = [];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 import { useSelector, useDispatch } from 'react-redux';
@@ -36,6 +41,8 @@ const Navbar = () => {
     const [refresh, setRefresh] = React.useState(false);
     const dispatch = useDispatch()
     const wybraneGospodarstwo = useSelector(selectGospodarstwo);
+    const utworzonoGospodarstwo = useSelector(selectUtworzonoGospodarstwo);
+    console.log(utworzonoGospodarstwo);
     console.log(wybraneGospodarstwo);
     axios.defaults.headers.common['Authorization'] = `Bearer ${user?.tokens.accessToken}`;
     // Fetching gospodarstwa for user
@@ -51,7 +58,7 @@ const Navbar = () => {
             };
             fetchGospodarstwa();
         }
-    }, [user, refresh]);
+    }, [user, refresh, utworzonoGospodarstwo]);
 
     // Fetch selected gospodarstwo from sessionStorage on load
     React.useEffect(() => {

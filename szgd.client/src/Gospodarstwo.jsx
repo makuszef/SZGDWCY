@@ -21,7 +21,7 @@ import {
     Box
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import CloseIcon from '@mui/icons-material/Close';
 import { useAuth } from './AuthContext';
@@ -32,7 +32,7 @@ import Tooltip from "@mui/material/Tooltip";
 import EmailIcon from "@mui/icons-material/Email";
 import HomeIcon from '@mui/icons-material/Home';
 import ContactsIcon from '@mui/icons-material/Contacts';
-
+import {selectUtworzonoGospodarstwo, setUtworzonoGospodarstwo} from "@/features/resourceSlice.jsx";
 /**
  * Renders the main buttons for managing "Gospodarstwa" (households).
  * Provides modals for creating households and adding members.
@@ -186,7 +186,7 @@ function MyButtons() {
             setSuccessMessage1(`Utworzono gospodarstwo: ${newGospodarstwoName}`);
             setNewGospodarstwoName('');
             setSelectedUsers([]);
-
+            dispatch(setUtworzonoGospodarstwo(Math.random()));
             // Odśwież listę gospodarstw
             if (user && user.userdata.id) {
                 await fetchGospodarstwa(); // Wywołanie funkcji pobierającej gospodarstwa
