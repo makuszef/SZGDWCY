@@ -61,6 +61,7 @@ function App() {
                             element={<AppLayout Content={card.component} Cards={MainCards} />}
                         />
                     ))}
+                    <Route path="*" element={<AppLayout Content={<LoginPage/>}/>} />
                 </Routes>
             </AuthProvider>
         </Provider>

@@ -57,7 +57,20 @@ namespace SZGD.Server.Controllers
                 GospodarstwoId = request.GospodarstwoId,
                 CzyWlasciciel = request.CzyWlasciciel,
             };
-
+            if (domownikWGospodarstwie.CzyWlasciciel)
+            {
+                domownikWGospodarstwie.CzyWidziDomownikow = true;
+                domownikWGospodarstwie.CzyWidziSprzet = true;
+                domownikWGospodarstwie.CzyMozeModyfikowacDomownikow = true;
+                domownikWGospodarstwie.CzyMozeModyfikowacGospodarstwo = true;
+                domownikWGospodarstwie.CzyMozePrzesylacPliki = true;
+                domownikWGospodarstwie.CzyWidziInformacjeMedyczneDomownikow = true;
+            }
+            else
+            {
+                domownikWGospodarstwie.CzyWidziDomownikow = true;
+                domownikWGospodarstwie.CzyWidziSprzet = true;
+            }
             // Add the new entity to the context
             _context.DomownikWGospodarstwie.Add(domownikWGospodarstwie);
             await _context.SaveChangesAsync();
@@ -96,10 +109,12 @@ namespace SZGD.Server.Controllers
         }
 
         // PUT: api/DomownikWGospodarstwie/{id}
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateDomownikWGospodarstwie(int id, [FromBody] DomownikWGospodarstwie updatedDomownikWGospodarstwie)
+        [HttpPut()]
+        public async Task<ActionResult> UpdateDomownikWGospodarstwie([FromBody] DomownikWGospodarstwie updatedDomownikWGospodarstwie)
         {
-            var domownikWGospodarstwie = await _context.DomownikWGospodarstwie.FindAsync(id);
+            var domownikWGospodarstwie = await _context.DomownikWGospodarstwie
+                .SingleOrDefaultAsync(d => d.DomownikId == updatedDomownikWGospodarstwie.DomownikId && d.GospodarstwoId == updatedDomownikWGospodarstwie.GospodarstwoId);
+
             if (domownikWGospodarstwie == null)
             {
                 return NotFound();

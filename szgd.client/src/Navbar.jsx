@@ -111,7 +111,7 @@ const Navbar = () => {
 
     const handleLogout = () => {
         logout();
-        navigate('/login');
+        
     };
 
     const handleAvatarChange = (event) => {

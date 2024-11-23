@@ -27,6 +27,7 @@ import NoGospodarstwoAlert from "@/NoGosporarstwo.jsx"; // Import ikony Home
 import EmailIcon from '@mui/icons-material/Email';
 import Tooltip from '@mui/material/Tooltip';
 import PhoneIcon from '@mui/icons-material/Phone';
+import ZmienUprawnieniaDomownikaModal from "@/ZmienUprawnieniaDomownika.jsx";
 
 /**
  * Component for managing household members ("Domownicy") within a selected "Gospodarstwo" (household).
@@ -91,11 +92,15 @@ import PhoneIcon from '@mui/icons-material/Phone';
 
 const Domownicy = () => {
     const [domownicy, setDomownicy] = useState([]);
+    const [domownicywGospodarstwie, setDomownicywGospodarstwie] = useState([]);
     const [editOpen, setEditOpen] = useState(false);
     const [currentDomownik, setCurrentDomownik] = useState(null);
     const [dialogData, setDialogData] = useState([]);
+    const [isModalOpen, setModalOpen] = useState(false);
+    const [zmienUprawnieniaDomownik, setZmienUprawnieniaDomownik] = useState({});
     const { user } = useAuth(); // Access user data from the auth context
     const domownikWGospodarstwie = useSelector(selectDomownikWGospodarstwie);
+    console.log(domownikWGospodarstwie);
     const gospodarstwo = useSelector(selectGospodarstwo);
     const gospodarstwoId = gospodarstwo.id;
     axios.defaults.headers.common['Authorization'] = `Bearer ${user?.tokens.accessToken}`;
@@ -120,6 +125,8 @@ const Domownicy = () => {
                         telefon: item.domownik.phoneNumber,
                     }));
                     setDomownicy(fetchedDomownicy);
+                    setDomownicywGospodarstwie(response.data.domownikWGospodarstwie);
+                    console.log(domownicywGospodarstwie);
                 } catch (error) {
                     console.error("Błąd podczas pobierania danych domowników:", error);
                 }
@@ -139,7 +146,13 @@ const Domownicy = () => {
         ]);
         setEditOpen(true);
     };
-
+    const handleEditOpenZmienUprawnienia = (domownik) => {
+        
+        const uprawnieniaDomownika = domownicywGospodarstwie.find(item => item.domownik.id === domownik.id);
+        console.log(uprawnieniaDomownika);
+        setZmienUprawnieniaDomownik(uprawnieniaDomownika);
+        setModalOpen(true);
+    };
     const handleDelete = async (domownikId) => {
         try {
             await axios.delete(`https://localhost:7191/api/Domownik/${domownikId}`);
@@ -181,7 +194,7 @@ const Domownicy = () => {
 
     return (
         <Box>
-        {gospodarstwo && gospodarstwo.id ? (<Box sx={{ width: '100%' }}>
+        {user && gospodarstwo && gospodarstwo.id ? (<Box sx={{ width: '100%' }}>
             {/*<Home sx={{ marginRight: 2 }} /> /!* Ikona domu *!/*/}
             <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
                 {/*Gospodarstwo: {gospodarstwoName || "Nie wybrano gospodarstwa"}*/}
@@ -239,7 +252,7 @@ const Domownicy = () => {
                                 </TableCell>
                                 {domownikWGospodarstwie?.czyMozeModyfikowacDomownikow && (
                                     <TableCell>
-                                        {domownik.id === user.userdata.id && <Button
+                                        {domownik.id === user.userdata.id && <Box><Button
                                             onClick={() => handleEditOpen(domownik)}
                                             startIcon={<EditIcon/>}
                                             variant="outlined"
@@ -247,7 +260,16 @@ const Domownicy = () => {
                                             sx={{marginRight: 1}}
                                         >
                                             Edytuj
-                                        </Button>}
+                                        </Button>
+                                            <Button
+                                            onClick={() => handleEditOpenZmienUprawnienia(domownik)}
+                                        startIcon={<EditIcon/>}
+                                        variant="outlined"
+                                        color="primary"
+                                        sx={{marginRight: 1}}
+                                    >
+                                        Zmien Uprawnienia
+                                    </Button></Box>}
                                         <Button
                                             onClick={() => handleDelete(domownik.id)}
                                             startIcon={<DeleteIcon />}
@@ -293,6 +315,8 @@ const Domownicy = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            {}
+            <ZmienUprawnieniaDomownikaModal data={zmienUprawnieniaDomownik} onClose={() => setModalOpen(false)} isOpen={isModalOpen}/>
         </Box>) : (<NoGospodarstwoAlert/>)}
         </Box>
     );

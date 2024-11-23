@@ -1,8 +1,13 @@
 import React, { createContext, useState, useContext } from 'react';
+import {useDispatch} from "react-redux";
+import {setGospodarstwo, setDomownik, setDomownikWGospodarstwie} from "@/features/resourceSlice.jsx";
+import {useNavigate} from "react-router-dom";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [user, setUser] = useState(() => {
         const savedUser = sessionStorage.getItem('user');
         return savedUser ? JSON.parse(savedUser) : null;
@@ -14,8 +19,14 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
+        console.log("logout");
         setUser(null);
+        dispatch(setGospodarstwo(null));
+        dispatch(setDomownikWGospodarstwie(null));
+        dispatch(setDomownik(null));
+        sessionStorage.clear();
         sessionStorage.removeItem('user');
+        navigate('/login');
     };
 
     return (
