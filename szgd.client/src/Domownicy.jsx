@@ -97,7 +97,7 @@ const Domownicy = () => {
     const [currentDomownik, setCurrentDomownik] = useState(null);
     const [dialogData, setDialogData] = useState([]);
     const [isModalOpen, setModalOpen] = useState(false);
-    const [zmienUprawnieniaDomownik, setZmienUprawnieniaDomownik] = useState({});
+    const [zmienUprawnieniaDomownik, setZmienUprawnieniaDomownik] = useState(null);
     const { user } = useAuth(); // Access user data from the auth context
     const domownikWGospodarstwie = useSelector(selectDomownikWGospodarstwie);
     console.log(domownikWGospodarstwie);
@@ -317,8 +317,8 @@ const Domownicy = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-            {}
-            <ZmienUprawnieniaDomownikaModal data={zmienUprawnieniaDomownik} onClose={() => setModalOpen(false)} isOpen={isModalOpen}/>
+            <ZmienUprawnieniaDomownikaModal data={zmienUprawnieniaDomownik} onClose={() => setModalOpen(false)}
+                                             isOpen={isModalOpen}/>
         </Box>) : (<NoGospodarstwoAlert/>)}
         </Box>
     );
