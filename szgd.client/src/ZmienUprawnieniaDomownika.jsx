@@ -9,9 +9,17 @@ import {
     Button,
 } from '@mui/material';
 import axios from 'axios';
+import API_URLS from "@/API_URLS.jsx";
+import {useAuth} from "@/AuthContext.jsx";
+import {useDispatch, useSelector} from "react-redux";
+import {selectGospodarstwo, setDomownikWGospodarstwie} from "@/features/resourceSlice.jsx";
 
 const ZmienUprawnieniaDomownikaModal = ({ isOpen, onClose, data }) => {
     const [permissions, setPermissions] = useState({});
+    const { user } = useAuth(); // Access user data from the auth context
+    const gospodarstwo = useSelector(selectGospodarstwo);
+    const gospodarstwoId = gospodarstwo.id;
+    const dispatch = useDispatch();
     useEffect(() => {
         setPermissions(data);
     }, [data]);
@@ -26,8 +34,17 @@ const ZmienUprawnieniaDomownikaModal = ({ isOpen, onClose, data }) => {
     // Funkcja zapisująca zmiany
     const saveChanges = async () => {
         try {
-            await axios.put(`https://localhost:7191/api/DomownikWGospodarstwie`, permissions);
+            await axios.put(API_URLS.DOMOWNIKWGOSPODARSTWIE.PUT, permissions);
             console.log('Uprawnienia zaktualizowane.');
+            axios.get(API_URLS.DOMOWNIKWGOSPODARSTWIE.GET_BY_KEYS(user.userdata.id, gospodarstwoId))
+                .then(response => {
+                    const updatowanyDomownikWGospodarstwie = response.data;
+                    dispatch(setDomownikWGospodarstwie(updatowanyDomownikWGospodarstwie));
+                    console.log(updatowanyDomownikWGospodarstwie);
+                })
+                .catch(error => {
+                    console.error("Error fetching data:", error);
+                });
             onClose(); // Zamknięcie dialogu
         } catch (error) {
             console.error('Błąd podczas zapisywania zmian:', error);

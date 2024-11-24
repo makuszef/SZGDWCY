@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from './AuthContext'; // Używamy kontekstu do sprawdzania stanu użytkownika
 import CorrectIcon from '@mui/icons-material/CheckCircle';
+import API_URLS from "@/API_URLS.jsx";
 
 /**
  * LoginPage component
@@ -52,7 +53,7 @@ const LoginPage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('https://localhost:7191/login', {
+            const response = await axios.post(API_URLS.AUTH.LOGIN, {
                 email,
                 password
             });
@@ -62,7 +63,7 @@ const LoginPage = () => {
             setSuccessMessage('Login successful!');
             axios.defaults.headers.common['Authorization'] = `Bearer ${response?.data.accessToken}`;
             try {
-                const userResponse = await axios.get(`https://localhost:7191/api/Domownik/GetDomownikByEmail/${email}`);
+                const userResponse = await axios.get(API_URLS.DOMOWNIK.GET_BY_EMAIL(email));
                 console.log('User data:', userResponse.data);
                 const userData = { userdata: userResponse.data, tokens: response.data };
                 login(userData); // Logowanie użytkownika

@@ -27,6 +27,7 @@ import {selectDomownikWGospodarstwie, selectGospodarstwo} from "@/features/resou
 import {useAuth} from "@/AuthContext.jsx";
 import AddIcon from '@mui/icons-material/Add';
 import NoGospodarstwoAlert from "@/NoGosporarstwo.jsx";
+import API_URLS from "@/API_URLS.jsx";
 /**
  * Komponent Sprzet zarządza sprzętem w gospodarstwie, umożliwia dodawanie, edytowanie, usuwanie i przeglądanie historii sprzętu.
  * Używa komponentów Material-UI oraz integracji z API.
@@ -153,7 +154,7 @@ const Sprzet = () => {
 
     useEffect(() => {
         if (gospodarstwo?.id) {
-            axios.get(`https://localhost:7191/api/sprzet/GetAllSprzet/${gospodarstwoId}`)
+            axios.get(API_URLS.SPRZET.GET_ALL_BY_GOSPODARSTWO_ID(gospodarstwoId))
                 .then(response => {
                     setResources(response.data);  // Ustawienie danych, jeśli zapytanie się uda
                 })
@@ -182,7 +183,7 @@ const Sprzet = () => {
         };
 
         try {
-            await axios.put(`https://localhost:7191/api/Sprzet`, updatedResource);
+            await axios.put(API_URLS.SPRZET.PUT, updatedResource);
             setResources(resources.map(resource =>
                 resource.id === currentResource.id ? updatedResource : resource
             ));
@@ -200,7 +201,7 @@ const Sprzet = () => {
 
     const handleDelete = async (resourceId) => {
         try {
-            await axios.delete(`https://localhost:7191/api/Sprzet/${resourceId}`);
+            await axios.delete(API_URLS.SPRZET.DELETE_BY_ID(resourceId));
             setResources(prevResources => prevResources.filter(resource => resource.id !== resourceId));
         } catch (error) {
             console.error("Error deleting equipment:", error);
@@ -209,7 +210,7 @@ const Sprzet = () => {
 
     const handleHistory = async (resourceId) => {
         try {
-            const response = await axios.get(`https://localhost:7191/api/Sprzet/${resourceId}/Historia`);
+            const response = await axios.get(API_URLS.SPRZET.GET_HISTORIA_SPRZETU_BY_SPRZET_ID(resourceId));
             const sortedData = response.data.sort((a, b) => new Date(b.dataUzycia) - new Date(a.dataUzycia));
             setHistoryData(sortedData);
             setHistoryOpen(true);
@@ -244,7 +245,7 @@ const Sprzet = () => {
             updateRequestBody.status = "WNaprawie";
         }
         console.log(updateRequestBody);
-        await axios.put(`https://localhost:7191/api/Sprzet`, updateRequestBody);
+        await axios.put(API_URLS.SPRZET.PUT, updateRequestBody);
 
         // Wywołanie POST do historii użycia sprzętu
         const historyRequestBody = {
@@ -257,7 +258,7 @@ const Sprzet = () => {
             komentarzDoAwarii: komentarzDoAwarii
         };
         try {
-            const response = await axios.post("https://localhost:7191/api/HistoriaUzyciaSprzetu", historyRequestBody);
+            const response = await axios.post(API_URLS.HISTORIA_UZYCIA_SPRZETU.POST, historyRequestBody);
             setSnackbarMessage('Operacja powiodła się');
             setSnackbarSeverity('success');
             setOpenSnackbar(true);
@@ -281,7 +282,7 @@ const Sprzet = () => {
         };
 
         try {
-            const response = await axios.post("https://localhost:7191/api/Sprzet", newResource);
+            const response = await axios.post(API_URLS.SPRZET.POST, newResource);
             setResources([...resources, response.data]); // Dodanie nowego sprzętu do stanu
             setAddOpen(false); // Zamknięcie dialogu
             setSnackbarMessage('Operacja powiodła się');

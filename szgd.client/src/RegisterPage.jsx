@@ -2,6 +2,7 @@
 import { TextField, Button, Box, Typography, Snackbar, Alert, Grid } from '@mui/material';
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
+import API_URLS from "@/API_URLS.jsx";
 
 const RegisterPage = () => {
     const [email, setEmail] = useState('');
@@ -18,7 +19,7 @@ const RegisterPage = () => {
         e.preventDefault();
 
         try {
-            const response = await axios.post(`https://localhost:7191/register`, {
+            const response = await axios.post(API_URLS.AUTH.REGISTER, {
                 email,
                 password,
             });
@@ -27,7 +28,7 @@ const RegisterPage = () => {
             setOpenSnackbar(true);
             console.log(firstName, lastName, phoneNumber);
             try {
-                const response2 = await axios.put(`https://localhost:7191/api/Domownik/${email}`, {
+                const response2 = await axios.put(API_URLS.DOMOWNIK.UPDATE_BY_EMAIL(email), {
                 imie: firstName, 
                 nazwisko: lastName,
                 phoneNumber: phoneNumber,

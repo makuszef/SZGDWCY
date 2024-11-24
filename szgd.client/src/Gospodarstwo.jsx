@@ -33,6 +33,8 @@ import EmailIcon from "@mui/icons-material/Email";
 import HomeIcon from '@mui/icons-material/Home';
 import ContactsIcon from '@mui/icons-material/Contacts';
 import {selectUtworzonoGospodarstwo, setUtworzonoGospodarstwo} from "@/features/resourceSlice.jsx";
+import API_URLS from "@/API_URLS.jsx";
+import {Api} from "@mui/icons-material";
 /**
  * Renders the main buttons for managing "Gospodarstwa" (households).
  * Provides modals for creating households and adding members.
@@ -144,7 +146,7 @@ function MyButtons() {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await axios.get('https://localhost:7191/api/Domownik');
+                const response = await axios.get(API_URLS.DOMOWNIK.GET_ALL);
                 setUsers(response.data);
             } catch (error) {
                 console.error("Error fetching users:", error);
@@ -155,7 +157,7 @@ function MyButtons() {
 
     const fetchGospodarstwa = async () => {
         try {
-            const response = await axios.get(`https://localhost:7191/api/Domownik/GetAllGospodarstwa/${user.userdata.id}`);
+            const response = await axios.get(API_URLS.DOMOWNIK.GET_ALL_GOSPODARSTWA_BY_ID(user.userdata.id));
             setGospodarstwa(response.data);
         } catch (error) {
             console.error("Error fetching gospodarstwa:", error);
@@ -172,14 +174,14 @@ function MyButtons() {
         e.preventDefault();
         try {
             const gospodarstwoData = { id: 0, nazwa: newGospodarstwoName };
-            const gospodarstwoResponse = await axios.post('https://localhost:7191/api/Gospodarstwo', gospodarstwoData);
+            const gospodarstwoResponse = await axios.post(API_URLS.GOSPODARSTWO.POST, gospodarstwoData);
             const gospodarstwoId = gospodarstwoResponse.data.id;
 
             const addDomownikPromises = selectedUsers.map((userId) => {
                 const domownikData = { domownikId: userId, gospodarstwoId, CzyWlasciciel:false };
                 if(domownikData.domownikId == user.userdata.id) {domownikData.CzyWlasciciel=true}
                 console.log(domownikData);
-                return axios.post('https://localhost:7191/api/DomownikwGospodarstwie/DodajDomownikaDoGospodarstwa', domownikData);
+                return axios.post(API_URLS.DOMOWNIKWGOSPODARSTWIE.ADD_MEMBER, domownikData);
             });
 
             await Promise.all(addDomownikPromises);
@@ -220,7 +222,7 @@ function MyButtons() {
         try {
             const addDomownikPromises = selectedUsers.map((userId) => {
                 const domownikData = { domownikId: userId, gospodarstwoId: selectedGospodarstwoId, CzyWlasciciel: false };
-                return axios.post('https://localhost:7191/api/DomownikwGospodarstwie/DodajDomownikaDoGospodarstwa', domownikData);
+                return axios.post(API_URLS.DOMOWNIKWGOSPODARSTWIE.ADD_MEMBER, domownikData);
             });
 
             await Promise.all(addDomownikPromises);

@@ -30,6 +30,7 @@ const pages = [];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 import { useSelector, useDispatch } from 'react-redux';
 import {useEffect} from "react";
+import API_URLS from "@/API_URLS.jsx";
 const Navbar = () => {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -50,7 +51,7 @@ const Navbar = () => {
         if (user && user.userdata.id) {
             const fetchGospodarstwa = async () => {
                 try {
-                    const response = await axios.get(`https://localhost:7191/api/Domownik/GetAllGospodarstwa/${user.userdata.id}`);
+                    const response = await axios.get(API_URLS.DOMOWNIK.GET_ALL_GOSPODARSTWA_BY_ID(user.userdata.id));
                     setGospodarstwa(response.data);
                 } catch (error) {
                     console.error("Error fetching gospodarstwa:", error);

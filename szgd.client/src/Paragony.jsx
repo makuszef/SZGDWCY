@@ -13,6 +13,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import NoGospodarstwoAlert from "@/NoGosporarstwo.jsx";
 import {useAuth} from "@/AuthContext.jsx";
 import {RANDOM} from "mysql/lib/PoolSelector.js";
+import API_URLS from "@/API_URLS.jsx";
 // Modal for displaying receipt details
 /**
  * ReceiptDetailsModal is a modal that displays detailed information about a receipt.
@@ -95,7 +96,7 @@ const ReceiptDetailsModal = ({ receipt, open, onClose }) => {
         try {
             const { id, nazwaPliku } = receipt;
             if (id) {
-                const response = await axios.get(`https://localhost:7191/api/PrzeslanyPlik/${id}`);
+                const response = await axios.get(API_URLS.PLIK.GET_BY_ID(id));
                 console.log(response.data);
                 if (response.data?.zawartoscPliku) {
                     // Decode Base64 to binary data
@@ -226,7 +227,7 @@ const ReceiptManager = () => {
     const fetchReceipts = async () => {
         if (gospodarstwo?.id) {
             try {
-                const {data} = await axios.get(`https://localhost:7191/api/paragon/ByGospodarstwo/${gospodarstwoId}`);
+                const {data} = await axios.get(API_URLS.PARAGON.GET_BY_GOSPODARSTWO_ID(gospodarstwoId));
                 setReceipts(data);
                 console.log(receipts);
             } catch (err) {
@@ -249,7 +250,7 @@ const ReceiptManager = () => {
             formData.append('file', file);
 
             const response = await axios.post(
-                `https://localhost:7191/api/AnalizeFile/upload/${gospodarstwoId}`,
+                API_URLS.ANALIZE_FILE.POST(gospodarstwoId),
                 formData,
                 {
                     headers: { 'Content-Type': 'multipart/form-data' },
@@ -270,7 +271,7 @@ const ReceiptManager = () => {
 
     const handleSelectReceipt = async (receiptId) => {
         try {
-            const { data } = await axios.get(`https://localhost:7191/api/paragon/${receiptId}`);
+            const { data } = await axios.get(API_URLS.PARAGON.GET_BY_ID(receiptId));
             setSelectedReceipt(data);
             setIsModalOpen(true);
         } catch (err) {

@@ -107,7 +107,21 @@ namespace SZGD.Server.Controllers
 
             return Ok(domownikWGospodarstwie);
         }
+        [HttpGet("{domownikId}/{gospodarstwoId}")]
+        public async Task<ActionResult<DomownikWGospodarstwie>> GetDomownikWGospodarstwieById(string domownikId, int gospodarstwoId)
+        {
+            var domownikWGospodarstwie = await _context.DomownikWGospodarstwie
+                .Include(dw => dw.Domownik)
+                .Include(dw => dw.Gospodarstwo)
+                .FirstOrDefaultAsync(dw => dw.DomownikId == domownikId && dw.GospodarstwoId == gospodarstwoId);
 
+            if (domownikWGospodarstwie == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(domownikWGospodarstwie);
+        }
         // PUT: api/DomownikWGospodarstwie/{id}
         [HttpPut()]
         public async Task<ActionResult> UpdateDomownikWGospodarstwie([FromBody] DomownikWGospodarstwie updatedDomownikWGospodarstwie)

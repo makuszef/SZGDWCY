@@ -21,14 +21,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 import { Home } from '@mui/icons-material';
 import {useAuth} from "@/AuthContext.jsx";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {selectDomownikWGospodarstwie, selectGospodarstwo} from "@/features/resourceSlice.jsx";
 import NoGospodarstwoAlert from "@/NoGosporarstwo.jsx"; // Import ikony Home
 import EmailIcon from '@mui/icons-material/Email';
 import Tooltip from '@mui/material/Tooltip';
 import PhoneIcon from '@mui/icons-material/Phone';
 import ZmienUprawnieniaDomownikaModal from "@/ZmienUprawnieniaDomownika.jsx";
-
+import API_URLS from "@/API_URLS.jsx";
 /**
  * Component for managing household members ("Domownicy") within a selected "Gospodarstwo" (household).
  * Allows viewing, editing, and deleting members.
@@ -103,6 +103,7 @@ const Domownicy = () => {
     console.log(domownikWGospodarstwie);
     const gospodarstwo = useSelector(selectGospodarstwo);
     const gospodarstwoId = gospodarstwo.id;
+    const dispatch = useDispatch();
     axios.defaults.headers.common['Authorization'] = `Bearer ${user?.tokens.accessToken}`;
     const columns = [
         { field: 'imie', headerName: 'Imie', width: 130 },
@@ -116,7 +117,7 @@ const Domownicy = () => {
         if (gospodarstwoId) {
             const fetchDomownicy = async () => {
                 try {
-                    const response = await axios.get(`https://localhost:7191/api/Gospodarstwo/${gospodarstwoId}`);
+                    const response = await axios.get(API_URLS.GOSPODARSTWO.GET_BY_ID(gospodarstwoId));
                     const fetchedDomownicy = response.data.domownikWGospodarstwie.map(item => ({
                         id: item.domownik.id,
                         imie: item.domownik.imie,
@@ -151,11 +152,12 @@ const Domownicy = () => {
         const uprawnieniaDomownika = domownicywGospodarstwie.find(item => item.domownik.id === domownik.id);
         console.log(uprawnieniaDomownika);
         setZmienUprawnieniaDomownik(uprawnieniaDomownika);
+        
         setModalOpen(true);
     };
     const handleDelete = async (domownikId) => {
         try {
-            await axios.delete(`https://localhost:7191/api/Domownik/${domownikId}`);
+            await axios.delete(API_URLS.DOMOWNIK.DELETE(domownikId));
             setDomownicy(prevDomownicy => prevDomownicy.filter(domownik => domownik.id !== domownikId));
         } catch (error) {
             console.error("Błąd podczas usuwania domownika:", error);
@@ -164,7 +166,7 @@ const Domownicy = () => {
 
     const handleUpdate = async (updatedDomownik) => {
         try {
-            await axios.put(`https://localhost:7191/api/Domownik/${updatedDomownik.id}`, updatedDomownik);
+            await axios.put(API_URLS.DOMOWNIK.UPDATE(updatedDomownik.id), updatedDomownik);
             setDomownicy(prevDomownicy => prevDomownicy.map(domownik => domownik.id === updatedDomownik.id ? updatedDomownik : domownik));
         } catch (error) {
             console.error("Błąd podczas aktualizowania danych domownika:", error);
