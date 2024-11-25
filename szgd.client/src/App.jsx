@@ -27,6 +27,7 @@ import store from "@/store.jsx";
 import {useEffect} from "react";
 import { Provider } from 'react-redux';
 import axios from 'axios'
+import ExpenseSplit from "@/ExpenseSplit.jsx";
 // Karty g��wne z przypisanymi ikonami i trasami
 const MainCards = [
     { title: 'Harmonogram sprzatania', icon: <SprzatanieIcon />, route: "/sprzatanie", component: <div>Harmonogram sprzatania</div> },
@@ -52,6 +53,7 @@ function App() {
                     <Route path="/about" element={<AppLayout Content={<About/>}/>} />
                     <Route path="/register" element={<AppLayout Content={<RegisterPage />} />} />
                     <Route path="/profile" element={<AppLayout Content={<Profile/>}/>} />
+                    
         
                     {/* Dynamiczne mapowanie tras */}
                     {MainCards.map(card => (
