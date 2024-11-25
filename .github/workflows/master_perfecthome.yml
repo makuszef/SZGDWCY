@@ -55,5 +55,5 @@ jobs:
         with:
           app-name: 'PerfectHome'
           slot-name: 'Production'
-          package: ./publish  # Zmieniona ścieżka na ./publish
+          package: ./  # Zmieniona ścieżka na ./publish
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5AF9D397777B45BFA3D32689C430B62B }}
