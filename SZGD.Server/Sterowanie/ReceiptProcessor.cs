@@ -21,7 +21,7 @@ using SZGD.Server.Models;
 namespace Azure;
 public class ReceiptProcessor
 {
-    private static string endpoint = "https://szgdv2.cognitiveservices.azure.com";
+    private static string endpoint = "https://ai-paragon.cognitiveservices.azure.com/";
     private static string apiKey = "16vcBRE2NonmQDvG3Hp1fNXwHUYUZHOcTZrHIu0TjYw1WnPbuLl4JQQJ99AKACYeBjFXJ3w3AAALACOGyctA";
     public async Task<Paragon> ProcessAI(Stream fileStream)
     { 
