@@ -1,6 +1,0 @@
-@SZGD.Server_HostAddress = http://localhost:5164
-
-GET {{SZGD.Server_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
