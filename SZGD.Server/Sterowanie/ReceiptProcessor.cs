@@ -25,7 +25,7 @@ public class ReceiptProcessor
     private static string apiKey = "16vcBRE2NonmQDvG3Hp1fNXwHUYUZHOcTZrHIu0TjYw1WnPbuLl4JQQJ99AKACYeBjFXJ3w3AAALACOGyctA";
     public async Task<Paragon> ProcessAI(Stream fileStream)
     { 
-        var client = new DocumentAnalysisClient(new Uri("https://szgdv2.cognitiveservices.azure.com"), new AzureKeyCredential("16vcBRE2NonmQDvG3Hp1fNXwHUYUZHOcTZrHIu0TjYw1WnPbuLl4JQQJ99AKACYeBjFXJ3w3AAALACOGyctA"));
+        var client = new DocumentAnalysisClient(new Uri("https://ai-paragon.cognitiveservices.azure.com/"), new AzureKeyCredential("G65tnZPdkO6quXkexpVapheyy0Kd7xpDb0pGh8nC4HFEJ9JjJetAJQQJ99AKAC5RqLJXJ3w3AAALACOGKSFQ"));
 
         // Wczytaj obraz paragonu
         // Rozpocznij analizę dokumentu - używamy 'prebuilt-receipt' (przygotowanego modelu do paragonów)
