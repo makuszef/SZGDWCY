@@ -1,19 +1,15 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy ASP.Net Core app to Azure Web App - PerfectHome
 
 on:
   push:
     branches:
-      - master
+      - master-deployment-backend
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
-    env:
-      DOTNET_ROOT: "C:/Program Files/dotnet"
+
     steps:
       - uses: actions/checkout@v4
 
@@ -26,13 +22,13 @@ jobs:
         run: dotnet build szgd.server --configuration Release
 
       - name: Publish .NET application
-        run: dotnet publish szgd.server -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        run: dotnet publish szgd.server -c Release -o ./publish  # Zmieniona ścieżka na ./publish
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ./publish  # Zmieniona ścieżka na ./publish
 
   deploy:
     runs-on: windows-latest
@@ -53,5 +49,5 @@ jobs:
         with:
           app-name: 'PerfectHome'
           slot-name: 'Production'
-          package: ${{env.DOTNET_ROOT}}/myapp
+          package: ./publish  # Zmieniona ścieżka na ./publish
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5AF9D397777B45BFA3D32689C430B62B }}
