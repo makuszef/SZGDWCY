@@ -95,5 +95,5 @@ jobs:
         with:
           app-name: 'PerfectHouse'
           slot-name: 'Production'
-          package: ./dist
+          package: ./szgd.client/dist
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_303E6ADA19784E5C86ECD663833CF83E }}
