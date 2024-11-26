@@ -1,4 +1,4 @@
-name: Azure Static Web Apps CI/CD React
+name: Azure Static Web Apps CI/CD REACT
 on:
   push:
     branches:
