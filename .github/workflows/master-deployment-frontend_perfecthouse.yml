@@ -25,6 +25,7 @@ jobs:
 
       # Install dependencies, build, and test
       - name: npm install, build, and test
+        working-directory: ./szgd.client
         run: |
           echo "Current directory content before npm install:"
           ls -la
