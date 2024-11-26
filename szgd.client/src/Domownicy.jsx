@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
+    Alert,
     Box,
     Button,
     Dialog,
@@ -29,6 +30,7 @@ import Tooltip from '@mui/material/Tooltip';
 import PhoneIcon from '@mui/icons-material/Phone';
 import ZmienUprawnieniaDomownikaModal from "@/ZmienUprawnieniaDomownika.jsx";
 import API_URLS from "@/API_URLS.jsx";
+import WarningIcon from '@mui/icons-material/Warning';
 /**
  * Component for managing household members ("Domownicy") within a selected "Gospodarstwo" (household).
  * Allows viewing, editing, and deleting members.
@@ -112,6 +114,26 @@ const Domownicy = () => {
         { field: 'telefon', headerName: 'Telefon', width: 150 },
         { field: 'actions', headerName: 'Akcje', width: 130 },
     ];
+
+    if (!domownikWGospodarstwie?.czyWidziDomownikow) {
+        return (
+            <Alert
+                severity="error"
+                icon={<WarningIcon />}
+                sx={{
+                    backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                    color: 'red',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: 2,
+                    borderRadius: '8px',
+                }}
+            >
+                <Typography>Nie masz uprawnień do przeglądania domowników.</Typography>
+            </Alert>
+        );
+    }
 
     useEffect(() => {
         if (gospodarstwoId) {
