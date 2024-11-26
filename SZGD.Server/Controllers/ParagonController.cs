@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace SZGD.Server.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ParagonController : ControllerBase

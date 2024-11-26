@@ -21,11 +21,11 @@ using SZGD.Server.Models;
 namespace Azure;
 public class ReceiptProcessor
 {
-    private static string endpoint = "https://szgdv2.cognitiveservices.azure.com";
-    private static string apiKey = "16vcBRE2NonmQDvG3Hp1fNXwHUYUZHOcTZrHIu0TjYw1WnPbuLl4JQQJ99AKACYeBjFXJ3w3AAALACOGyctA";
+    private static string endpoint = "https://ai-paragon.cognitiveservices.azure.com/";
+    private static string apiKey = "G65tnZPdkO6quXkexpVapheyy0Kd7xpDb0pGh8nC4HFEJ9JjJetAJQQJ99AKAC5RqLJXJ3w3AAALACOGKSFQ";
     public async Task<Paragon> ProcessAI(Stream fileStream)
     { 
-        var client = new DocumentAnalysisClient(new Uri("https://ai-paragon.cognitiveservices.azure.com/"), new AzureKeyCredential("G65tnZPdkO6quXkexpVapheyy0Kd7xpDb0pGh8nC4HFEJ9JjJetAJQQJ99AKAC5RqLJXJ3w3AAALACOGKSFQ"));
+        var client = new DocumentAnalysisClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
 
         // Wczytaj obraz paragonu
         // Rozpocznij analizę dokumentu - używamy 'prebuilt-receipt' (przygotowanego modelu do paragonów)

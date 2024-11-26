@@ -13,6 +13,7 @@ import MedicalServicesIcon from '@mui/icons-material/MedicalServices'; // Ikona 
 import InventoryIcon from '@mui/icons-material/Inventory';            // Ikona zapas�w
 import WindowIcon from '@mui/icons-material/Window';                 // Ikona kontroli okien
 import HomeIcon from '@mui/icons-material/Home';                     // Ikona domownik�w
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';      // Ikona Wydatki
 import PeopleIcon from '@mui/icons-material/People';
 import Sprzet from './Sprzet'
 import Domownicy from './Domownicy';
@@ -27,7 +28,7 @@ import store from "@/store.jsx";
 import {useEffect} from "react";
 import { Provider } from 'react-redux';
 import axios from 'axios'
-import ExpenseSplit from "@/ExpenseSplit.jsx";
+import ExpenseSplit from "./ExpenseSplit.jsx";
 // Karty g��wne z przypisanymi ikonami i trasami
 const MainCards = [
     { title: 'Harmonogram sprzatania', icon: <SprzatanieIcon />, route: "/sprzatanie", component: <div>Harmonogram sprzatania</div> },
@@ -39,8 +40,10 @@ const MainCards = [
     { title: 'Kontrola okien', icon: <WindowIcon />, route: "/kontrola-okien", component: <div>Kontrola okien</div> },
     { title: 'Domownicy', icon: <PeopleIcon />, route: "/domownicy", component: <Domownicy gospodarstwoId={1}/>},
     { title: 'Gospodarstwa', icon: <HomeIcon />, route: "/gospodarstwa", component: <Gospodarstwo/>},
+    { title: 'Wydatki', icon: <AttachMoneyIcon />, route: "/wydatki", component: <ExpenseSplit/>},
 ];
 const userinfo = localStorage.getItem('user');
+const files = 3;
 function App() {
     return (
         <Provider store={store}>
@@ -53,6 +56,7 @@ function App() {
                     <Route path="/about" element={<AppLayout Content={<About/>}/>} />
                     <Route path="/register" element={<AppLayout Content={<RegisterPage />} />} />
                     <Route path="/profile" element={<AppLayout Content={<Profile/>}/>} />
+                    <Route path="/wydatki" element={<AppLayout Content={<ExpenseSplit/>}/>} />
                     
         
                     {/* Dynamiczne mapowanie tras */}

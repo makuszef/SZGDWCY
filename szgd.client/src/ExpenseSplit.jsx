@@ -6,25 +6,35 @@ const ExpenseSplit = ({ gospodarstwoId }) => {
     const [users, setUsers] = useState([]);
     const [receipts, setReceipts] = useState([]);
     const [expenses, setExpenses] = useState([]);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
+        if (!gospodarstwoId) {
+            console.error("Brak gospodarstwoId");
+            return;
+        }
+
         // Pobranie użytkowników gospodarstwa
         const fetchUsers = async () => {
             try {
                 const response = await axios.get(`/api/Domownik/GetDomownicyGospodarstwa/${gospodarstwoId}`);
+                console.log("Użytkownicy:", response.data);
                 setUsers(response.data);
             } catch (error) {
                 console.error("Błąd podczas pobierania użytkowników gospodarstwa:", error);
+                setError("Nie udało się załadować użytkowników.");
             }
         };
 
         // Pobranie paragonów gospodarstwa
         const fetchReceipts = async () => {
             try {
-                const response = await axios.get(`/api/Paragon/GetByGospodarstwo/${gospodarstwoId}`);
+                const response = await axios.get(`/api/Paragon/ByGospodarstwo/${gospodarstwoId}`);
+                console.log("Paragony:", response.data);
                 setReceipts(response.data);
             } catch (error) {
                 console.error("Błąd podczas pobierania paragonów:", error);
+                setError("Nie udało się załadować paragonów.");
             }
         };
 
@@ -40,17 +50,22 @@ const ExpenseSplit = ({ gospodarstwoId }) => {
 
     // Funkcja do obliczania wydatków
     const calculateExpenses = () => {
-        // Zsumowanie całkowitych wydatków
-        const totalExpenses = receipts.reduce((sum, receipt) => sum + receipt.totalAmount, 0);
+        if (users.length === 0 || receipts.length === 0) {
+            setExpenses([]);
+            return;
+        }
 
-        // Podział kosztów na liczbę użytkowników
-        const splitAmount = totalExpenses / users.length;
+        // Całkowite wydatki gospodarstwa
+        const totalExpenses = receipts.reduce((sum, receipt) => sum + (receipt.totalAmount || 0), 0);
+
+        // Podział wydatków na liczbę użytkowników
+        const splitAmount = users.length > 0 ? totalExpenses / users.length : 0;
 
         // Obliczenie salda każdego użytkownika
         const userExpenses = users.map((user) => {
-            // Wydatki użytkownika (filtrujemy paragony użytkownika)
-            const userReceipts = receipts.filter((receipt) => receipt.userId === user.id);
-            const userTotal = userReceipts.reduce((sum, receipt) => sum + receipt.totalAmount, 0);
+            // Filtrujemy paragony przypisane do użytkownika
+            const userReceipts = receipts.filter((receipt) => receipt.domownikId === user.id);
+            const userTotal = userReceipts.reduce((sum, receipt) => sum + (receipt.totalAmount || 0), 0);
 
             return {
                 id: user.id,
@@ -63,31 +78,35 @@ const ExpenseSplit = ({ gospodarstwoId }) => {
         setExpenses(userExpenses);
     };
 
+    // Formatowanie waluty
+    const formatCurrency = (value) =>
+        new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(value);
+
     return (
         <Box>
             <Typography variant="h6" gutterBottom>
                 Podział wydatków gospodarstwa
             </Typography>
-
+            {error && <Typography color="error">{error}</Typography>}
             {expenses.length > 0 ? (
                 <TableContainer>
                     <Table>
                         <TableHead>
                             <TableRow>
                                 <TableCell>Użytkownik</TableCell>
-                                <TableCell>Zapłacone (PLN)</TableCell>
-                                <TableCell>Należność (PLN)</TableCell>
-                                <TableCell>Saldo (PLN)</TableCell>
+                                <TableCell>Zapłacone</TableCell>
+                                <TableCell>Należność</TableCell>
+                                <TableCell>Saldo</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {expenses.map((expense) => (
                                 <TableRow key={expense.id}>
                                     <TableCell>{expense.name}</TableCell>
-                                    <TableCell>{expense.paid.toFixed(2)}</TableCell>
-                                    <TableCell>{(expense.paid - expense.balance).toFixed(2)}</TableCell>
+                                    <TableCell>{formatCurrency(expense.paid)}</TableCell>
+                                    <TableCell>{formatCurrency(expense.paid - expense.balance)}</TableCell>
                                     <TableCell>
-                                        {expense.balance.toFixed(2)} {expense.balance < 0 ? '(Winny)' : '(Otrzymuje)'}
+                                        {formatCurrency(expense.balance)} {expense.balance < 0 ? '(Winny)' : '(Otrzymuje)'}
                                     </TableCell>
                                 </TableRow>
                             ))}

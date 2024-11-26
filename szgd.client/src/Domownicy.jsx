@@ -285,15 +285,16 @@ const Domownicy = () => {
                                         >
                                             Edytuj
                                         </Button>
-                                            <Button
+                                            </Box>}
+                                        <Button
                                             onClick={() => handleEditOpenZmienUprawnienia(domownik)}
-                                        startIcon={<EditIcon/>}
-                                        variant="outlined"
-                                        color="primary"
-                                        sx={{marginRight: 1}}
-                                    >
-                                        Zmien Uprawnienia
-                                    </Button></Box>}
+                                            startIcon={<EditIcon/>}
+                                            variant="outlined"
+                                            color="primary"
+                                            sx={{marginRight: 1}}
+                                        >
+                                            Zmien Uprawnienia
+                                        </Button>
                                         <Button
                                             onClick={() => handleDelete(domownik.id)}
                                             startIcon={<DeleteIcon />}
