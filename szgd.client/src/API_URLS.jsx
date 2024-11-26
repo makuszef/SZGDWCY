@@ -1,6 +1,6 @@
 // API_URLS.jsx
 
-const BASE_URL = "https://localhost:7191"; // Bazowy URL API
+const BASE_URL = "https://perfecthome.azurewebsites.net"; // Bazowy URL API
 
 const API_URLS = {
     AUTH: {

@@ -271,7 +271,7 @@ const ReceiptManager = () => {
 
     const handleSelectReceipt = async (receiptId) => {
         try {
-            const { data } = await axios.get(API_URLS.PARAGON.GET_BY_ID(receiptId));
+            const { data } = await axios.get(API_URLS.POZYCJAPARAGONU.GET_BY_ID(receiptId));
             setSelectedReceipt(data);
             setIsModalOpen(true);
         } catch (err) {
