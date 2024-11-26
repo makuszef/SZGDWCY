@@ -42,6 +42,7 @@ jobs:
           npm run test --if-present
           echo "Current directory content after build and test:"
           ls -la
+          pwd
 
       # Zip artifact for deployment
       - name: Zip artifact for deployment
@@ -49,6 +50,7 @@ jobs:
           zip release.zip ./* -r
           echo "Current directory content after zipping:"
           ls -la
+          pwd
 
       # Upload artifact for deployment job
       - name: Upload artifact for deployment job
@@ -95,5 +97,5 @@ jobs:
         with:
           app-name: 'PerfectHouse'
           slot-name: 'Production'
-          package: ./szgd.client/dist
+          package: ./szgd.client/out
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_303E6ADA19784E5C86ECD663833CF83E }}
