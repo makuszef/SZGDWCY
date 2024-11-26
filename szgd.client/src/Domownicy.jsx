@@ -281,15 +281,7 @@ const Domownicy = () => {
                                 </TableCell>
                                 {domownikWGospodarstwie?.czyMozeModyfikowacDomownikow && (
                                     <TableCell>
-                                        {domownik.id === user.userdata.id && <Box><Button
-                                            onClick={() => handleEditOpen(domownik)}
-                                            startIcon={<EditIcon/>}
-                                            variant="outlined"
-                                            color="primary"
-                                            sx={{marginRight: 1}}
-                                        >
-                                            Edytuj
-                                        </Button>
+                                        {domownik.id === user.userdata.id && <Box>
                                             </Box>}
                                         <Button
                                             onClick={() => handleEditOpenZmienUprawnienia(domownik)}
