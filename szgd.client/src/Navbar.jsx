@@ -134,20 +134,7 @@ const Navbar = () => {
         <AppBar>
             <Container sx={{ width: '100%' }}>
                 <Toolbar disableGutters>
-                    <Button
-                        startIcon={<LoginIcon />}
-                        onClick={() => navigate('/login')}
-                        sx={{
-                            color: 'inherit',
-                            mr: 2,
-                            '&:hover': { backgroundColor: 'transparent' },
-                            display: 'flex',
-                            alignItems: 'center',
-                            height: 40,
-                        }}
-                    >
-                        <Typography variant="h6">Login</Typography>
-                    </Button>
+                    
 
                     {user?.userdata && <Button
                         startIcon={<HomeIcon/>}
