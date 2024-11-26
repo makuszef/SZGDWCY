@@ -115,6 +115,11 @@ const Domownicy = () => {
         { field: 'actions', headerName: 'Akcje', width: 130 },
     ];
 
+    if (!gospodarstwo?.id) {
+        return <NoGospodarstwoAlert />;
+    }
+
+    // Sprawdzenie uprawnień
     if (!domownikWGospodarstwie?.czyWidziDomownikow) {
         return (
             <Alert
