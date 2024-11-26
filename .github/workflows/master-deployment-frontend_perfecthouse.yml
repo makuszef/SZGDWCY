@@ -12,9 +12,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-          APPDATA: ${{ runner.temp }}/appdata # Ustawienie zmiennej APPDATA
-
+    
     steps:
       # Checkout the repository
       - uses: actions/checkout@v4
@@ -24,8 +22,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
-      - name: Ensure APPDATA folder exists
-        run: mkdir -p $APPDATA/ASP.NET/https
+      - name: Set APPDATA and ensure folder exists
+        run: |
+          export APPDATA=$(mktemp -d) # Tworzy tymczasowy katalog
+          mkdir -p $APPDATA/ASP.NET/https
+          echo "APPDATA=$APPDATA" >> $GITHUB_ENV # Dodaje zmienną do środowiska
+      - name: Display environment variables
+        run: env # Wyświetl wszystkie zmienne środowiskowe
       # Install dependencies, build, and test
       - name: npm install, build, and test
         working-directory: ./szgd.client
