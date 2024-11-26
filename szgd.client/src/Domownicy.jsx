@@ -115,31 +115,6 @@ const Domownicy = () => {
         { field: 'actions', headerName: 'Akcje', width: 130 },
     ];
 
-    if (!gospodarstwo?.id) {
-        return <NoGospodarstwoAlert />;
-    }
-
-    // Sprawdzenie uprawnień
-    if (!domownikWGospodarstwie?.czyWidziDomownikow) {
-        return (
-            <Alert
-                severity="error"
-                icon={<WarningIcon />}
-                sx={{
-                    backgroundColor: 'rgba(255, 0, 0, 0.1)',
-                    color: 'red',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: 2,
-                    borderRadius: '8px',
-                }}
-            >
-                <Typography>Nie masz uprawnień do przeglądania domowników.</Typography>
-            </Alert>
-        );
-    }
-
     useEffect(() => {
         if (gospodarstwoId) {
             const fetchDomownicy = async () => {
@@ -223,7 +198,21 @@ const Domownicy = () => {
 
     return (
         <Box>
-        {user && gospodarstwo && gospodarstwo.id ? (<Box sx={{ width: '100%' }}>
+        {!domownikWGospodarstwie?.czyWidziDomownikow ? <Alert
+            severity="error"
+            icon={<WarningIcon />}
+            sx={{
+                backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                color: 'red',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: 2,
+                borderRadius: '8px',
+            }}
+        >
+            <Typography>Nie masz uprawnień do przeglądania domownikow.</Typography>
+        </Alert> : (user && gospodarstwo && gospodarstwo.id) ? (<Box sx={{ width: '100%' }}>
             {/*<Home sx={{ marginRight: 2 }} /> /!* Ikona domu *!/*/}
             <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
                 {/*Gospodarstwo: {gospodarstwoName || "Nie wybrano gospodarstwa"}*/}

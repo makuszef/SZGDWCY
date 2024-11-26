@@ -153,31 +153,7 @@ const Sprzet = () => {
             ),
         },
     ];
-
-    if (!gospodarstwo?.id) {
-        return <NoGospodarstwoAlert />;
-    }
-
-    // Sprawdzenie uprawnień
-    if (!domownikWGospodarstwie?.czyWidziSprzet) {
-        return (
-            <Alert
-                severity="error"
-                icon={<WarningIcon />}
-                sx={{
-                    backgroundColor: 'rgba(255, 0, 0, 0.1)',
-                    color: 'red',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: 2,
-                    borderRadius: '8px',
-                }}
-            >
-                <Typography>Nie masz uprawnień do przeglądania sprzętu.</Typography>
-            </Alert>
-        );
-    }
+    
 
     useEffect(() => {
         if (gospodarstwo?.id) {
@@ -345,7 +321,21 @@ const Sprzet = () => {
 
     return (
         <Box>
-        {gospodarstwo?.id ? (<Box sx={{ width: '1000px' }}>
+        {!domownikWGospodarstwie.czyWidziSprzet ? <Alert
+            severity="error"
+            icon={<WarningIcon />}
+            sx={{
+                backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                color: 'red',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: 2,
+                borderRadius: '8px',
+            }}
+        >
+            <Typography>Nie masz uprawnień do przeglądania sprzętu.</Typography>
+        </Alert> : gospodarstwo?.id ? (<Box sx={{ width: '1000px' }}>
             {resources != null && resources.length > 0 ? (
                 <TableTemplate
                     passedResources={resources}
