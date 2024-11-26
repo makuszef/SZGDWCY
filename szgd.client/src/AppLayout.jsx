@@ -25,6 +25,7 @@ const MainCards = [
     { title: 'Kontrola okien', icon: <WindowIcon />, route: "/kontrola-okien", component: <div>Kontrola okien</div> },
     { title: 'Domownicy', icon: <PeopleIcon />, route: "/domownicy", component: <div>Domownicy</div> },
     { title: 'Gospodarstwa', icon: <HomeIcon />, route: "/gospodarstwa", component: <div>Gospodarstwa</div>},
+
 ];
 
 const AppLayout = ({ Content, Cards }) => {
