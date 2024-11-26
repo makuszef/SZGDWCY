@@ -83,7 +83,11 @@ jobs:
           unzip release.zip
           echo "Current directory content after unzipping:"
           ls -la
-
+      - name: Check pwd
+        run: |
+          pwd
+          echo "Current directory content after zipping:"
+          ls -la
       # Deploy to Azure Web App
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -91,5 +95,5 @@ jobs:
         with:
           app-name: 'PerfectHouse'
           slot-name: 'Production'
-          package: .
+          package: ./dist
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_303E6ADA19784E5C86ECD663833CF83E }}
