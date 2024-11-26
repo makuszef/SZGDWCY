@@ -12,6 +12,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+          APPDATA: ${{ runner.temp }}/appdata # Ustawienie zmiennej APPDATA
 
     steps:
       # Checkout the repository
@@ -22,7 +24,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
-
+      - name: Ensure APPDATA folder exists
+        run: mkdir -p $APPDATA/ASP.NET/https
       # Install dependencies, build, and test
       - name: npm install, build, and test
         working-directory: ./szgd.client
