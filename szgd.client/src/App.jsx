@@ -41,6 +41,7 @@ const MainCards = [
     { title: 'Gospodarstwa', icon: <HomeIcon />, route: "/gospodarstwa", component: <Gospodarstwo/>},
 ];
 const userinfo = localStorage.getItem('user');
+const files = 2;
 function App() {
     return (
         <Provider store={store}>
