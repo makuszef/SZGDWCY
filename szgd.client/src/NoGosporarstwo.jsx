@@ -22,7 +22,7 @@ const NoGospodarstwoAlert = () => {
             </Alert>) : 
                 <Alert severity="warning" sx={{ margin: 2 }}>
                 <AlertTitle>Brak wybranego gospodarstwa</AlertTitle>
-                Wybierz gospodarstwo, aby kontynuować. Jeśli nie wybrałeś gospodarstwa.
+                Wybierz gospodarstwo, aby kontynuować.
             </Alert>}
         </Box>
         

@@ -29,6 +29,7 @@ import AddIcon from '@mui/icons-material/Add';
 import NoGospodarstwoAlert from "@/NoGosporarstwo.jsx";
 import API_URLS from "@/API_URLS.jsx";
 import WarningIcon from '@mui/icons-material/Warning';
+
 /**
  * Komponent Sprzet zarządza sprzętem w gospodarstwie, umożliwia dodawanie, edytowanie, usuwanie i przeglądanie historii sprzętu.
  * Używa komponentów Material-UI oraz integracji z API.
@@ -153,6 +154,11 @@ const Sprzet = () => {
         },
     ];
 
+    if (!gospodarstwo?.id) {
+        return <NoGospodarstwoAlert />;
+    }
+
+    // Sprawdzenie uprawnień
     if (!domownikWGospodarstwie?.czyWidziSprzet) {
         return (
             <Alert
