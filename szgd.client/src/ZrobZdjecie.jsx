@@ -9,6 +9,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import UndoIcon from '@mui/icons-material/Undo';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import {useAuth} from "@/AuthContext.jsx";
+import API_URLS from "@/API_URLS.jsx";
 /**
  * CameraComponent allows the user to capture a photo using the device's rear camera,
  * upload it to a server, and retake the photo if needed.
@@ -149,7 +150,7 @@ const CameraComponent = ({ gospodarstwoId, onCompletion }) => {
 
         try {
             const response = await axios.post(
-                `https://localhost:7191/api/AnalizeFile/upload/${gospodarstwoId}`,
+                API_URLS.ANALIZE_FILE.POST(gospodarstwoId),
                 formData,
                 {
                     headers: { 'Content-Type': 'multipart/form-data' },

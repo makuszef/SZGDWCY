@@ -104,7 +104,7 @@ export default function Sidebar({ ListItems }) {
                     <ListItemIcon>
                         {item.icon}
                     </ListItemIcon>
-                    {!isMobile ? <ListItemText primary={item.title} /> : <div></div>}
+                    {!isMobile ? <ListItemText sx={{ color: 'white' }} primary={item.title} /> : <div></div>}
                 </ListItemButton>
             ))}
         </List>
