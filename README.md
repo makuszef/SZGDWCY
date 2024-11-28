@@ -83,3 +83,6 @@ Przykładowa struktura:
 - **Path**: `/sprzet` (endpoint react).
 - **Komponent**: `UserList.js`
 - **Endpoint**: `/api/users` (serwer ASP.NET).
+
+Prezentacja aplilacji
+[![Film na YouTube](https://img.youtube.com/vi/zB424tai7kg/0.jpg)](https://youtu.be/zB424tai7kg)
