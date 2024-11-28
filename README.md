@@ -84,5 +84,11 @@ Przykładowa struktura:
 - **Komponent**: `UserList.js`
 - **Endpoint**: `/api/users` (serwer ASP.NET).
 
-Prezentacja aplilacji
-[![Film na YouTube](https://img.youtube.com/vi/zB424tai7kg/0.jpg)](https://youtu.be/zB424tai7kg)
+<h2 align="center">Prezentacja aplikacji</h2>
+
+<p align="center">
+  <a href="https://youtu.be/zB424tai7kg">
+    <img src="https://img.youtube.com/vi/zB424tai7kg/0.jpg" alt="Film na YouTube" style="width:100%; max-width:800px;">
+  </a>
+</p>
+
